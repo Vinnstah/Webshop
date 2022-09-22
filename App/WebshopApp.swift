@@ -7,15 +7,18 @@
 
 import SwiftUI
 import AppFeature
+import ComposableArchitecture
 
 @main
-struct WebshopApp: App {
+struct WebshopApp: SwiftUI.App {
+    
     var body: some Scene {
         WindowGroup {
-            TestView()
+            App.View(store: Store.init(initialState: .init(), reducer: App()))
 #if os(macOS)
                 .frame(minWidth: 1024, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 #endif
         }
     }
 }
+

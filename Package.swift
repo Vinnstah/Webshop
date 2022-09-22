@@ -2,6 +2,7 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+let tca: Target.Dependency = .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
 
 let package = Package(
     name: "Webshop",
@@ -13,6 +14,7 @@ let package = Package(
             targets: ["AppFeature"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "protocol-beta"),
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
@@ -21,7 +23,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "AppFeature",
-            dependencies: []),
+            dependencies: [tca]),
         .testTarget(
             name: "WebshopTests",
             dependencies: ["AppFeature"]),

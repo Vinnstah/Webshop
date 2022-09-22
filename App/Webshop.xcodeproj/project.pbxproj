@@ -7,19 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E5AA5DDE28DCDA51003B0F52 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5AA5DD928DCDA51003B0F52 /* ContentView.swift */; };
 		E5AA5DDF28DCDA51003B0F52 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5AA5DDA28DCDA51003B0F52 /* Assets.xcassets */; };
 		E5AA5DE028DCDA51003B0F52 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5AA5DDC28DCDA51003B0F52 /* Preview Assets.xcassets */; };
 		E5AA5DE128DCDA51003B0F52 /* WebshopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5AA5DDD28DCDA51003B0F52 /* WebshopApp.swift */; };
+		E5AA5DE628DCDC0C003B0F52 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E5AA5DE528DCDC0C003B0F52 /* AppFeature */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		E515028E28DCD984002E6F0D /* Webshop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Webshop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5AA5DD828DCDA51003B0F52 /* Webshop.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Webshop.entitlements; sourceTree = "<group>"; };
-		E5AA5DD928DCDA51003B0F52 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E5AA5DDA28DCDA51003B0F52 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E5AA5DDC28DCDA51003B0F52 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		E5AA5DDD28DCDA51003B0F52 /* WebshopApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebshopApp.swift; sourceTree = "<group>"; };
+		E5AA5DE328DCDB9A003B0F52 /* Webshop */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Webshop; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5AA5DE628DCDC0C003B0F52 /* AppFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -36,12 +37,13 @@
 		E515028528DCD984002E6F0D = {
 			isa = PBXGroup;
 			children = (
+				E5AA5DE228DCDB9A003B0F52 /* Packages */,
 				E5AA5DDA28DCDA51003B0F52 /* Assets.xcassets */,
-				E5AA5DD928DCDA51003B0F52 /* ContentView.swift */,
 				E5AA5DDB28DCDA51003B0F52 /* Preview Content */,
 				E5AA5DD828DCDA51003B0F52 /* Webshop.entitlements */,
 				E5AA5DDD28DCDA51003B0F52 /* WebshopApp.swift */,
 				E515028F28DCD984002E6F0D /* Products */,
+				E5AA5DE428DCDC0C003B0F52 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,6 +63,21 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		E5AA5DE228DCDB9A003B0F52 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				E5AA5DE328DCDB9A003B0F52 /* Webshop */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		E5AA5DE428DCDC0C003B0F52 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -75,8 +92,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				E5AA5DE828DCDC15003B0F52 /* PBXTargetDependency */,
 			);
 			name = Webshop;
+			packageProductDependencies = (
+				E5AA5DE528DCDC0C003B0F52 /* AppFeature */,
+			);
 			productName = Webshop;
 			productReference = E515028E28DCD984002E6F0D /* Webshop.app */;
 			productType = "com.apple.product-type.application";
@@ -133,11 +154,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				E5AA5DE128DCDA51003B0F52 /* WebshopApp.swift in Sources */,
-				E5AA5DDE28DCDA51003B0F52 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E5AA5DE828DCDC15003B0F52 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E5AA5DE728DCDC15003B0F52 /* AppFeature */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E515029B28DCD986002E6F0D /* Debug */ = {
@@ -350,6 +377,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E5AA5DE528DCDC0C003B0F52 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
+		};
+		E5AA5DE728DCDC15003B0F52 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E515028628DCD984002E6F0D /* Project object */;
 }

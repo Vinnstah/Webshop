@@ -12,6 +12,9 @@ let package = Package(
         .library(
             name: "AppFeature",
             targets: ["AppFeature"]),
+        .library(
+            name: "SplashFeature",
+            targets: ["SplashFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "protocol-beta"),
@@ -23,9 +26,18 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "AppFeature",
+            dependencies: [
+                tca,
+                "SplashFeature"
+            ]),
+        .testTarget(
+            name: "AppFeatureTests",
+            dependencies: ["AppFeature"]),
+        .target(
+            name: "SplashFeature",
             dependencies: [tca]),
         .testTarget(
-            name: "WebshopTests",
-            dependencies: ["AppFeature"]),
+            name: "SplashFeatureTests",
+            dependencies: ["SplashFeature"]),
     ]
 )

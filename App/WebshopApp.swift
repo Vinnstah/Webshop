@@ -14,7 +14,11 @@ struct WebshopApp: SwiftUI.App {
     
     var body: some Scene {
         WindowGroup {
-            App.View(store: Store.init(initialState: .init(), reducer: App()))
+            App.View(store:
+                        Store(initialState: .init(), reducer: App().debug())
+                             )
+            
+                
 #if os(macOS)
                 .frame(minWidth: 1024, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 #endif

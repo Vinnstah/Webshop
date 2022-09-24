@@ -5,4 +5,5 @@ final class SplashFeatureTests: XCTestCase {
     func testTrivial() throws {
         XCTAssert(true)
     }
+
 }

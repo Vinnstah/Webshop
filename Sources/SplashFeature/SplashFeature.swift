@@ -42,6 +42,7 @@ public extension Splash {
         
         public enum InternalAction: Equatable, Sendable {
             case onAppear
+            case setIsLoggedInToFalse
         }
     }
     
@@ -65,6 +66,10 @@ public extension Splash {
                     )
                 }
                 
+            case .internal(.setIsLoggedInToFalse):
+                return .run { send in
+                    await userDefaultsClient.setIsLoggedIn(false)
+                }
             }
         }
         
@@ -86,6 +91,10 @@ public extension Splash {
                         viewStore.send(.internal(.onAppear))
                     }
                     .background(Color.red)
+                
+                Button("Log out user") {
+                    viewStore.send(.internal(.setIsLoggedInToFalse))
+                }
             }
         }
     }

@@ -20,6 +20,9 @@ let package = Package(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
+            name: "OnboardingFeature",
+            targets: ["OnboardingFeature"]),
+        .library(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
         .library(
@@ -38,6 +41,7 @@ let package = Package(
             name: "AppFeature",
             dependencies: [
                 tca,
+                "OnboardingFeature",
                 "SplashFeature",
             ],
             swiftSettings: swiftSettings
@@ -45,6 +49,19 @@ let package = Package(
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
+        
+        .target(
+            name: "OnboardingFeature",
+            dependencies: [
+                tca,
+                "UserDefaultsClient",
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "OnboardingFeatureTests",
+            dependencies: ["OnboardingFeature"]),
+        
         .target(
             name: "SplashFeature",
             dependencies: [
@@ -56,6 +73,7 @@ let package = Package(
         .testTarget(
             name: "SplashFeatureTests",
             dependencies: ["SplashFeature"]),
+        
         .target(
             name: "UserDefaultsClient",
             dependencies: [tca],

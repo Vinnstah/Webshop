@@ -8,27 +8,45 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
+import SplashFeature
 
 public struct App: ReducerProtocol {
     public init() {}
 }
 
 public extension App {
-    struct State {
-        public init(){}
+    enum State: Equatable {
+        case splash(Splash.State)
+        public init() { self = .splash(.init())}
     }
-    enum Action {}
+    enum Action: Equatable {
+        case splash(Splash.Action)
+    }
     
     
     var body: some ReducerProtocol<State, Action> {
+
         Reduce { state, action in
             switch action {
+                
+            case .splash(.delegate(.loadIsLoggedInResult(.isLoggedIn))):
+                return .none
+                
+            case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
+                return .none
+                
             default: return .none
             }
         }
-        
+        .ifCaseLet(
+                   /State.splash,
+                    action: /Action.splash
+               ) {
+                   Splash()
+               }
     }
 }
+
 
 public extension App {
     struct View: SwiftUI.View {
@@ -39,7 +57,13 @@ public extension App {
         }
         
         public var body: some SwiftUI.View {
-            Text("TEST")
+            SwitchStore(self.store) {
+                CaseLet(
+                    state: /App.State.splash,
+                    action: App.Action.splash,
+                    then: Splash.View.init
+                )
+            }
         }
         
     }

@@ -1,8 +1,8 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-22.
-//
+import XCTest
+@testable import UserDefaultsClient
 
-import Foundation
+final class UserDefaultsClientTests: XCTestCase {
+    func testTrivial() throws {
+        XCTAssert(true)
+    }
+}

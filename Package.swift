@@ -4,6 +4,13 @@
 import PackageDescription
 let tca: Target.Dependency = .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
 
+var swiftSettings: [SwiftSetting] = [
+    .unsafeFlags([
+        "-Xfrontend", "-warn-concurrency",
+        "-Xfrontend", "-enable-actor-data-race-checks",
+    ])
+]
+
 let package = Package(
     name: "Webshop",
     platforms: [.iOS(.v15), .macOS(.v12)],
@@ -15,6 +22,9 @@ let package = Package(
         .library(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
+        .library(
+            name: "UserDefaultsClient",
+            targets: ["UserDefaultsClient"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "protocol-beta"),
@@ -28,16 +38,31 @@ let package = Package(
             name: "AppFeature",
             dependencies: [
                 tca,
-                "SplashFeature"
-            ]),
+                "SplashFeature",
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
         .target(
             name: "SplashFeature",
-            dependencies: [tca]),
+            dependencies: [
+                tca,
+                "UserDefaultsClient",
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "SplashFeatureTests",
             dependencies: ["SplashFeature"]),
+        .target(
+            name: "UserDefaultsClient",
+            dependencies: [tca],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "UserDefaultsClientTests",
+            dependencies: ["UserDefaultsClient"]),
     ]
 )

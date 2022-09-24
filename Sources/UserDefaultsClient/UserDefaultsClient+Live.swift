@@ -1,9 +1,10 @@
 import Foundation
+import ComposableArchitecture
 
 extension UserDefaultsClient {
     public static func live(
-        userDefaults: @autoclosure @escaping () -> UserDefaults = UserDefaults(
-            suiteName: "group.isowords"
+        userDefaults: @Sendable @autoclosure @escaping () -> UserDefaults = UserDefaults(
+            suiteName: "group.webshop"
         )!
     ) -> Self {
         Self(
@@ -17,5 +18,17 @@ extension UserDefaultsClient {
             setDouble: { userDefaults().set($0, forKey: $1) },
             setInteger: { userDefaults().set($0, forKey: $1) }
         )
+    }
+}
+
+private enum UserDefaultsClientKey: DependencyKey {
+    typealias Value = UserDefaultsClient
+    static let liveValue = UserDefaultsClient.live()
+    static let testValue = UserDefaultsClient.unimplemented
+}
+public extension DependencyValues {
+    var userDefaultsClient: UserDefaultsClient {
+        get { self[UserDefaultsClientKey.self] }
+        set { self[UserDefaultsClientKey.self] = newValue }
     }
 }

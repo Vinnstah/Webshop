@@ -62,7 +62,7 @@ public extension Onboarding {
                               )
                     )
                     .padding()
-                    //
+
                     SecureField("Password",
                                 text: viewStore.binding(
                                     get: { $0.passwordField },
@@ -137,6 +137,15 @@ public extension Onboarding {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 Text("View to fill in all information")
+                
+                Picker("Default Currency", selection: viewStore.binding(
+                    get: { $0.defaultCurrency },
+                    send: { .defaultCurrencyChosen(currency: $0) }
+                  )
+                ) {
+                    Text("USD")
+                    Text("SEK")
+                }
                 
                 Button("Next step") {
                     viewStore.send(.nextStep)

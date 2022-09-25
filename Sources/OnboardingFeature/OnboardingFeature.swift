@@ -21,29 +21,32 @@ public struct Onboarding: ReducerProtocol {
 
 public extension Onboarding {
     
-    struct State: Equatable {
+    struct State: Equatable, Sendable {
         public var step: Step
         public var emailAddressField: String
         public var passwordField: String
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
+        public var defaultCurrency: String
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
             emailAddressField: String = "",
             passwordField: String = "",
             isLoginInFlight: Bool = false,
-            areTermsAndConditionsAccepted: Bool = false
+            areTermsAndConditionsAccepted: Bool = false,
+            defaultCurrency: String = "SEK"
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
             self.passwordField = passwordField
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
+            self.defaultCurrency = defaultCurrency
         }
         
         
-        public enum Step: Int, Equatable, CaseIterable, Comparable {
+        public enum Step: Int, Equatable, CaseIterable, Comparable, Sendable {
             case step0_LoginOrCreateUser
             case step1_Welcome
             case step2_FillInYourInformation
@@ -73,6 +76,7 @@ public extension Onboarding {
         case previousStep
         case finishSignUp
         case termsAndConditionsBoxPressed
+        case defaultCurrencyChosen(currency: String)
     }
     
     var body: some ReducerProtocol<State, Action> {
@@ -105,14 +109,18 @@ public extension Onboarding {
                 return .none
                 
             case .finishSignUp:
-                return .run { [userDefaultsClient] _ in
+                return .run { [userDefaultsClient, currency = state.defaultCurrency] _ in
                     await userDefaultsClient.setIsLoggedIn(true)
+                    await userDefaultsClient.setDefaultCurrency(currency)
                 }
                 
             case .termsAndConditionsBoxPressed:
                 state.areTermsAndConditionsAccepted.toggle()
                 return .none
                 
+            case let .defaultCurrencyChosen(currency):
+                state.defaultCurrency = currency
+                return .none
             }
         }
     }

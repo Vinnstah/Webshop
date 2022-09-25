@@ -12,11 +12,13 @@ extension UserDefaultsClient {
             dataForKey: { userDefaults().data(forKey: $0) },
             doubleForKey: { userDefaults().double(forKey: $0) },
             integerForKey: { userDefaults().integer(forKey: $0) },
+            stringForKey: { userDefaults().string(forKey: $0) ?? "" },
             remove: { userDefaults().removeObject(forKey: $0) },
             setBool: { userDefaults().set($0, forKey: $1) },
             setData: { userDefaults().set($0, forKey: $1) },
             setDouble: { userDefaults().set($0, forKey: $1) },
-            setInteger: { userDefaults().set($0, forKey: $1) }
+            setInteger: { userDefaults().set($0, forKey: $1) },
+            setString: { userDefaults().set($0, forKey: $1) }
         )
     }
 }

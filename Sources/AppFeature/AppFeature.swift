@@ -10,8 +10,10 @@ import SwiftUI
 import ComposableArchitecture
 import SplashFeature
 import OnboardingFeature
+import MainFeature
 
 public struct App: ReducerProtocol {
+    @Dependency(\.userDefaultsClient) var userDefaultsClient
     public init() {}
 }
 
@@ -19,14 +21,17 @@ public extension App {
     enum State: Equatable {
         case splash(Splash.State)
         case onboarding(Onboarding.State)
+        case main(Main.State)
         
         public init() {
             self = .splash(.init())
         }
     }
-    enum Action: Equatable {
+    enum Action: Equatable, Sendable {
         case splash(Splash.Action)
         case onboarding(Onboarding.Action)
+        case main(Main.Action)
+        case userIsLoggedIn(currency: String)
     }
     
     
@@ -36,6 +41,12 @@ public extension App {
             switch action {
                 
             case .splash(.delegate(.loadIsLoggedInResult(.isLoggedIn))):
+                return .run { [userDefaultsClient] send in
+                    await send(.userIsLoggedIn(currency: userDefaultsClient.getDefaultCurrency()))
+                }
+                
+            case let .userIsLoggedIn(currency: currency):
+                state = .main(.init(defaultCurrency: currency))
                 return .none
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
@@ -57,7 +68,12 @@ public extension App {
         ) {
             Onboarding()
         }
-
+        .ifCaseLet(
+            /State.main,
+             action: /Action.main
+        ) {
+            Main()
+        }
         
     }
 }
@@ -81,6 +97,11 @@ public extension App {
                 state: /App.State.onboarding,
                 action: App.Action.onboarding),
                        then:Onboarding.View.init(store:)
+            )
+            IfLetStore(self.store.scope(
+                state: /App.State.main,
+                action: App.Action.main),
+                       then:Main.View.init(store:)
             )
             
         }

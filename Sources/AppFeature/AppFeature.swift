@@ -41,6 +41,7 @@ public extension App {
             switch action {
                 
             case .splash(.delegate(.loadIsLoggedInResult(.isLoggedIn))):
+                /// Should maybe be moved to Splash?
                 return .run { [userDefaultsClient] send in
                     await send(.userIsLoggedIn(currency: userDefaultsClient.getDefaultCurrency()))
                 }
@@ -105,16 +106,6 @@ public extension App {
             )
             
         }
-        //        public var body: some SwiftUI.View {
-        //            SwitchStore(self.store) {
-        //                CaseLet(
-        //                    state: /App.State.splash,
-        //                    action: App.Action.splash,
-        //                    then: Splash.View.init
-        //                )
-        //            }
-        //        }
-        
     }
 }
 

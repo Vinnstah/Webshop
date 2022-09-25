@@ -15,6 +15,7 @@ import UserDefaultsClient
 
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
+    
     public init() {}
 }
 
@@ -25,17 +26,20 @@ public extension Onboarding {
         public var emailAddressField: String
         public var passwordField: String
         public var isLoginInFlight: Bool
+        public var areTermsAndConditionsAccepted: Bool
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
             emailAddressField: String = "",
             passwordField: String = "",
-            isLoginInFlight: Bool = false
+            isLoginInFlight: Bool = false,
+            areTermsAndConditionsAccepted: Bool = false
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
             self.passwordField = passwordField
             self.isLoginInFlight = isLoginInFlight
+            self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
         }
         
         
@@ -68,6 +72,7 @@ public extension Onboarding {
         case nextStep
         case previousStep
         case finishSignUp
+        case termsAndConditionsBoxPressed
     }
     
     var body: some ReducerProtocol<State, Action> {
@@ -100,145 +105,17 @@ public extension Onboarding {
                 return .none
                 
             case .finishSignUp:
-                return .run { _ in
+                return .run { [userDefaultsClient] _ in
                     await userDefaultsClient.setIsLoggedIn(true)
                 }
-            }
-        }
-    }
-}
-
-
-public extension Onboarding {
-    struct View: SwiftUI.View {
-        
-        public let store: StoreOf<Onboarding>
-        
-        public init(store: StoreOf<Onboarding>) {
-            self.store = store
-        }
-        
-        public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
-                Group {
-                    if viewStore.state.step == .step0_LoginOrCreateUser {
-                        OnboardingLoginView(store: store)
-                    }
-                    if viewStore.state.step == .step1_Welcome {
-                        OnboardingSignUpView(store: store)
-                    }
-                    if viewStore.state.step == .step2_FillInYourInformation {
-                        Text("View to fill in all information")
-                        
-                        Button("Next step") {
-                            viewStore.send(.nextStep)
-                        }
-                        if viewStore.state.step != .step1_Welcome {
-                            Button("Previous Step") { viewStore.send(.previousStep)}
-                        }
-                    }
-                    if viewStore.state.step == .step3_UsernameAndPassword {
-                        Text("View to set Username and Password")
-                        
-                        Button("Next step") {
-                            viewStore.send(.nextStep)
-                        }
-                        if viewStore.state.step != .step1_Welcome {
-                            Button("Previous Step") { viewStore.send(.previousStep)}
-                        }
-                    }
-                    if viewStore.state.step == .step4_TermsAndConditions {
-                        Text("Accept T&C")
-                        
-                        Button("Finish Sign Up") {
-                            viewStore.send(.finishSignUp)
-                        }
-                        if viewStore.state.step != .step1_Welcome {
-                            Button("Previous Step") { viewStore.send(.previousStep)}
-                        }
-                    }
-                }
-            }
-            
-            
-        }
-    }
-}
-
-public struct OnboardingLoginView: SwiftUI.View {
-    public let store: StoreOf<Onboarding>
-    
-    public init(store: StoreOf<Onboarding>) {
-        self.store = store
-    }
-    
-    public var body: some SwiftUI.View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            VStack {
-                TextField("Email",
-                          text: viewStore.binding(
-                            get: { $0.emailAddressField },
-                            send: { .emailAddressFieldReceivingInput(text: $0) }
-                          )
-                )
-                .padding()
-                //
-                SecureField("Password",
-                            text: viewStore.binding(
-                                get: { $0.passwordField },
-                                send: { .passwordFieldReceivingInput(text: $0) }
-                            )
-                )
-                .padding()
                 
-                Button("Login") {
-                    viewStore.send(.loginButtonPressed)
-                }
-                
-                Button("Sign Up") {
-                    viewStore.send(.signUpButtonPressed)
-                }
-            }
-        }
-    }
-}
-
-public struct OnboardingSignUpView: SwiftUI.View {
-    public let store: StoreOf<Onboarding>
-    
-    public init(store: StoreOf<Onboarding>) {
-        self.store = store
-    }
-    
-    public var body: some SwiftUI.View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            Text("WELCOME TO SIGNUP")
-            VStack {
-                TextField("Email",
-                          text: viewStore.binding(
-                            get: { $0.emailAddressField },
-                            send: { .emailAddressFieldReceivingInput(text: $0) }
-                          )
-                )
-                .padding()
-                //
-                SecureField("Password",
-                            text: viewStore.binding(
-                                get: { $0.passwordField },
-                                send: { .passwordFieldReceivingInput(text: $0) }
-                            )
-                )
-                .padding()
-                HStack {
-                    Button("Next step") {
-                        viewStore.send(.nextStep)
-                    }
-                    if viewStore.state.step != .step1_Welcome {
-                        Button("Previous Step") { viewStore.send(.previousStep)}
-                    }
-                }
+            case .termsAndConditionsBoxPressed:
+                state.areTermsAndConditionsAccepted.toggle()
+                return .none
                 
             }
         }
     }
 }
+
+

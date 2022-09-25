@@ -67,7 +67,7 @@ public extension Splash {
                 }
                 
             case .internal(.setIsLoggedInToFalse):
-                return .run { send in
+                return .run { [userDefaultsClient] send in
                     await userDefaultsClient.setIsLoggedIn(false)
                 }
             }

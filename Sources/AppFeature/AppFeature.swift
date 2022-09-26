@@ -49,7 +49,7 @@ public extension App {
                         )
                     )
                 }
-                
+//
             case let .userIsLoggedIn(currency):
                 state = .main(.init(defaultCurrency: currency.rawValue))
                 return .none

@@ -22,25 +22,40 @@ public extension Onboarding {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 Group {
-                    if viewStore.state.step == .step0_LoginOrCreateUser {
+                    switch viewStore.step {
+                    case .step0_LoginOrCreateUser:
                         Onboarding.LoginView(store: store)
-                    }
-                    if viewStore.state.step == .step1_Welcome {
+                        
+                    case .step1_Welcome:
                         Onboarding.WelcomeView(store: store)
-                    }
-                    if viewStore.state.step == .step2_FillInYourInformation {
+                        
+                    case .step2_FillInYourInformation:
                         Onboarding.PersonalInformationView(store: store)
-                    }
-                    if viewStore.state.step == .step3_UsernameAndPassword {
+                        
+                    case .step3_UsernameAndPassword:
                         Onboarding.CredentialsView(store: store)
-                    }
-                    if viewStore.state.step == .step4_TermsAndConditions {
+                        
+                    case .step4_TermsAndConditions:
                         Onboarding.TermsAndConditionsView(store: store)
                     }
+                    //
+                    //                    if viewStore.state.step == .step0_LoginOrCreateUser {
+                    //                        Onboarding.LoginView(store: store)
+                    //                    }
+                    //                    if viewStore.state.step == .step1_Welcome {
+                    //                        Onboarding.WelcomeView(store: store)
+                    //                    }
+                    //                    if viewStore.state.step == .step2_FillInYourInformation {
+                    //                        Onboarding.PersonalInformationView(store: store)
+                    //                    }
+                    //                    if viewStore.state.step == .step3_UsernameAndPassword {
+                    //                        Onboarding.CredentialsView(store: store)
+                    //                    }
+                    //                    if viewStore.state.step == .step4_TermsAndConditions {
+                    //                        Onboarding.TermsAndConditionsView(store: store)
+                    //                    }
                 }
             }
-            
-            
         }
     }
 }
@@ -63,7 +78,7 @@ public extension Onboarding {
                               )
                     )
                     .padding()
-
+                    
                     SecureField("Password",
                                 text: viewStore.binding(
                                     get: { $0.passwordField },
@@ -73,13 +88,14 @@ public extension Onboarding {
                     .padding()
                     
                     Button("Login") {
-                        viewStore.send(.loginButtonPressed)
+                        viewStore.send(.loginButtonPressed, animation: .default)
                     }
                     
                     Button("Sign Up") {
                         viewStore.send(.signUpButtonPressed)
                     }
                 }
+                
             }
         }
     }
@@ -117,10 +133,17 @@ public extension Onboarding {
                             viewStore.send(.nextStep)
                         }
                         if viewStore.state.step != .step1_Welcome {
-                            Button("Previous Step") { viewStore.send(.previousStep)}
+                            Button("Previous Step") { viewStore.send(.previousStep, animation: .easeIn(duration: 1.0))}
                         }
                     }
                     
+                }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            viewStore.send(.goBackToLoginView)
+                        }
+                    }
                 }
             }
         }
@@ -149,12 +172,20 @@ public extension Onboarding {
                             Text($0.rawValue)
                         }
                     }
+                    .padding()
                     
                     Button("Next step") {
                         viewStore.send(.nextStep)
                     }
                     if viewStore.state.step != .step1_Welcome {
                         Button("Previous Step") { viewStore.send(.previousStep)}
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            viewStore.send(.goBackToLoginView)
+                        }
                     }
                 }
             }
@@ -172,13 +203,22 @@ public extension Onboarding {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
-                Text("View to set Username and Password")
-                
-                Button("Next step") {
-                    viewStore.send(.nextStep)
+                VStack {
+                    Text("View to set Username and Password")
+                    
+                    Button("Next step") {
+                        viewStore.send(.nextStep)
+                    }
+                    if viewStore.state.step != .step1_Welcome {
+                        Button("Previous Step") { viewStore.send(.previousStep)}
+                    }
                 }
-                if viewStore.state.step != .step1_Welcome {
-                    Button("Previous Step") { viewStore.send(.previousStep)}
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            viewStore.send(.goBackToLoginView)
+                        }
+                    }
                 }
             }
         }
@@ -187,7 +227,7 @@ public extension Onboarding {
 
 public extension Onboarding {
     struct TermsAndConditionsView: SwiftUI.View {
-
+        
         public let store: StoreOf<Onboarding>
         
         public init(store: StoreOf<Onboarding>) {
@@ -196,30 +236,39 @@ public extension Onboarding {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
-                ScrollView(.vertical) {
-                    Text("""
+                VStack {
+                    ScrollView(.vertical) {
+                        Text("""
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                         """)
-                }
-                .frame(width: 200, height: 400)
-                
-                HStack {
-                    Text("Accept Terms and Conditions")
+                    }
+                    .frame(width: 200, height: 400)
                     
-                    /// This variable should be in a ViewState instead?
-                    Image(systemName: viewStore.state.areTermsAndConditionsAccepted ? "checkmark.square" : "square")
-                        .onTapGesture {
-                            viewStore.send(.termsAndConditionsBoxPressed)
+                    HStack {
+                        Text("Accept Terms and Conditions")
+                        
+                        /// This variable should be in a ViewState instead?
+                        Image(systemName: viewStore.state.areTermsAndConditionsAccepted ? "checkmark.square" : "square")
+                            .onTapGesture {
+                                viewStore.send(.termsAndConditionsBoxPressed)
+                            }
+                    }
+                    
+                    Button("Finish Sign Up") {
+                        viewStore.send(.finishSignUp)
+                    }
+                    .disabled(!viewStore.areTermsAndConditionsAccepted)
+                    
+                    if viewStore.state.step != .step1_Welcome {
+                        Button("Previous Step") { viewStore.send(.previousStep)}
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            viewStore.send(.goBackToLoginView)
                         }
-                }
-                
-                Button("Finish Sign Up") {
-                    viewStore.send(.finishSignUp)
-                }
-                .disabled(!viewStore.areTermsAndConditionsAccepted)
-                
-                if viewStore.state.step != .step1_Welcome {
-                    Button("Previous Step") { viewStore.send(.previousStep)}
+                    }
                 }
             }
         }

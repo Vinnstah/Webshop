@@ -36,6 +36,8 @@ public extension UserDefaultsClient {
     }
 }
 
+//TODO: Implement User model with local settings.
+/// Not sure where to place this. Should maybe be part of a User model with other local settings.
 public enum DefaultCurrency: String, Equatable, Sendable, CaseIterable {
     case SEK = "SEK"
     case USD = "USD"

@@ -79,6 +79,7 @@ public extension Onboarding {
         case termsAndConditionsBoxPressed
         case defaultCurrencyChosen(DefaultCurrency)
         case delegate(DelegateAction)
+        case goBackToLoginView
         
         public enum DelegateAction: Equatable, Sendable {
             case userFinishedOnboarding(DefaultCurrency)
@@ -122,8 +123,7 @@ public extension Onboarding {
                     
                     try await mainQueue.sleep(for: .milliseconds(700))
                     await send(.delegate(.userFinishedOnboarding(currency)))
-                    
-                    
+
                 }
                 
             case .termsAndConditionsBoxPressed:
@@ -135,6 +135,10 @@ public extension Onboarding {
                 return .none
                 
             case .delegate(_):
+                return .none
+                
+            case .goBackToLoginView:
+                state = .init()
                 return .none
             }
         }

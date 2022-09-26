@@ -67,10 +67,17 @@ public extension Main {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
-                Text("Main Feature goes here")
-                
-                Button("Log out user") {
-                    viewStore.send(.internal(.logOutUser))
+                VStack {
+                    Text("Main Feature goes here")
+                    
+                    HStack {
+                        Text("Default currency: ")
+                        Text(viewStore.state.defaultCurreny)
+                    }
+                    
+                    Button("Log out user") {
+                        viewStore.send(.internal(.logOutUser))
+                    }
                 }
             }
         }

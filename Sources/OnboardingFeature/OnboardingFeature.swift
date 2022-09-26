@@ -134,12 +134,13 @@ public extension Onboarding {
                 state.defaultCurrency = currency
                 return .none
                 
-            case .delegate(_):
-                return .none
-                
             case .goBackToLoginView:
                 state = .init()
                 return .none
+                
+            case .delegate(_):
+                return .none
+                
             }
         }
     }

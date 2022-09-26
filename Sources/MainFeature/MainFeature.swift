@@ -8,8 +8,10 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
+import UserDefaultsClient
 
 public struct Main: ReducerProtocol {
+    @Dependency(\.userDefaultsClient) var userDefaultsClient
     public init() {}
 }
 
@@ -23,17 +25,35 @@ public extension Main {
     }
     
     enum Action: Equatable, Sendable {
+        case `internal`(InternalAction)
+        case delegate(DelegateAction)
+        
+        public enum DelegateAction: Equatable, Sendable {
+            case userIsLoggedOut
+        }
+        
+        public enum InternalAction: Equatable, Sendable {
+            case logOutUser
+        }
     }
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
-            default: return .none
+                
+            case .internal(.logOutUser):
+                return .run { [userDefaultsClient] send in
+                    await userDefaultsClient.setIsLoggedIn(false)
+                    await send(.delegate(.userIsLoggedOut))
+                }
+            case .delegate(_):
+                return .none
             }
         }
-        
     }
+    
 }
+
 
 
 public extension Main {
@@ -46,7 +66,13 @@ public extension Main {
         }
         
         public var body: some SwiftUI.View {
-            Text("Main Feature goes here")
+            WithViewStore(self.store, observe: { $0 }) { viewStore in
+                Text("Main Feature goes here")
+                
+                Button("Log out user") {
+                    viewStore.send(.internal(.logOutUser))
+                }
+            }
         }
     }
 }

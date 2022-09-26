@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
+import UserDefaultsClient
 
 public extension Onboarding {
     struct View: SwiftUI.View {
@@ -136,22 +137,25 @@ public extension Onboarding {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
-                Text("View to fill in all information")
-                
-                Picker("Default Currency", selection: viewStore.binding(
-                    get: { $0.defaultCurrency },
-                    send: { .defaultCurrencyChosen(currency: $0) }
-                  )
-                ) {
-                    Text("USD")
-                    Text("SEK")
-                }
-                
-                Button("Next step") {
-                    viewStore.send(.nextStep)
-                }
-                if viewStore.state.step != .step1_Welcome {
-                    Button("Previous Step") { viewStore.send(.previousStep)}
+                VStack {
+                    Text("View to fill in all information")
+                    
+                    Picker("Default Currency", selection: viewStore.binding(
+                        get: { $0.defaultCurrency },
+                        send: { .defaultCurrencyChosen($0) }
+                    )
+                    ) {
+                        ForEach(DefaultCurrency.allCases, id: \.self) {
+                            Text($0.rawValue)
+                        }
+                    }
+                    
+                    Button("Next step") {
+                        viewStore.send(.nextStep)
+                    }
+                    if viewStore.state.step != .step1_Welcome {
+                        Button("Previous Step") { viewStore.send(.previousStep)}
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@ import UserDefaultsClient
 
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
+    @Dependency(\.mainQueue) var mainQueue
     
     public init() {}
 }
@@ -27,7 +28,7 @@ public extension Onboarding {
         public var passwordField: String
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
-        public var defaultCurrency: String
+        public var defaultCurrency: DefaultCurrency
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
@@ -35,7 +36,7 @@ public extension Onboarding {
             passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
-            defaultCurrency: String = "SEK"
+            defaultCurrency: DefaultCurrency = .SEK
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
@@ -76,7 +77,12 @@ public extension Onboarding {
         case previousStep
         case finishSignUp
         case termsAndConditionsBoxPressed
-        case defaultCurrencyChosen(currency: String)
+        case defaultCurrencyChosen(DefaultCurrency)
+        case delegate(DelegateAction)
+        
+        public enum DelegateAction: Equatable, Sendable {
+            case userFinishedOnboarding(DefaultCurrency)
+        }
     }
     
     var body: some ReducerProtocol<State, Action> {
@@ -109,9 +115,15 @@ public extension Onboarding {
                 return .none
                 
             case .finishSignUp:
-                return .run { [userDefaultsClient, currency = state.defaultCurrency] _ in
+                return .run { [userDefaultsClient, mainQueue, currency = state.defaultCurrency] send in
                     await userDefaultsClient.setIsLoggedIn(true)
-                    await userDefaultsClient.setDefaultCurrency(currency)
+                    
+                    await userDefaultsClient.setDefaultCurrency(currency.rawValue)
+                    
+                    try await mainQueue.sleep(for: .milliseconds(700))
+                    await send(.delegate(.userFinishedOnboarding(currency)))
+                    
+                    
                 }
                 
             case .termsAndConditionsBoxPressed:
@@ -120,6 +132,9 @@ public extension Onboarding {
                 
             case let .defaultCurrencyChosen(currency):
                 state.defaultCurrency = currency
+                return .none
+                
+            case .delegate(_):
                 return .none
             }
         }

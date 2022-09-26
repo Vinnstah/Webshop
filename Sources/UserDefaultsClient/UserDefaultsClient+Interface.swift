@@ -35,3 +35,13 @@ public extension UserDefaultsClient {
         stringForKey(currencyKey)
     }
 }
+
+public enum DefaultCurrency: String, Equatable, Sendable, CaseIterable {
+    case SEK = "SEK"
+    case USD = "USD"
+
+    
+    public init(_ rawValue: String) {
+        self = DefaultCurrency(rawValue: rawValue) ?? .SEK
+    }
+}

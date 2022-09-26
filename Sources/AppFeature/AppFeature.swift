@@ -11,6 +11,7 @@ import ComposableArchitecture
 import SplashFeature
 import OnboardingFeature
 import MainFeature
+import UserDefaultsClient
 
 public struct App: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -31,7 +32,7 @@ public extension App {
         case splash(Splash.Action)
         case onboarding(Onboarding.Action)
         case main(Main.Action)
-        case userIsLoggedIn(currency: String)
+        case userIsLoggedIn(DefaultCurrency)
     }
     
     
@@ -41,17 +42,28 @@ public extension App {
             switch action {
                 
             case .splash(.delegate(.loadIsLoggedInResult(.isLoggedIn))):
-                /// Should maybe be moved to Splash?
                 return .run { [userDefaultsClient] send in
-                    await send(.userIsLoggedIn(currency: userDefaultsClient.getDefaultCurrency()))
+                    await send(
+                        .userIsLoggedIn(
+                            .init(userDefaultsClient.getDefaultCurrency())
+                        )
+                    )
                 }
                 
-            case let .userIsLoggedIn(currency: currency):
-                state = .main(.init(defaultCurrency: currency))
+            case let .userIsLoggedIn(currency):
+                state = .main(.init(defaultCurrency: currency.rawValue))
                 return .none
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
-                state = .onboarding(.init(step: .step0_LoginOrCreateUser ))
+                state = .onboarding(.init(step: .step0_LoginOrCreateUser))
+                return .none
+                
+            case .main(.delegate(.userIsLoggedOut)):
+                state = .onboarding(.init(step: .step0_LoginOrCreateUser))
+                return .none
+                
+            case let .onboarding(.delegate(.userFinishedOnboarding(currency))):
+                state = .main(.init(defaultCurrency: currency.rawValue))
                 return .none
                 
             default: return .none

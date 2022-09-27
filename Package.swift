@@ -3,6 +3,9 @@
 
 import PackageDescription
 let tca: Target.Dependency = .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+let vapor: Target.Dependency = .product(name: "Vapor", package: "vapor")
+let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "vapor-routing")
+let urlRouting: Target.Dependency = .product(name: "_URLRouting", package: "swift-parsing")
 
 var swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
@@ -26,6 +29,12 @@ let package = Package(
             name: "OnboardingFeature",
             targets: ["OnboardingFeature"]),
         .library(
+            name: "Server",
+            targets: ["Server"]),
+        .library(
+            name: "SiteRouter",
+            targets: ["SiteRouter"]),
+        .library(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
         .library(
@@ -34,6 +43,9 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "protocol-beta"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+        .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
+        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.1.0"),
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
@@ -62,39 +74,65 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-            .testTarget(
-                name: "MainFeatureTests",
-                dependencies: ["MainFeature"]),
+        .testTarget(
+            name: "MainFeatureTests",
+            dependencies: ["MainFeature"]),
         
-        .target(
-            name: "OnboardingFeature",
-            dependencies: [
-                tca,
-                "UserDefaultsClient",
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "OnboardingFeature",
+                dependencies: [
+                    tca,
+                    "SiteRouter",
+                    "UserDefaultsClient",
+                    urlRouting,
+                ],
+                swiftSettings: swiftSettings
+            ),
         .testTarget(
             name: "OnboardingFeatureTests",
             dependencies: ["OnboardingFeature"]),
         
-        .target(
-            name: "SplashFeature",
-            dependencies: [
-                tca,
-                "UserDefaultsClient",
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .executableTarget(name: "runner", dependencies: [.target(name: "Server")]),
+        
+            .target(
+                name: "Server",
+                dependencies: [
+                    "SiteRouter",
+                    vapor,
+                    vaporRouting,
+                ],
+                swiftSettings: swiftSettings
+            ),
+        
+        
+            .target(
+                name: "SiteRouter",
+                dependencies: [
+                    urlRouting,
+                    vapor,
+                    vaporRouting,
+                ],
+                swiftSettings: swiftSettings
+            ),
+        
+        
+            .target(
+                name: "SplashFeature",
+                dependencies: [
+                    tca,
+                    "UserDefaultsClient",
+                ],
+                swiftSettings: swiftSettings
+            ),
         .testTarget(
             name: "SplashFeatureTests",
             dependencies: ["SplashFeature"]),
         
-        .target(
-            name: "UserDefaultsClient",
-            dependencies: [tca],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "UserDefaultsClient",
+                dependencies: [tca],
+                swiftSettings: swiftSettings
+            ),
         .testTarget(
             name: "UserDefaultsClientTests",
             dependencies: ["UserDefaultsClient"]),

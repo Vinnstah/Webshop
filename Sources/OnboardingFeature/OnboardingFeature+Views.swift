@@ -74,7 +74,7 @@ public extension Onboarding {
                     TextField("Email",
                               text: viewStore.binding(
                                 get: { $0.emailAddressField },
-                                send: { .emailAddressFieldReceivingInput(text: $0) }
+                                send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
                               )
                     )
                     .padding()
@@ -82,17 +82,17 @@ public extension Onboarding {
                     SecureField("Password",
                                 text: viewStore.binding(
                                     get: { $0.passwordField },
-                                    send: { .passwordFieldReceivingInput(text: $0) }
+                                    send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )
                     .padding()
                     
                     Button("Login") {
-                        viewStore.send(.loginButtonPressed, animation: .default)
+                        viewStore.send(.internal(.loginButtonPressed), animation: .default)
                     }
                     
                     Button("Sign Up") {
-                        viewStore.send(.signUpButtonPressed)
+                        viewStore.send(.internal(.signUpButtonPressed))
                     }
                 }
                 
@@ -116,7 +116,7 @@ public extension Onboarding {
                     TextField("Email",
                               text: viewStore.binding(
                                 get: { $0.emailAddressField },
-                                send: { .emailAddressFieldReceivingInput(text: $0) }
+                                send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
                               )
                     )
                     .padding()
@@ -124,16 +124,16 @@ public extension Onboarding {
                     SecureField("Password",
                                 text: viewStore.binding(
                                     get: { $0.passwordField },
-                                    send: { .passwordFieldReceivingInput(text: $0) }
+                                    send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )
                     .padding()
                     HStack {
                         Button("Next step") {
-                            viewStore.send(.nextStep)
+                            viewStore.send(.internal(.nextStep))
                         }
                         if viewStore.state.step != .step1_Welcome {
-                            Button("Previous Step") { viewStore.send(.previousStep, animation: .easeIn(duration: 1.0))}
+                            Button("Previous Step") { viewStore.send(.internal(.previousStep), animation: .easeIn(duration: 1.0))}
                         }
                     }
                     
@@ -141,7 +141,7 @@ public extension Onboarding {
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
-                            viewStore.send(.goBackToLoginView)
+                            viewStore.send(.internal(.goBackToLoginView))
                         }
                     }
                 }
@@ -165,7 +165,7 @@ public extension Onboarding {
                     
                     Picker("Default Currency", selection: viewStore.binding(
                         get: { $0.defaultCurrency },
-                        send: { .defaultCurrencyChosen($0) }
+                        send: { .internal(.defaultCurrencyChosen($0)) }
                     )
                     ) {
                         ForEach(DefaultCurrency.allCases, id: \.self) {
@@ -175,16 +175,16 @@ public extension Onboarding {
                     .padding()
                     
                     Button("Next step") {
-                        viewStore.send(.nextStep)
+                        viewStore.send(.internal(.nextStep))
                     }
                     if viewStore.state.step != .step1_Welcome {
-                        Button("Previous Step") { viewStore.send(.previousStep)}
+                        Button("Previous Step") { viewStore.send(.internal(.previousStep))}
                     }
                 }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
-                            viewStore.send(.goBackToLoginView)
+                            viewStore.send(.internal(.goBackToLoginView))
                         }
                     }
                 }
@@ -207,16 +207,16 @@ public extension Onboarding {
                     Text("View to set Username and Password")
                     
                     Button("Next step") {
-                        viewStore.send(.nextStep)
+                        viewStore.send(.internal(.nextStep))
                     }
                     if viewStore.state.step != .step1_Welcome {
-                        Button("Previous Step") { viewStore.send(.previousStep)}
+                        Button("Previous Step") { viewStore.send(.internal(.previousStep)) }
                     }
                 }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
-                            viewStore.send(.goBackToLoginView)
+                            viewStore.send(.internal(.goBackToLoginView))
                         }
                     }
                 }
@@ -250,23 +250,23 @@ public extension Onboarding {
                         /// This variable should be in a ViewState instead?
                         Image(systemName: viewStore.state.areTermsAndConditionsAccepted ? "checkmark.square" : "square")
                             .onTapGesture {
-                                viewStore.send(.termsAndConditionsBoxPressed)
+                                viewStore.send(.internal(.termsAndConditionsBoxPressed))
                             }
                     }
                     
                     Button("Finish Sign Up") {
-                        viewStore.send(.finishSignUp)
+                        viewStore.send(.internal(.finishSignUp))
                     }
                     .disabled(!viewStore.areTermsAndConditionsAccepted)
                     
                     if viewStore.state.step != .step1_Welcome {
-                        Button("Previous Step") { viewStore.send(.previousStep)}
+                        Button("Previous Step") { viewStore.send(.internal(.previousStep)) }
                     }
                 }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
-                            viewStore.send(.goBackToLoginView)
+                            viewStore.send(.internal(.goBackToLoginView))
                         }
                     }
                 }

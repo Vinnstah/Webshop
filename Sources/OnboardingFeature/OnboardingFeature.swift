@@ -9,9 +9,10 @@ import Foundation
 import ComposableArchitecture
 import SwiftUI
 import UserDefaultsClient
+import SiteRouter
+import _URLRouting
 
 /// Add to check UserDefaults if its the first time they open app -> Show onboarding
-
 
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -29,6 +30,7 @@ public extension Onboarding {
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
         public var defaultCurrency: DefaultCurrency
+        public var token: LoginResponse
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
@@ -36,7 +38,8 @@ public extension Onboarding {
             passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
-            defaultCurrency: DefaultCurrency = .SEK
+            defaultCurrency: DefaultCurrency = .SEK,
+            token: LoginResponse = 
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
@@ -44,6 +47,7 @@ public extension Onboarding {
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.defaultCurrency = defaultCurrency
+            self.token = token
         }
         
         
@@ -69,17 +73,24 @@ public extension Onboarding {
     }
     
     enum Action: Equatable, Sendable {
-        case emailAddressFieldReceivingInput(text: String)
-        case passwordFieldReceivingInput(text: String)
-        case loginButtonPressed
-        case signUpButtonPressed
-        case nextStep
-        case previousStep
-        case finishSignUp
-        case termsAndConditionsBoxPressed
-        case defaultCurrencyChosen(DefaultCurrency)
+        
         case delegate(DelegateAction)
-        case goBackToLoginView
+        case `internal`(InternalAction)
+        
+        
+        public enum InternalAction: Equatable, Sendable {
+            case emailAddressFieldReceivingInput(text: String)
+            case passwordFieldReceivingInput(text: String)
+            case loginButtonPressed
+            case signUpButtonPressed
+            case nextStep
+            case previousStep
+            case finishSignUp
+            case goBackToLoginView
+            case termsAndConditionsBoxPressed
+            case defaultCurrencyChosen(DefaultCurrency)
+            case sendUserDataToServer(UserModel)
+        }
         
         public enum DelegateAction: Equatable, Sendable {
             case userFinishedOnboarding(DefaultCurrency)
@@ -91,51 +102,71 @@ public extension Onboarding {
             
             switch action {
                 
-            case let .emailAddressFieldReceivingInput(text: text):
+            case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.emailAddressField = text
                 return .none
                 
-            case let .passwordFieldReceivingInput(text: text):
+            case let .internal(.passwordFieldReceivingInput(text: text)):
                 state.passwordField = text
                 return .none
                 
-            case .loginButtonPressed:
+            case .internal(.loginButtonPressed):
                 state.isLoginInFlight = true
                 return .none
                 
-            case .signUpButtonPressed:
+            case .internal(.signUpButtonPressed):
                 state.step = .step1_Welcome
                 return .none
                 
-            case .nextStep:
+            case .internal(.nextStep):
                 state.step.nextStep()
                 return .none
                 
-            case .previousStep:
+            case .internal(.previousStep):
                 state.step.previousStep()
                 return .none
                 
-            case .finishSignUp:
-                return .run { [userDefaultsClient, mainQueue, currency = state.defaultCurrency] send in
+            case .internal(.finishSignUp):
+                return .run { [userDefaultsClient, mainQueue, currency = state.defaultCurrency, email = state.emailAddressField, password = state.passwordField] send in
+                    await send(.internal(.sendUserDataToServer(.init(username: email, password: password, secret: "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT"))))
                     await userDefaultsClient.setIsLoggedIn(true)
                     
                     await userDefaultsClient.setDefaultCurrency(currency.rawValue)
                     
                     try await mainQueue.sleep(for: .milliseconds(700))
                     await send(.delegate(.userFinishedOnboarding(currency)))
-
+                    
                 }
                 
-            case .termsAndConditionsBoxPressed:
+            case .internal(.termsAndConditionsBoxPressed):
                 state.areTermsAndConditionsAccepted.toggle()
                 return .none
                 
-            case let .defaultCurrencyChosen(currency):
+            case let .internal(.defaultCurrencyChosen(currency)):
                 state.defaultCurrency = currency
                 return .none
                 
-            case .goBackToLoginView:
+            case .internal(.goBackToLoginView):
                 state = .init()
+                return .none
+                
+            case let .internal(.sendUserDataToServer(user)):
+                    return .task {
+                      do {
+                        state.token = try await apiClient.request(
+                            .api(.login(user)),
+                            as: LoginResponse.self
+                        ).value
+                      } catch {
+
+                      }
+                    }
+//                return .run { [user] send in
+//                    state.token = try router.request(for: .api(.login(user)))
+////                    await apiClient.request(.api(.login(user)))
+//                }
+                
+            case .internal(_):
                 return .none
                 
             case .delegate(_):

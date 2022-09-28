@@ -30,7 +30,7 @@ public extension Onboarding {
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
         public var defaultCurrency: DefaultCurrency
-        public var token: LoginResponse
+//        public var token: String
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
@@ -38,8 +38,8 @@ public extension Onboarding {
             passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
-            defaultCurrency: DefaultCurrency = .SEK,
-            token: LoginResponse = 
+            defaultCurrency: DefaultCurrency = .SEK
+//            token: String = ""
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
@@ -47,7 +47,7 @@ public extension Onboarding {
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.defaultCurrency = defaultCurrency
-            self.token = token
+//            self.token = token
         }
         
         
@@ -90,6 +90,7 @@ public extension Onboarding {
             case termsAndConditionsBoxPressed
             case defaultCurrencyChosen(DefaultCurrency)
             case sendUserDataToServer(UserModel)
+            case userDataServerResponse(TaskResult<String>)
         }
         
         public enum DelegateAction: Equatable, Sendable {
@@ -151,20 +152,32 @@ public extension Onboarding {
                 return .none
                 
             case let .internal(.sendUserDataToServer(user)):
-                    return .task {
-                      do {
-                        state.token = try await apiClient.request(
-                            .api(.login(user)),
-                            as: LoginResponse.self
-                        ).value
-                      } catch {
-
-                      }
+                return .run { send in
+                    do {
+                        return await send(.internal(
+                            .userDataServerResponse(
+                                .success(
+                                    try await apiClient.decodedResponse(
+                                        for: .login(user),
+                                        as: LoginResponse.self,
+                                        decoder: JSONDecoder()
+                                    ).value.token
+                                ))
+                            )
+                        )
+                    } catch {
+                        return await send(.internal(.goBackToLoginView))
                     }
-//                return .run { [user] send in
-//                    state.token = try router.request(for: .api(.login(user)))
-////                    await apiClient.request(.api(.login(user)))
-//                }
+                }
+                
+            case let .internal(.userDataServerResponse(.success(response))):
+                print(response)
+//                state.token = response
+                return .none
+                
+                //            case let .internal(.userDataServerResponse(.failure(error))):
+                //                print(error)
+                //                return .none
                 
             case .internal(_):
                 return .none

@@ -16,10 +16,10 @@ func siteHandler(
   route: SiteRoute
 ) async throws -> any AsyncResponseEncodable {
     switch route {
-    case let .api(route):
-        switch route {
+//    case let .api(route):
+//        switch route {
         case let .login(user):
             return constructJWT(secretKey: user.secret, header: JWT.Header.init(), payload: JWT.Payload(name: user.username))
         }
-    }
+//    }
 }

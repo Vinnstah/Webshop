@@ -13,8 +13,8 @@ import SiteRouter
 import _URLRouting
 import URLRoutingClient
 
-/// Add to check UserDefaults if its the first time they open app -> Show onboarding
 
+/// Add to check UserDefaults if its the first time they open app -> Show onboarding
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue

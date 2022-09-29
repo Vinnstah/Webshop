@@ -44,7 +44,7 @@ public extension Splash {
             case onAppear
         }
     }
-    
+     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
@@ -53,7 +53,6 @@ public extension Splash {
                 return .none
                 
             case .internal(.onAppear):
-                
                 return .run { [userDefaultsClient, mainQueue] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
                     await send(

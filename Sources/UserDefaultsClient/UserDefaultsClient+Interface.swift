@@ -2,11 +2,11 @@ import ComposableArchitecture
 import Foundation
 
 public struct UserDefaultsClient: Sendable {
-    public var boolForKey: @Sendable (String) -> Bool
-    public var dataForKey: @Sendable (String) -> Data?
-    public var doubleForKey: @Sendable (String) -> Double
-    public var integerForKey: @Sendable (String) -> Int
-    public var stringForKey: @Sendable (String) -> String
+    public var boolForKey: @Sendable (String) async -> Bool
+    public var dataForKey: @Sendable (String) async -> Data?
+    public var doubleForKey: @Sendable (String) async -> Double
+    public var integerForKey: @Sendable (String) async -> Int
+    public var stringForKey: @Sendable (String) async -> String
     public var remove: @Sendable (String) async -> Void
     public var setBool: @Sendable (Bool, String) async -> Void
     public var setData: @Sendable (Data?, String) async -> Void
@@ -23,16 +23,16 @@ public extension UserDefaultsClient {
         await setBool(isLoggedIn, isLoggedInKey)
     }
     
-    func getIsLoggedIn() -> Bool {
-        boolForKey(isLoggedInKey)
+    func getIsLoggedIn() async -> Bool {
+        await boolForKey(isLoggedInKey)
     }
     
     func setDefaultCurrency(_ currency: String) async {
         await setString(currency, currencyKey)
     }
     
-    func getDefaultCurrency() -> String {
-        stringForKey(currencyKey)
+    func getDefaultCurrency() async -> String {
+        await stringForKey(currencyKey)
     }
 }
 

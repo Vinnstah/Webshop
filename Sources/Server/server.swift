@@ -17,7 +17,6 @@ func siteHandler(
 ) async throws -> any AsyncResponseEncodable {
     switch route {
         case let .login(user):
-        print(constructJWT(secretKey: user.secret, header: JWT.Header.init(), payload: JWT.Payload(name: user.username)))
         return constructJWT(secretKey: user.secret, header: JWT.Header.init(), payload: JWT.Payload(name: user.username))
         }
 }

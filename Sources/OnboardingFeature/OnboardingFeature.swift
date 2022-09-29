@@ -11,12 +11,14 @@ import SwiftUI
 import UserDefaultsClient
 import SiteRouter
 import _URLRouting
+import URLRoutingClient
 
 /// Add to check UserDefaults if its the first time they open app -> Show onboarding
 
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
+    @Dependency(\.urlRoutingClient) var urlRoutingClient
     
     public init() {}
 }
@@ -124,8 +126,17 @@ public extension Onboarding {
                 return .none
                 
             case .internal(.finishSignUp):
-                return .run { [userDefaultsClient, currency = state.defaultCurrency, email = state.emailAddressField, password = state.passwordField] send in
-                    await send(.internal(.sendUserDataToServer(.init(username: email, password: password, secret: "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT"))))
+                return .run { [
+                    userDefaultsClient,
+                    currency = state.defaultCurrency,
+                    email = state.emailAddressField,
+                    password = state.passwordField
+                ] send in
+                    
+                    await send(.internal(.sendUserDataToServer(
+                        .init(username: email, password: password, secret: "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT")))
+                    )
+                    
                     await userDefaultsClient.setIsLoggedIn(true)
                     
                     await userDefaultsClient.setDefaultCurrency(currency.rawValue)
@@ -145,12 +156,12 @@ public extension Onboarding {
                 return .none
                 
             case let .internal(.sendUserDataToServer(user)):
-                return .run { send in
+                return .run { [urlRoutingClient] send in
                     do {
                         return await send(.internal(
                             .userDataServerResponse(
                                 TaskResult {
-                                    try await apiClient.decodedResponse(
+                                    try await urlRoutingClient.decodedResponse(
                                         for: .login(user),
                                         as: LoginResponse.self
                                     ).value.token
@@ -160,6 +171,21 @@ public extension Onboarding {
                         )
                     }
                 }
+//                return .run { send in
+//                    do {
+//                        return await send(.internal(
+//                            .userDataServerResponse(
+//                                TaskResult {
+//                                    try await apiClient.decodedResponse(
+//                                        for: .login(user),
+//                                        as: LoginResponse.self
+//                                    ).value.token
+//                                }
+//                            )
+//                        )
+//                        )
+//                    }
+//                }
                 
             case let .internal(.userDataServerResponse(result)):
                 let token = (try? result.value) ?? "Empty token Implement logic here"

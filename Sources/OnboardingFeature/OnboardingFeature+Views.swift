@@ -38,22 +38,6 @@ public extension Onboarding {
                     case .step4_TermsAndConditions:
                         Onboarding.TermsAndConditionsView(store: store)
                     }
-                    //
-                    //                    if viewStore.state.step == .step0_LoginOrCreateUser {
-                    //                        Onboarding.LoginView(store: store)
-                    //                    }
-                    //                    if viewStore.state.step == .step1_Welcome {
-                    //                        Onboarding.WelcomeView(store: store)
-                    //                    }
-                    //                    if viewStore.state.step == .step2_FillInYourInformation {
-                    //                        Onboarding.PersonalInformationView(store: store)
-                    //                    }
-                    //                    if viewStore.state.step == .step3_UsernameAndPassword {
-                    //                        Onboarding.CredentialsView(store: store)
-                    //                    }
-                    //                    if viewStore.state.step == .step4_TermsAndConditions {
-                    //                        Onboarding.TermsAndConditionsView(store: store)
-                    //                    }
                 }
             }
         }

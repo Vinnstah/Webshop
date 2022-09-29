@@ -32,24 +32,3 @@ public struct LoginResponse: Content, Sendable, Equatable {
         case failedToGetServerResponse
     }
 }
-
-//public let apiClient = URLRoutingClient.live(
-//    router: SiteRouter.router
-//        .baseURL("http://127.0.0.1:8080")
-//)
-//
-//private enum URLRoutingClientKey: DependencyKey {
-//    typealias Value = URLRoutingClient
-//    static let liveValue = URLRoutingClient.live(router: SiteRouter.router
-//        .baseURL("http://127.0.0.1:8080"))
-//    static let testValue = URLRoutingClient.live(router: SiteRouter.router
-//        .baseURL("http://127.0.0.1:8080"))
-//}
-//public extension DependencyValues {
-//    var urlRoutingClient: URLRoutingClient<SiteRoute> {
-//        get { self[URLRoutingClientKey.self] }
-//        set { self[URLRoutingClientKey.self] = newValue }
-//    }
-//}
-//
-//extension URLRoutingClient: @unchecked Sendable {}

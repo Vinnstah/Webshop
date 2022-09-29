@@ -66,7 +66,14 @@ public extension App {
                 state = .main(.init(defaultCurrency: currency.rawValue, token: token))
                 return .none
                 
-            default: return .none
+            case .splash(.internal(_)):
+                return .none
+                
+            case .onboarding(.internal(_)):
+                return .none
+                
+            case .main(.internal(_)):
+                return .none
             }
         }
         .ifCaseLet(

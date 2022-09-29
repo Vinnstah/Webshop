@@ -19,6 +19,7 @@ public enum SiteRoute: Equatable {
 
 public let router = OneOf {
     Route(.case(SiteRoute.login)) {
+        Path { "login" }
         Method.post
         Body(.json(UserModel.self))
     }
@@ -46,6 +47,10 @@ public struct LoginResponse: Content, Sendable, Equatable {
     
     public init(token: String) {
         self.token = token
+    }
+    
+    public enum CodingKeys: String, CodingKey {
+        case token = "token"
     }
     
     public enum ServerError: Content, Equatable, Sendable, Error {

@@ -51,7 +51,7 @@ public extension App {
                 }
 //
             case let .userIsLoggedIn(currency):
-                state = .main(.init(defaultCurrency: currency.rawValue))
+                state = .main(.init(defaultCurrency: currency.rawValue, token: "IMPLEMENT THIS"))
                 return .none
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
@@ -62,8 +62,8 @@ public extension App {
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
                 return .none
                 
-            case let .onboarding(.delegate(.userFinishedOnboarding(currency))):
-                state = .main(.init(defaultCurrency: currency.rawValue))
+            case let .onboarding(.delegate(.userFinishedOnboarding(currency, token))):
+                state = .main(.init(defaultCurrency: currency.rawValue, token: token))
                 return .none
                 
             default: return .none

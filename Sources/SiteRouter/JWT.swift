@@ -40,7 +40,7 @@ public struct JWT: Codable, Sendable, Equatable {
         public init(
             sub: String = UUID().uuidString,
             name: String,
-            iat: Double = NSDate().timeIntervalSince1970
+            iat: Double = Date().timeIntervalSince1970
         ) {
             self.sub = sub
             self.name = name
@@ -49,7 +49,7 @@ public struct JWT: Codable, Sendable, Equatable {
     }
 }
 
-public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Payload) -> String {
+public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Payload) -> [String: String] {
     let secret = secretKey
     let privateKey = SymmetricKey(data: Data(secret.utf8))
     let headerJSONData = try! JSONEncoder().encode(header)
@@ -65,7 +65,7 @@ public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Pay
     
     let token = [headerBase64String, payloadBase64String, signatureBase64String].joined(separator: ".")
     
-    return token
+    return ["token": token]
 }
 
 

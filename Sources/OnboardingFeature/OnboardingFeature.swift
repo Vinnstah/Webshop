@@ -30,7 +30,6 @@ public extension Onboarding {
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
         public var defaultCurrency: DefaultCurrency
-//        public var token: String
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
@@ -39,7 +38,6 @@ public extension Onboarding {
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
             defaultCurrency: DefaultCurrency = .SEK
-//            token: String = ""
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
@@ -47,7 +45,6 @@ public extension Onboarding {
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.defaultCurrency = defaultCurrency
-//            self.token = token
         }
         
         
@@ -77,7 +74,6 @@ public extension Onboarding {
         case delegate(DelegateAction)
         case `internal`(InternalAction)
         
-        
         public enum InternalAction: Equatable, Sendable {
             case emailAddressFieldReceivingInput(text: String)
             case passwordFieldReceivingInput(text: String)
@@ -94,7 +90,7 @@ public extension Onboarding {
         }
         
         public enum DelegateAction: Equatable, Sendable {
-            case userFinishedOnboarding(DefaultCurrency)
+            case userFinishedOnboarding(DefaultCurrency, token: String)
         }
     }
     
@@ -128,14 +124,11 @@ public extension Onboarding {
                 return .none
                 
             case .internal(.finishSignUp):
-                return .run { [userDefaultsClient, mainQueue, currency = state.defaultCurrency, email = state.emailAddressField, password = state.passwordField] send in
+                return .run { [userDefaultsClient, currency = state.defaultCurrency, email = state.emailAddressField, password = state.passwordField] send in
                     await send(.internal(.sendUserDataToServer(.init(username: email, password: password, secret: "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT"))))
                     await userDefaultsClient.setIsLoggedIn(true)
                     
                     await userDefaultsClient.setDefaultCurrency(currency.rawValue)
-                    
-                    try await mainQueue.sleep(for: .milliseconds(700))
-                    await send(.delegate(.userFinishedOnboarding(currency)))
                     
                 }
                 
@@ -156,28 +149,24 @@ public extension Onboarding {
                     do {
                         return await send(.internal(
                             .userDataServerResponse(
-                                .success(
+                                TaskResult {
                                     try await apiClient.decodedResponse(
                                         for: .login(user),
-                                        as: LoginResponse.self,
-                                        decoder: JSONDecoder()
+                                        as: LoginResponse.self
                                     ).value.token
-                                ))
+                                }
                             )
                         )
-                    } catch {
-                        return await send(.internal(.goBackToLoginView))
+                        )
                     }
                 }
                 
-            case let .internal(.userDataServerResponse(.success(response))):
-                print(response)
-//                state.token = response
-                return .none
-                
-                //            case let .internal(.userDataServerResponse(.failure(error))):
-                //                print(error)
-                //                return .none
+            case let .internal(.userDataServerResponse(result)):
+                let token = (try? result.value) ?? "Empty token Implement logic here"
+                return .run { [mainQueue, currency = state.defaultCurrency] send in
+                    try await mainQueue.sleep(for: .milliseconds(700))
+                    await send(.delegate(.userFinishedOnboarding(currency, token: token)))
+                }
                 
             case .internal(_):
                 return .none

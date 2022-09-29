@@ -18,9 +18,11 @@ public struct Main: ReducerProtocol {
 public extension Main {
     struct State: Equatable {
         public var defaultCurreny: String
+        public var token: String
         
-        public init(defaultCurrency: String) {
+        public init(defaultCurrency: String, token: String) {
             self.defaultCurreny = defaultCurrency
+            self.token = token
         }
     }
     
@@ -73,6 +75,11 @@ public extension Main {
                     HStack {
                         Text("Default currency: ")
                         Text(viewStore.state.defaultCurreny)
+                    }
+                    
+                    HStack {
+                        Text("JWT TOKEN: ")
+                        Text(viewStore.state.token)
                     }
                     
                     Button("Log out user") {

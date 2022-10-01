@@ -5,6 +5,7 @@ import ComposableArchitecture
 
 public enum SiteRoute: Equatable {
     case login(UserModel)
+    case retrieveSecret(Secret)
 }
 
 
@@ -13,6 +14,19 @@ public let router = OneOf {
         Path { "login" }
         Method.post
         Body(.json(UserModel.self))
+    }
+    Route(.case(SiteRoute.retrieveSecret)) {
+        Path { "secret" }
+        Method.post
+        Body(.json(Secret.self))
+    }
+}
+
+public struct Secret: Codable, Equatable {
+    public let passcode: String
+    
+    public init(passcode: String) {
+        self.passcode = passcode
     }
 }
 

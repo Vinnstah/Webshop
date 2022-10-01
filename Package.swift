@@ -62,6 +62,7 @@ let package = Package(
                 "MainFeature",
                 "OnboardingFeature",
                 "SplashFeature",
+                "URLRoutingClient",
             ],
             swiftSettings: swiftSettings
         ),

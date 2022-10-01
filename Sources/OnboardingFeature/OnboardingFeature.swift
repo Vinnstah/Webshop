@@ -54,8 +54,7 @@ public extension Onboarding {
             case step0_LoginOrCreateUser
             case step1_Welcome
             case step2_FillInYourInformation
-            case step3_UsernameAndPassword
-            case step4_TermsAndConditions
+            case step3_TermsAndConditions
             
             mutating func nextStep() {
                 self = Self(rawValue: self.rawValue + 1) ?? Self.allCases.last!
@@ -171,21 +170,6 @@ public extension Onboarding {
                         )
                     }
                 }
-//                return .run { send in
-//                    do {
-//                        return await send(.internal(
-//                            .userDataServerResponse(
-//                                TaskResult {
-//                                    try await apiClient.decodedResponse(
-//                                        for: .login(user),
-//                                        as: LoginResponse.self
-//                                    ).value.token
-//                                }
-//                            )
-//                        )
-//                        )
-//                    }
-//                }
                 
             case let .internal(.userDataServerResponse(result)):
                 let token = (try? result.value) ?? "Empty token Implement logic here"

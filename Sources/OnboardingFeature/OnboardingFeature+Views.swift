@@ -32,10 +32,7 @@ public extension Onboarding {
                     case .step2_FillInYourInformation:
                         Onboarding.PersonalInformationView(store: store)
                         
-                    case .step3_UsernameAndPassword:
-                        Onboarding.CredentialsView(store: store)
-                        
-                    case .step4_TermsAndConditions:
+                    case .step3_TermsAndConditions:
                         Onboarding.TermsAndConditionsView(store: store)
                     }
                 }
@@ -177,37 +174,6 @@ public extension Onboarding {
     }
 }
 
-public extension Onboarding {
-    struct CredentialsView: SwiftUI.View {
-        public let store: StoreOf<Onboarding>
-        
-        public init(store: StoreOf<Onboarding>) {
-            self.store = store
-        }
-        
-        public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
-                VStack {
-                    Text("View to set Username and Password")
-                    
-                    Button("Next step") {
-                        viewStore.send(.internal(.nextStep))
-                    }
-                    if viewStore.state.step != .step1_Welcome {
-                        Button("Previous Step") { viewStore.send(.internal(.previousStep)) }
-                    }
-                }
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            viewStore.send(.internal(.goBackToLoginView))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 public extension Onboarding {
     struct TermsAndConditionsView: SwiftUI.View {

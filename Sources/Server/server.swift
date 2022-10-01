@@ -18,5 +18,10 @@ func siteHandler(
     switch route {
         case let .login(user):
         return constructJWT(secretKey: user.secret, header: JWT.Header.init(), payload: JWT.Payload(name: user.username))
+    case let .retrieveSecret(secret):
+        guard secret.passcode == "test" else {
+            return "INCORRECT"
         }
+        return "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT"
+    }
 }

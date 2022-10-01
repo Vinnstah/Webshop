@@ -5,17 +5,26 @@ import ComposableArchitecture
 
 @MainActor
 final class TestsOfSplashScopeInAppFeature: XCTestCase {
+    
+    let mainQueue = DispatchQueue.test
+    
     func testTrivial() throws {
         XCTAssert(true)
     }
     
     func test__GIVEN__initial_state__WHEN__splash_delegate_receives_action__THEN__send_userIsLoggedIn() async {
         
+        
         let store = TestStore(initialState: App.State(), reducer: App())
         
-        let splashStore = TestStore(initialState: .init(), reducer: Splash())
+        store.dependencies.mainQueue = mainQueue.eraseToAnyScheduler()
         
-        await splashStore.send(.delegate(.loadIsLoggedInResult(.isLoggedIn)))
+        let currency = await store.dependencies.userDefaultsClient.getDefaultCurrency()
+        
+        await store.send(.userIsLoggedIn(DefaultCurrency(rawValue: currency) ?? "SEK"))
+        
+        await mainQueue.advance(by: .seconds(1))
+        
         
         await store.send(.userIsLoggedIn(.SEK)) {
             $0 = .main(.init(defaultCurrency: "SEK", token: "IMPLEMENT THIS"))

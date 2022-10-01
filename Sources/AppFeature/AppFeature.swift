@@ -12,9 +12,11 @@ import SplashFeature
 import OnboardingFeature
 import MainFeature
 import UserDefaultsClient
+import URLRoutingClient
 
 public struct App: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
+    @Dependency(\.urlRoutingClient) var urlRoutingClient
     public init() {}
 }
 
@@ -49,14 +51,16 @@ public extension App {
                         )
                     )
                 }
-//
+
             case let .userIsLoggedIn(currency):
                 state = .main(.init(defaultCurrency: currency.rawValue, token: "IMPLEMENT THIS"))
                 return .none
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
-                return .none
+                return .run { [urlRoutingClient] send in
+                    await urlRoutingClient.decodedResponse(for: .retrieveSecret(.init(passcode: "test"))).value
+                }
                 
             case .main(.delegate(.userIsLoggedOut)):
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))

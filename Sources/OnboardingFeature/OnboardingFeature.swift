@@ -133,7 +133,7 @@ public extension Onboarding {
                 ] send in
                     
                     await send(.internal(.sendUserDataToServer(
-                        .init(username: email, password: password, secret: "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT")))
+                        .init(username: email, password: password, token: "test", secret: "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT")))
                     )
                     
                     await userDefaultsClient.setIsLoggedIn(true)

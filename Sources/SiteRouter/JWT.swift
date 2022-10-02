@@ -49,7 +49,7 @@ public struct JWT: Codable, Sendable, Equatable {
     }
 }
 
-public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Payload) -> [String: String] {
+public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Payload) -> String {
     let secret = secretKey
     let privateKey = SymmetricKey(data: Data(secret.utf8))
     let headerJSONData = try! JSONEncoder().encode(header)
@@ -64,8 +64,8 @@ public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Pay
     let signatureBase64String = Data(signature).urlSafeBase64EncodedString()
     
     let token = [headerBase64String, payloadBase64String, signatureBase64String].joined(separator: ".")
-    
-    return ["token": token]
+    return token
+//    return ["token": token]
 }
 
 

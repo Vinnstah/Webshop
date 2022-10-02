@@ -2,6 +2,7 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+let postgres: Target.Dependency = .product(name: "PostgresNIO", package: "postgres-nio")
 let tca: Target.Dependency = .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
 let vapor: Target.Dependency = .product(name: "Vapor", package: "vapor")
 let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "vapor-routing")
@@ -45,6 +46,7 @@ let package = Package(
             targets: ["UserDefaultsClient"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "protocol-beta"),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
@@ -102,6 +104,7 @@ let package = Package(
             .target(
                 name: "Server",
                 dependencies: [
+                    postgres,
                     "SiteRouter",
                     vapor,
                     vaporRouting,

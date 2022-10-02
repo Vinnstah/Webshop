@@ -58,9 +58,10 @@ public extension App {
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
-                return .run { [urlRoutingClient] send in
-                    await urlRoutingClient.decodedResponse(for: .retrieveSecret(.init(passcode: "test"))).value
-                }
+                return .none
+//                return .run { [urlRoutingClient] send in
+//                    await urlRoutingClient.decodedResponse(for: .retrieveSecret(.init(passcode: "test"))).value
+//                }
                 
             case .main(.delegate(.userIsLoggedOut)):
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))

@@ -10,10 +10,10 @@ import Vapor
 
 /// Secret should not be a part of this model
 public struct UserModel: Content, Equatable, Codable, Sendable {
-    public let username: String
-    public let password: String
-    public let token: String
-    public let secret: String
+    public var username: String
+    public var password: String
+    public var token: String
+    public var secret: String
     
     public init(
         username: String,

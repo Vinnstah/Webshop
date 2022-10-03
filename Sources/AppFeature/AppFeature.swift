@@ -53,6 +53,7 @@ public extension App {
                     )
                 }
 
+                /// FIX THIS, Userdefaults should add entire user
             case let .userIsLoggedIn(currency):
                 state = .main(.init(user: .init(email: "TEST", password: "TEST", jwt: "TEST", userSettings: .init())))
                 return .none
@@ -60,8 +61,6 @@ public extension App {
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
                 return .none
-//                return .run { [urlRoutingClient] send in
-//                    await urlRoutingClient.decodedResponse(for: .retrieveSecret(.init(passcode: "test"))).value
 //                }
                 
             case .main(.delegate(.userIsLoggedOut)):

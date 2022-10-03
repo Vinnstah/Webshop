@@ -24,9 +24,7 @@ func siteHandler(
         
         try await insertUser(db, logger: logger, user: updatedUser)
         try await db.close()
-//        return CreateUserResponse(email: user.email, jwt: jwt, status: "Ok")
         return updatedUser
-//        return constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.email))
         
     case let .retrieveSecret(secret):
         guard secret.passcode == "test" else {

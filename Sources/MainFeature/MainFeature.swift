@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import SwiftUI
 import UserDefaultsClient
+import UserModel
 
 public struct Main: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -17,12 +18,10 @@ public struct Main: ReducerProtocol {
 
 public extension Main {
     struct State: Equatable {
-        public var defaultCurreny: String
-        public var token: String
+        public var user: User
         
-        public init(defaultCurrency: String, token: String) {
-            self.defaultCurreny = defaultCurrency
-            self.token = token
+        public init(user: User) {
+            self.user = user
         }
     }
     
@@ -74,12 +73,12 @@ public extension Main {
                     
                     HStack {
                         Text("Default currency: ")
-                        Text(viewStore.state.defaultCurreny)
+                        Text(viewStore.state.user.userSettings.defaultCurrency.rawValue)
                     }
                     
                     HStack {
                         Text("JWT TOKEN: ")
-                        Text(viewStore.state.token)
+                        Text(viewStore.state.user.jwt)
                     }
                     
                     Button("Log out user") {

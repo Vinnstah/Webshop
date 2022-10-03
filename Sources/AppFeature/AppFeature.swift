@@ -13,6 +13,7 @@ import OnboardingFeature
 import MainFeature
 import UserDefaultsClient
 import URLRoutingClient
+import UserModel
 
 public struct App: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -34,7 +35,7 @@ public extension App {
         case splash(Splash.Action)
         case onboarding(Onboarding.Action)
         case main(Main.Action)
-        case userIsLoggedIn(DefaultCurrency)
+        case userIsLoggedIn(Currency)
     }
     
     
@@ -53,7 +54,7 @@ public extension App {
                 }
 
             case let .userIsLoggedIn(currency):
-                state = .main(.init(defaultCurrency: currency.rawValue, token: "IMPLEMENT THIS"))
+                state = .main(.init(user: .init(email: "TEST", password: "TEST", jwt: "TEST", userSettings: .init())))
                 return .none
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
@@ -67,8 +68,8 @@ public extension App {
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
                 return .none
                 
-            case let .onboarding(.delegate(.userFinishedOnboarding(currency, token))):
-                state = .main(.init(defaultCurrency: currency.rawValue, token: token))
+            case let .onboarding(.delegate(.userFinishedOnboarding(user))):
+                state = .main(.init(user: user))
                 return .none
                 
             case .splash(.internal(_)):

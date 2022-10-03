@@ -10,6 +10,7 @@ import PostgresNIO
 import Logging
 import NIOPosix
 import SiteRouter
+import UserModel
 
 public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 public let logger = Logger(label: "postgres-logger")
@@ -35,7 +36,6 @@ public func connectDatabase() async throws -> PostgresConnection  {
         logger: logger
     )
     
-    try await connection.close()
     return connection
 }
 
@@ -47,10 +47,10 @@ public func closeDatabaseEventLoop() {
     }
 }
 
-public func insertUser(_ db: PostgresConnection, logger: Logger, user: UserModel) async throws {
+public func insertUser(_ db: PostgresConnection, logger: Logger, user: User) async throws {
     try await db.query("""
                         INSERT INTO users(user_name,password,jwt)
-                        VALUES (\(user.username),\(user.password),\(user.token));
+                        VALUES (\(user.email),\(user.password),\(user.jwt));
                         """,
                        logger: logger
     )

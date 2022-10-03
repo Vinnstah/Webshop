@@ -1,10 +1,11 @@
 import Vapor
 import VaporRouting
 import ComposableArchitecture
+import UserModel
 
 
 public enum SiteRoute: Equatable {
-    case login(UserModel)
+    case login(User)
     case retrieveSecret(Secret)
 }
 
@@ -13,7 +14,7 @@ public let router = OneOf {
     Route(.case(SiteRoute.login)) {
         Path { "login" }
         Method.post
-        Body(.json(UserModel.self))
+        Body(.json(User.self))
     }
     Route(.case(SiteRoute.retrieveSecret)) {
         Path { "secret" }
@@ -44,5 +45,18 @@ public struct LoginResponse: Content, Sendable, Equatable {
     
     public enum ServerError: Content, Equatable, Sendable, Error {
         case failedToGetServerResponse
+    }
+}
+
+
+public struct CreateUserResponse: Content, Equatable {
+    let email: String
+    let jwt: String
+    let status: String
+    
+    public init(email: String, jwt: String, status: String) {
+        self.email = email
+        self.jwt = jwt
+        self.status = status
     }
 }

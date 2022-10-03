@@ -1,6 +1,7 @@
 import Vapor
 import VaporRouting
 import SiteRouter
+import UserModel
 
 // configures your application
 public func configure(_ app: Application) throws {
@@ -18,12 +19,14 @@ func siteHandler(
     switch route {
     case let .login(user):
         let db = try await connectDatabase()
-        let token = constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.username))
-        let userUpdated = UserModel(username: user.username, password: user.password, token: token, secret: user.secret)
+        let jwt = constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.email))
+        let updatedUser = User(email: user.email, password: user.password, jwt: jwt, userSettings: user.userSettings)
         
-        _ = try await insertUser(db, logger: logger, user: userUpdated)
+        try await insertUser(db, logger: logger, user: updatedUser)
         try await db.close()
-        return constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.username))
+//        return CreateUserResponse(email: user.email, jwt: jwt, status: "Ok")
+        return updatedUser
+//        return constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.email))
         
     case let .retrieveSecret(secret):
         guard secret.passcode == "test" else {

@@ -44,6 +44,9 @@ let package = Package(
         .library(
             name: "UserDefaultsClient",
             targets: ["UserDefaultsClient"]),
+        .library(
+            name: "UserModel",
+            targets: ["UserModel"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
@@ -65,6 +68,7 @@ let package = Package(
                 "OnboardingFeature",
                 "SplashFeature",
                 "URLRoutingClient",
+                "UserModel",
             ],
             swiftSettings: swiftSettings
         ),
@@ -75,8 +79,9 @@ let package = Package(
             .target(
                 name: "MainFeature",
                 dependencies: [
-                    tca,
                     "UserDefaultsClient",
+                    "UserModel",
+                    tca,
                 ],
                 swiftSettings: swiftSettings
             ),
@@ -87,10 +92,11 @@ let package = Package(
             .target(
                 name: "OnboardingFeature",
                 dependencies: [
-                    tca,
                     "SiteRouter",
                     "URLRoutingClient",
                     "UserDefaultsClient",
+                    "UserModel",
+                    tca,
                     urlRouting,
                 ],
                 swiftSettings: swiftSettings
@@ -104,8 +110,9 @@ let package = Package(
             .target(
                 name: "Server",
                 dependencies: [
-                    postgres,
                     "SiteRouter",
+                    "UserModel",
+                    postgres,
                     vapor,
                     vaporRouting,
                 ],
@@ -116,6 +123,7 @@ let package = Package(
             .target(
                 name: "SiteRouter",
                 dependencies: [
+                    "UserModel",
                     tca,
                     urlRouting,
                     vapor,
@@ -155,5 +163,11 @@ let package = Package(
         .testTarget(
             name: "UserDefaultsClientTests",
             dependencies: ["UserDefaultsClient"]),
+        
+        .target(
+            name: "UserModel",
+            dependencies: [vapor],
+            swiftSettings: swiftSettings
+        ),
     ]
 )

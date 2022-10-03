@@ -21,7 +21,7 @@ final class TestsOfSplashScopeInAppFeature: XCTestCase {
         
         let currency = await store.dependencies.userDefaultsClient.getDefaultCurrency()
         
-        await store.send(.userIsLoggedIn(DefaultCurrency(rawValue: currency) ?? "SEK"))
+        await store.send(.userIsLoggedIn(Currency(rawValue: currency) ?? "SEK"))
         
         await mainQueue.advance(by: .seconds(1))
         

@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import SwiftUI
 import UserDefaultsClient
+import UserModel
 
 public extension Onboarding {
     struct View: SwiftUI.View {
@@ -145,11 +146,11 @@ public extension Onboarding {
                     Text("View to fill in all information")
                     
                     Picker("Default Currency", selection: viewStore.binding(
-                        get: { $0.defaultCurrency },
+                        get: { $0.user.userSettings.defaultCurrency },
                         send: { .internal(.defaultCurrencyChosen($0)) }
                     )
                     ) {
-                        ForEach(DefaultCurrency.allCases, id: \.self) {
+                        ForEach(Currency.allCases, id: \.self) {
                             Text($0.rawValue)
                         }
                     }

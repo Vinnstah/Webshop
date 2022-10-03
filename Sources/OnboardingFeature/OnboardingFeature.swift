@@ -12,6 +12,7 @@ import UserDefaultsClient
 import SiteRouter
 import _URLRouting
 import URLRoutingClient
+import UserModel
 
 
 /// Add to check UserDefaults if its the first time they open app -> Show onboarding
@@ -31,7 +32,7 @@ public extension Onboarding {
         public var passwordField: String
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
-        public var defaultCurrency: DefaultCurrency
+        public var user: User
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
@@ -39,14 +40,14 @@ public extension Onboarding {
             passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
-            defaultCurrency: DefaultCurrency = .SEK
+            user: User = .init(email: "", password: "", jwt: "", userSettings: .init())
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
             self.passwordField = passwordField
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
-            self.defaultCurrency = defaultCurrency
+            self.user = user
         }
         
         
@@ -85,13 +86,13 @@ public extension Onboarding {
             case finishSignUp
             case goBackToLoginView
             case termsAndConditionsBoxPressed
-            case defaultCurrencyChosen(DefaultCurrency)
-            case sendUserDataToServer(UserModel)
-            case userDataServerResponse(TaskResult<String>)
+            case defaultCurrencyChosen(Currency)
+            case sendUserDataToServer(User)
+            case userDataServerResponse(TaskResult<User>)
         }
         
         public enum DelegateAction: Equatable, Sendable {
-            case userFinishedOnboarding(DefaultCurrency, token: String)
+            case userFinishedOnboarding(user: User)
         }
     }
     
@@ -101,11 +102,11 @@ public extension Onboarding {
             switch action {
                 
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
-                state.emailAddressField = text
+                state.user.email = text
                 return .none
                 
             case let .internal(.passwordFieldReceivingInput(text: text)):
-                state.passwordField = text
+                state.user.password = text
                 return .none
                 
             case .internal(.loginButtonPressed):
@@ -127,18 +128,14 @@ public extension Onboarding {
             case .internal(.finishSignUp):
                 return .run { [
                     userDefaultsClient,
-                    currency = state.defaultCurrency,
-                    email = state.emailAddressField,
-                    password = state.passwordField
+                    user = state.user
                 ] send in
                     
-                    await send(.internal(.sendUserDataToServer(
-                        .init(username: email, password: password, token: "test", secret: "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT")))
-                    )
+                    await send(.internal(.sendUserDataToServer(user)))
                     
                     await userDefaultsClient.setIsLoggedIn(true)
                     
-                    await userDefaultsClient.setDefaultCurrency(currency.rawValue)
+                    await userDefaultsClient.setDefaultCurrency(user.userSettings.defaultCurrency.rawValue)
                     
                 }
                 
@@ -147,7 +144,7 @@ public extension Onboarding {
                 return .none
                 
             case let .internal(.defaultCurrencyChosen(currency)):
-                state.defaultCurrency = currency
+                state.user.userSettings.defaultCurrency = currency
                 return .none
                 
             case .internal(.goBackToLoginView):
@@ -162,8 +159,8 @@ public extension Onboarding {
                                 TaskResult {
                                     try await urlRoutingClient.decodedResponse(
                                         for: .login(user),
-                                        as: LoginResponse.self
-                                    ).value.token
+                                        as: User.self
+                                    ).value
                                 }
                             )
                         )
@@ -172,10 +169,10 @@ public extension Onboarding {
                 }
                 
             case let .internal(.userDataServerResponse(result)):
-                let token = (try? result.value) ?? "Empty token Implement logic here"
-                return .run { [mainQueue, currency = state.defaultCurrency] send in
+                let user = try? result.value
+                return .run { [mainQueue] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
-                    await send(.delegate(.userFinishedOnboarding(currency, token: token)))
+                    await send(.delegate(.userFinishedOnboarding(user: user ?? .init(email: "", password: "", jwt: "", userSettings: .init()))))
                 }
                 
             case .internal(_):

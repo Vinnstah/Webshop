@@ -170,8 +170,9 @@ public extension Onboarding {
                 
             case let .internal(.userDataServerResponse(result)):
                 let user = try? result.value
-                return .run { [mainQueue] send in
+                return .run { [mainQueue, userDefaultsClient] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
+                    await userDefaultsClient.setLoggedInUser(user!)
                     await send(.delegate(.userFinishedOnboarding(user: user ?? .init(email: "", password: "", jwt: "", userSettings: .init()))))
                 }
                 

@@ -5,12 +5,14 @@ extension UserDefaultsClient {
         doubleForKey: { _ in 0 },
         integerForKey: { _ in 0 },
         stringForKey: { _ in ""},
+        userForKey: { _ in .init(email: "", password: "", jwt: "", userSettings: .init())},
         remove: { _ in },
         setBool: { _, _ in },
         setData: { _, _ in },
         setDouble: { _, _ in },
         setInteger: { _, _ in },
-        setString: { _, _ in }
+        setString: { _, _ in },
+        setUser: { _, _ in }
     )
 }
 
@@ -25,12 +27,14 @@ extension UserDefaultsClient {
         doubleForKey: XCTUnimplemented("\(Self.self).doubleForKey", placeholder: 0),
         integerForKey: XCTUnimplemented("\(Self.self).integerForKey", placeholder: 0),
         stringForKey: XCTUnimplemented("\(Self.self).stringForKey", placeholder: ""),
+        userForKey: XCTUnimplemented("\(Self.self).userForKey", placeholder: .init(email: "", password: "", jwt: "", userSettings: .init())),
         remove: XCTUnimplemented("\(Self.self).remove"),
         setBool: XCTUnimplemented("\(Self.self).setBool"),
         setData: XCTUnimplemented("\(Self.self).setData"),
         setDouble: XCTUnimplemented("\(Self.self).setDouble"),
         setInteger: XCTUnimplemented("\(Self.self).setInteger"),
-        setString: XCTUnimplemented("\(Self.self).setString")
+        setString: XCTUnimplemented("\(Self.self).setString"),
+        setUser: XCTUnimplemented("\(Self.self).setUser")
     )
     
     public mutating func override(bool: Bool, forKey key: String) {

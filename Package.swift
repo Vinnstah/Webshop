@@ -146,28 +146,31 @@ let package = Package(
             dependencies: ["SplashFeature"]),
         
             .target(
-            name: "URLRoutingClient",
-            dependencies: [
-                "SiteRouter",
-                tca,
-                vaporRouting,
-            ],
-            swiftSettings: swiftSettings
-        ),
+                name: "URLRoutingClient",
+                dependencies: [
+                    "SiteRouter",
+                    tca,
+                    vaporRouting,
+                ],
+                swiftSettings: swiftSettings
+            ),
         
             .target(
                 name: "UserDefaultsClient",
-                dependencies: [tca],
+                dependencies: [
+                    "UserModel",
+                    tca,
+                ],
                 swiftSettings: swiftSettings
             ),
         .testTarget(
             name: "UserDefaultsClientTests",
             dependencies: ["UserDefaultsClient"]),
         
-        .target(
-            name: "UserModel",
-            dependencies: [vapor],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "UserModel",
+                dependencies: [vapor],
+                swiftSettings: swiftSettings
+            ),
     ]
 )

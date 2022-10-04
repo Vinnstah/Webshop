@@ -12,12 +12,13 @@ public func configure(_ app: Application) throws {
     
 }
 
+/// Handles all the actions for each route
 func siteHandler(
     request: Request,
     route: SiteRoute
 ) async throws -> any AsyncResponseEncodable {
     switch route {
-    case let .login(user):
+    case let .create(user):
         let db = try await connectDatabase()
         let jwt = constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.email))
         let updatedUser = User(email: user.email, password: user.password, jwt: jwt, userSettings: user.userSettings)
@@ -26,11 +27,14 @@ func siteHandler(
         try await db.close()
         return updatedUser
         
-    case let .retrieveSecret(secret):
-        guard secret.passcode == "test" else {
-            return "INCORRECT"
+    case let .login(user):
+        let db = try await connectDatabase()
+        let dbUser = try await getUser(db, logger: logger, user: user)
+        if user.jwt != dbUser.jwt {
+            return LoginResponse(status: ["status": "Failed"])
         }
-        return ["secret": "?E(H+KbeShVmYq3t6w9z$C&F)J@NcQfT"]
+        return LoginResponse(status: ["status": "Success"])
+        
     }
 }
 

@@ -46,6 +46,8 @@ public extension UserDefaultsClient {
     func getLoggedInUser() async -> User {
         await userForKey(userKey)
     }
+ 
+    
 }
 
 

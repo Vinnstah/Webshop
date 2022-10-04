@@ -80,6 +80,7 @@ public extension Onboarding {
             case emailAddressFieldReceivingInput(text: String)
             case passwordFieldReceivingInput(text: String)
             case loginButtonPressed
+            case loginResponse(TaskResult<LoginResponse>)
             case signUpButtonPressed
             case nextStep
             case previousStep
@@ -111,6 +112,23 @@ public extension Onboarding {
                 
             case .internal(.loginButtonPressed):
                 state.isLoginInFlight = true
+                return .run { [urlRoutingClient, user = state.user] send in
+                    do {
+                        return await send(.internal(.loginResponse(
+                            TaskResult {
+                                try await urlRoutingClient.decodedResponse(
+                                    for: .login(user),
+                                    as: LoginResponse.self
+                                ).value
+                            }
+                        )
+                        )
+                        )
+                    }
+                }
+                
+            case let .internal(.loginResponse(.success(status))):
+                print(status)
                 return .none
                 
             case .internal(.signUpButtonPressed):
@@ -158,7 +176,7 @@ public extension Onboarding {
                             .userDataServerResponse(
                                 TaskResult {
                                     try await urlRoutingClient.decodedResponse(
-                                        for: .login(user),
+                                        for: .create(user),
                                         as: User.self
                                     ).value
                                 }
@@ -172,6 +190,7 @@ public extension Onboarding {
                 let user = try? result.value
                 return .run { [mainQueue, userDefaultsClient] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
+                    // TODO: DELETE OLD USERDEFAULTS
                     await userDefaultsClient.setLoggedInUser(user!)
                     await send(.delegate(.userFinishedOnboarding(user: user ?? .init(email: "", password: "", jwt: "", userSettings: .init()))))
                 }

@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-25.
-//
-
 import Foundation
 import ComposableArchitecture
 import SwiftUI
@@ -44,7 +37,6 @@ public extension Main {
                 
             case .internal(.logOutUser):
                 return .run { [userDefaultsClient] send in
-                   let user = await userDefaultsClient.getLoggedInUser()
                     await userDefaultsClient.setIsLoggedIn(false)
                     await send(.delegate(.userIsLoggedOut))
                 }

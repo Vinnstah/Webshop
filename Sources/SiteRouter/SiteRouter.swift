@@ -5,42 +5,33 @@ import UserModel
 
 
 public enum SiteRoute: Equatable {
+    case create(User)
     case login(User)
-    case retrieveSecret(Secret)
 }
 
 
 public let router = OneOf {
+    Route(.case(SiteRoute.create)) {
+        Path { "create" }
+        Method.post
+        Body(.json(User.self))
+    }
     Route(.case(SiteRoute.login)) {
         Path { "login" }
         Method.post
         Body(.json(User.self))
     }
-    Route(.case(SiteRoute.retrieveSecret)) {
-        Path { "secret" }
-        Method.post
-        Body(.json(Secret.self))
-    }
 }
-
-public struct Secret: Codable, Equatable {
-    public let passcode: String
-    
-    public init(passcode: String) {
-        self.passcode = passcode
-    }
-}
-
 
 public struct LoginResponse: Content, Sendable, Equatable {
-    public let token: String
+    public let status: [String: String]
     
-    public init(token: String) {
-        self.token = token
+    public init(status: [String: String] = [:]) {
+        self.status = status
     }
     
     public enum CodingKeys: String, CodingKey {
-        case token = "token"
+        case status = "status"
     }
     
     public enum ServerError: Content, Equatable, Sendable, Error {

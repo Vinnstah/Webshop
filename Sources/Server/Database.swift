@@ -54,5 +54,24 @@ public func insertUser(_ db: PostgresConnection, logger: Logger, user: User) asy
                         """,
                        logger: logger
     )
-    
+}
+
+public func getUser(_ db: PostgresConnection, logger: Logger, user: User) async throws -> User {
+    let rows = try await db.query("""
+                        SELECT * FROM users WHERE
+                        jwt = '\(user.jwt)';
+                        """,
+                       logger: logger
+    )
+    var users: User? = nil
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let user = User(
+            email: try randomRow["user_name"].decode(String.self, context: .default),
+            password: try randomRow["password"].decode(String.self, context: .default),
+            jwt: try randomRow["jwt"].decode(String.self, context: .default),
+            userSettings: .init())
+    users = user
+    }
+    return users!
 }

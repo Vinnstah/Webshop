@@ -35,7 +35,12 @@ public extension App {
         case splash(Splash.Action)
         case onboarding(Onboarding.Action)
         case main(Main.Action)
-        case userIsLoggedIn(Currency)
+        case `internal`(InternalAction)
+
+        
+        public enum InternalAction: Equatable, Sendable {
+            case userIsLoggedIn(User)
+        }
     }
     
     
@@ -47,21 +52,18 @@ public extension App {
             case .splash(.delegate(.loadIsLoggedInResult(.isLoggedIn))):
                 return .run { [userDefaultsClient] send in
                     await send(
-                        .userIsLoggedIn(
-                            .init(userDefaultsClient.getDefaultCurrency())
+                        .internal(.userIsLoggedIn(userDefaultsClient.getLoggedInUser())
                         )
                     )
                 }
 
-                /// FIX THIS, Userdefaults should add entire user
-            case let .userIsLoggedIn(currency):
-                state = .main(.init(user: .init(email: "TEST", password: "TEST", jwt: "TEST", userSettings: .init())))
+            case let .internal(.userIsLoggedIn(user)):
+                state = .main(.init(user: user))
                 return .none
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
                 return .none
-//                }
                 
             case .main(.delegate(.userIsLoggedOut)):
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
@@ -78,6 +80,9 @@ public extension App {
                 return .none
                 
             case .main(.internal(_)):
+                return .none
+                
+            case .internal(_):
                 return .none
             }
         }
@@ -132,4 +137,12 @@ public extension App {
         }
     }
 }
-
+//
+//public enum FirstBoot: Equatable, Sendable {
+//    case firstTimeBootingApp
+//    case appHasBeenBootedBefore
+//
+//    public init(_ firstBoot: Bool) {
+//        self = firstBoot ? .appHasBeenBootedBefore : .firstTimeBootingApp
+//    }
+//}

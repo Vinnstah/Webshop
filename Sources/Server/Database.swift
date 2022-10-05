@@ -56,22 +56,55 @@ public func insertUser(_ db: PostgresConnection, logger: Logger, user: User) asy
     )
 }
 
-public func getUser(_ db: PostgresConnection, logger: Logger, user: User) async throws -> User {
-    let rows = try await db.query("""
-                        SELECT * FROM users WHERE
-                        jwt = '\(user.jwt)';
-                        """,
-                       logger: logger
-    )
-    var users: User? = nil
+//public func getUser(_ db: PostgresConnection, logger: Logger, user: User) async throws -> User {
+//    let rows = try await db.query("""
+//                        SELECT * FROM users WHERE
+//                        jwt = '\(user.jwt)';
+//                        """,
+//                       logger: logger
+//    )
+//    var users: [User] = []
+//    for try await row in rows {
+//        let randomRow = row.makeRandomAccess()
+//        let user = User(
+//            email: try randomRow["user_name"].decode(String.self, context: .default),
+//            password: try randomRow["password"].decode(String.self, context: .default),
+//            jwt: try randomRow["jwt"].decode(String.self, context: .default),
+//            userSettings: .init())
+//        users.append(user)
+//        print(users)
+//    }
+//    return users.first!
+//}
+
+
+public func returnUserRowsAsArray(_ rows: PostgresRowSequence) async throws -> [User] {
+    var users: [User] = []
     for try await row in rows {
         let randomRow = row.makeRandomAccess()
         let user = User(
-            email: try randomRow["user_name"].decode(String.self, context: .default),
-            password: try randomRow["password"].decode(String.self, context: .default),
-            jwt: try randomRow["jwt"].decode(String.self, context: .default),
-            userSettings: .init())
-    users = user
+                email: try randomRow["user_name"].decode(String.self, context: .default),
+                password: try randomRow["password"].decode(String.self, context: .default),
+                jwt: try randomRow["jwt"].decode(String.self, context: .default),
+                userSettings: .init())
+        users.append(user)
+        print(user)
     }
-    return users!
+    return users
+}
+
+public func loginUser(_ db: PostgresConnection, _ email: String, _ password: String) async throws -> String? {
+    let rows = try await db.query("""
+                                  SELECT * FROM users WHERE user_name='\(email)';
+                                  """, logger: logger)
+    let user = try await returnUserRowsAsArray(rows).first
+    if user == nil {
+        return nil
+    } else {
+        let user = user!
+        if user.password == password {
+            return user.jwt
+        }
+        return nil
+    }
 }

@@ -80,7 +80,7 @@ public extension Onboarding {
             case emailAddressFieldReceivingInput(text: String)
             case passwordFieldReceivingInput(text: String)
             case loginButtonPressed
-            case loginResponse(TaskResult<LoginResponse>)
+            case loginResponse(TaskResult<String>)
             case signUpButtonPressed
             case nextStep
             case previousStep
@@ -94,6 +94,7 @@ public extension Onboarding {
         
         public enum DelegateAction: Equatable, Sendable {
             case userFinishedOnboarding(user: User)
+            case userLoggedIn(token: String)
         }
     }
     
@@ -118,7 +119,7 @@ public extension Onboarding {
                             TaskResult {
                                 try await urlRoutingClient.decodedResponse(
                                     for: .login(user),
-                                    as: LoginResponse.self
+                                    as: String.self
                                 ).value
                             }
                         )
@@ -127,9 +128,14 @@ public extension Onboarding {
                     }
                 }
                 
-            case let .internal(.loginResponse(.success(status))):
-                print(status)
-                return .none
+            case let .internal(.loginResponse(.success(token))):
+                return .run { [mainQueue, userDefaultsClient] send in
+                    try await mainQueue.sleep(for: .milliseconds(700))
+//                    await userDefault
+//                    await userDefaultsClient.setLoggedInUser(user)
+                    await userDefaultsClient.setIsLoggedIn(true)
+                    await send(.delegate(.userLoggedIn(token: token )))
+                }
                 
             case .internal(.signUpButtonPressed):
                 state.step = .step1_Welcome
@@ -187,12 +193,14 @@ public extension Onboarding {
                 }
                 
             case let .internal(.userDataServerResponse(result)):
-                let user = try? result.value
+                guard let user = try? result.value else {
+                    return .none
+                }
                 return .run { [mainQueue, userDefaultsClient] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
                     // TODO: DELETE OLD USERDEFAULTS
-                    await userDefaultsClient.setLoggedInUser(user!)
-                    await send(.delegate(.userFinishedOnboarding(user: user ?? .init(email: "", password: "", jwt: "", userSettings: .init()))))
+                    await userDefaultsClient.setLoggedInUser(user)
+                    await send(.delegate(.userFinishedOnboarding(user: user )))
                 }
                 
             case .internal(_):

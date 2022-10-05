@@ -73,6 +73,10 @@ public extension App {
                 state = .main(.init(user: user))
                 return .none
                 
+            case let .onboarding(.delegate(.userLoggedIn(token))):
+                state = .main(.init(user: User(email: "", password: "", jwt: token, userSettings: .init())))
+                return .none
+                
             case .splash(.internal(_)):
                 return .none
                 
@@ -84,6 +88,7 @@ public extension App {
                 
             case .internal(_):
                 return .none
+
             }
         }
         .ifCaseLet(

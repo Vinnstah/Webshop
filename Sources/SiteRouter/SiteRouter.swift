@@ -39,6 +39,12 @@ public struct LoginResponse: Content, Sendable, Equatable {
     }
 }
 
+public struct ResultPayload<T: Codable>: Content {
+    let forAction: String
+    let status: Bool
+    let data: T?
+}
+
 
 public struct CreateUserResponse: Content, Equatable {
     let email: String

@@ -29,13 +29,14 @@ func siteHandler(
         
     case let .login(user):
         let db = try await connectDatabase()
-        let token = try await loginUser(db, user.email, user.password) ?? "No user found in database"
+        let token = try await loginUser(db, user.email, user.password)
         try await db.close()
-//        if user.email != dbUser.email && user.password != dbUser.password {
-//            return LoginResponse(status: ["status": "Failed"])
-//        }
-//        return dbUser
-        return ResultPayload(forAction: "login", status: token != nil, data: token ?? "Invalid Username or Password")
+        return ResultPayload(
+            forAction: "login",
+            status: token == nil ? .failedToLogin : .successfulLogin,
+            data: token ?? "Invalid Username or Password"
+        )
     }
 }
+
 

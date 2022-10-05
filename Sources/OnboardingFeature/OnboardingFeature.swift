@@ -24,6 +24,7 @@ public struct Onboarding: ReducerProtocol {
     public init() {}
 }
 
+extension AlertState: @unchecked Sendable {}
 public extension Onboarding {
     
     struct State: Equatable, Sendable {
@@ -33,6 +34,7 @@ public extension Onboarding {
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
         public var user: User
+        public var alert: AlertState<Action>?
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
@@ -40,7 +42,8 @@ public extension Onboarding {
             passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
-            user: User = .init(email: "", password: "", jwt: "", userSettings: .init())
+            user: User = .init(email: "", password: "", jwt: "", userSettings: .init()),
+            alert: AlertState<Action>? = nil
         ) {
             self.step = step
             self.emailAddressField = emailAddressField
@@ -48,6 +51,7 @@ public extension Onboarding {
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.user = user
+            self.alert = alert
         }
         
         
@@ -80,7 +84,7 @@ public extension Onboarding {
             case emailAddressFieldReceivingInput(text: String)
             case passwordFieldReceivingInput(text: String)
             case loginButtonPressed
-            case loginResponse(TaskResult<String>)
+            case loginResponse(TaskResult<ResultPayload>)
             case signUpButtonPressed
             case nextStep
             case previousStep
@@ -90,6 +94,7 @@ public extension Onboarding {
             case defaultCurrencyChosen(Currency)
             case sendUserDataToServer(User)
             case userDataServerResponse(TaskResult<User>)
+            case alertConfirmTapped
         }
         
         public enum DelegateAction: Equatable, Sendable {
@@ -119,7 +124,7 @@ public extension Onboarding {
                             TaskResult {
                                 try await urlRoutingClient.decodedResponse(
                                     for: .login(user),
-                                    as: String.self
+                                    as: ResultPayload.self
                                 ).value
                             }
                         )
@@ -128,13 +133,25 @@ public extension Onboarding {
                     }
                 }
                 
-            case let .internal(.loginResponse(.success(token))):
-                return .run { [mainQueue, userDefaultsClient] send in
-                    try await mainQueue.sleep(for: .milliseconds(700))
-//                    await userDefault
-//                    await userDefaultsClient.setLoggedInUser(user)
-                    await userDefaultsClient.setIsLoggedIn(true)
-                    await send(.delegate(.userLoggedIn(token: token )))
+            case let .internal(.loginResponse(.success(result))):
+                
+                switch result.status {
+                    
+                case .failedToLogin:
+                    
+                    state.alert = AlertState(
+                         title: TextState("Error"),
+                         message: TextState(result.data),
+                         dismissButton: .cancel(TextState("Dismiss"), action: .none)
+                     )
+                    return .none
+                    
+                case .successfulLogin:
+                    return .run { [mainQueue, userDefaultsClient] send in
+                        try await mainQueue.sleep(for: .milliseconds(700))
+                        await userDefaultsClient.setIsLoggedIn(true)
+                        await send(.delegate(.userLoggedIn(token: result.data)))
+                    }
                 }
                 
             case .internal(.signUpButtonPressed):
@@ -202,6 +219,10 @@ public extension Onboarding {
                     await userDefaultsClient.setLoggedInUser(user)
                     await send(.delegate(.userFinishedOnboarding(user: user )))
                 }
+                
+            case .internal(.alertConfirmTapped):
+                state.alert = nil
+                return .none
                 
             case .internal(_):
                 return .none

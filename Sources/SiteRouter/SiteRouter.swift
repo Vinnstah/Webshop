@@ -23,26 +23,22 @@ public let router = OneOf {
     }
 }
 
-public struct LoginResponse: Content, Sendable, Equatable {
-    public let status: [String: String]
-    
-    public init(status: [String: String] = [:]) {
-        self.status = status
-    }
-    
-    public enum CodingKeys: String, CodingKey {
-        case status = "status"
-    }
-    
-    public enum ServerError: Content, Equatable, Sendable, Error {
-        case failedToGetServerResponse
-    }
-}
 
-public struct ResultPayload<T: Codable>: Content {
-    let forAction: String
-    let status: Bool
-    let data: T?
+public struct ResultPayload: Content, Sendable, Equatable {
+    public let forAction: String
+    public let status: Status
+    public let data: String
+    
+    public init(forAction: String, status: Status, data: String) {
+        self.forAction = forAction
+        self.status = status
+        self.data = data
+    }
+    
+    public enum Status: Content, Sendable, Equatable {
+        case failedToLogin
+        case successfulLogin
+    }
 }
 
 

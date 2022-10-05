@@ -78,6 +78,14 @@ public extension Onboarding {
                     }
                 }
                 
+                .alert(
+                    self
+                        .store
+                        .scope(
+                            state: \.alert
+                        ),
+                    dismiss: .internal(.alertConfirmTapped)
+                )
             }
         }
     }

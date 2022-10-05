@@ -14,6 +14,7 @@ import _URLRouting
 import URLRoutingClient
 import UserModel
 
+extension AlertState: @unchecked Sendable {}
 
 /// Add to check UserDefaults if its the first time they open app -> Show onboarding
 public struct Onboarding: ReducerProtocol {
@@ -24,7 +25,6 @@ public struct Onboarding: ReducerProtocol {
     public init() {}
 }
 
-extension AlertState: @unchecked Sendable {}
 public extension Onboarding {
     
     struct State: Equatable, Sendable {
@@ -35,6 +35,8 @@ public extension Onboarding {
         public var areTermsAndConditionsAccepted: Bool
         public var user: User
         public var alert: AlertState<Action>?
+        
+        
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
@@ -118,6 +120,7 @@ public extension Onboarding {
                 
             case .internal(.loginButtonPressed):
                 state.isLoginInFlight = true
+                
                 return .run { [urlRoutingClient, user = state.user] send in
                     do {
                         return await send(.internal(.loginResponse(
@@ -127,14 +130,12 @@ public extension Onboarding {
                                     as: ResultPayload.self
                                 ).value
                             }
-                        )
-                        )
-                        )
+                        )))
                     }
                 }
                 
             case let .internal(.loginResponse(.success(result))):
-                
+                state.isLoginInFlight = false
                 switch result.status {
                     
                 case .failedToLogin:
@@ -147,8 +148,7 @@ public extension Onboarding {
                     return .none
                     
                 case .successfulLogin:
-                    return .run { [mainQueue, userDefaultsClient] send in
-                        try await mainQueue.sleep(for: .milliseconds(700))
+                    return .run { [userDefaultsClient] send in
                         await userDefaultsClient.setIsLoggedIn(true)
                         await send(.delegate(.userLoggedIn(token: result.data)))
                     }
@@ -184,6 +184,7 @@ public extension Onboarding {
                 state.areTermsAndConditionsAccepted.toggle()
                 return .none
                 
+                // TODO: Make this a part of User model instead.
             case let .internal(.defaultCurrencyChosen(currency)):
                 state.user.userSettings.defaultCurrency = currency
                 return .none
@@ -233,6 +234,14 @@ public extension Onboarding {
             }
         }
     }
+}
+
+public func emailRequirements(email: String) -> Bool? {
+    guard let regex = try? Regex(#"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$"#) else { return nil }
+    if email.wholeMatch(of: regex) != nil {
+        return true
+    }
+    return false
 }
 
 

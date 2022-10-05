@@ -72,6 +72,7 @@ public extension Onboarding {
                     Button("Login") {
                         viewStore.send(.internal(.loginButtonPressed), animation: .default)
                     }
+                    .disabled(viewStore.state.isLoginInFlight)
                     
                     Button("Sign Up") {
                         viewStore.send(.internal(.signUpButtonPressed))

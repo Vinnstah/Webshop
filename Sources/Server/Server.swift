@@ -19,23 +19,19 @@ func siteHandler(
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case let .create(user):
-        let db = try await connectDatabase()
+        let db = try await connectDatabase()       
         let jwt = constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.email))
-        let updatedUser = User(email: user.email, password: user.password, jwt: jwt, userSettings: user.userSettings)
+        let updatedUser = User(email: user.email, password: user.hexedPassword, jwt: jwt, userSettings: user.userSettings)
         
         try await insertUser(db, logger: logger, user: updatedUser)
         try await db.close()
-        return updatedUser
+        return ResultPayload(forAction: "login", payload: updatedUser.jwt)
         
     case let .login(user):
         let db = try await connectDatabase()
-        let token = try await loginUser(db, user.email, user.password)
+        let token = try await loginUser(db, user.email, user.hexedPassword)
         try await db.close()
-        return ResultPayload(
-            forAction: "login",
-            status: token == nil ? .failedToLogin : .successfulLogin,
-            data: token ?? "Invalid Username or Password"
-        )
+        return ResultPayload(forAction: "login", payload: token)
     }
 }
 

@@ -22,6 +22,9 @@ public struct App: ReducerProtocol {
 }
 
 public extension App {
+    
+    typealias JWT = String
+    
     enum State: Equatable {
         case splash(Splash.State)
         case onboarding(Onboarding.State)
@@ -39,7 +42,7 @@ public extension App {
 
         
         public enum InternalAction: Equatable, Sendable {
-            case userIsLoggedIn(User)
+            case userIsLoggedIn(JWT)
         }
     }
     
@@ -52,13 +55,13 @@ public extension App {
             case .splash(.delegate(.loadIsLoggedInResult(.isLoggedIn))):
                 return .run { [userDefaultsClient] send in
                     await send(
-                        .internal(.userIsLoggedIn(userDefaultsClient.getLoggedInUser())
+                        .internal(.userIsLoggedIn(userDefaultsClient.getLoggedInUserJWT())
                         )
                     )
                 }
 
-            case let .internal(.userIsLoggedIn(user)):
-                state = .main(.init(user: user))
+            case let .internal(.userIsLoggedIn(jwt)):
+                state = .main(.init(jwt: jwt))
                 return .none
                 
             case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
@@ -69,12 +72,12 @@ public extension App {
                 state = .onboarding(.init(step: .step0_LoginOrCreateUser))
                 return .none
                 
-            case let .onboarding(.delegate(.userFinishedOnboarding(user))):
-                state = .main(.init(user: user))
+            case let .onboarding(.delegate(.userFinishedOnboarding(jwt))):
+                state = .main(.init(jwt: jwt))
                 return .none
                 
-            case let .onboarding(.delegate(.userLoggedIn(token))):
-                state = .main(.init(user: User(email: "", password: "", jwt: token, userSettings: .init())))
+            case let .onboarding(.delegate(.userLoggedIn(jwt))):
+                state = .main(.init(jwt: jwt))
                 return .none
                 
             case .splash(.internal(_)):

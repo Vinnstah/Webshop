@@ -11,10 +11,10 @@ public struct Main: ReducerProtocol {
 
 public extension Main {
     struct State: Equatable {
-        public var user: User
+        public var jwt: String
         
-        public init(user: User) {
-            self.user = user
+        public init(jwt: String) {
+            self.jwt = jwt
         }
     }
     
@@ -64,14 +64,11 @@ public extension Main {
                 VStack {
                     Text("Main Feature goes here")
                     
-                    HStack {
-                        Text("Default currency: ")
-                        Text(viewStore.state.user.userSettings.defaultCurrency.rawValue)
-                    }
+
                     
                     HStack {
                         Text("JWT TOKEN: ")
-                        Text(viewStore.state.user.jwt)
+                        Text(viewStore.state.jwt)
                     }
                     
                     Button("Log out user") {

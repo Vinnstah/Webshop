@@ -9,11 +9,18 @@ import Foundation
 import Vapor
 //import PostgresNIO
 
+// TODO: Separate userSettings
 public struct User: Content, Equatable, Codable, Sendable {
     public var email: String
     public var password: String
     public var jwt: String
     public var userSettings: UserSettings
+    
+    public var hexedPassword: String {
+        let utf8ConvertedPassword = password.data(using: .utf8)!
+        let sha256password = Data(SHA256.hash(data: utf8ConvertedPassword))
+        return sha256password.base64EncodedString()
+    }
     
     public init(
         email: String,
@@ -33,6 +40,12 @@ public struct User: Content, Equatable, Codable, Sendable {
         public init(defaultCurrency: Currency = .SEK) {
             self.defaultCurrency = defaultCurrency
         }
+    }
+    
+    public func hexPassword(_ password: String) -> String {
+        let utf8ConvertedPassword = password.data(using: .utf8)!
+        let sha256password = Data(SHA256.hash(data: utf8ConvertedPassword))
+        return sha256password.base64EncodedString()
     }
 }
 

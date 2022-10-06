@@ -24,20 +24,24 @@ public let router = OneOf {
 }
 
 
-public struct ResultPayload: Content, Sendable, Equatable {
+public struct ResultPayload<Payload: Sendable & Equatable & Codable>: Content, Sendable, Equatable {
     public let forAction: String
-    public let status: Status
-    public let data: String
-    
-    public init(forAction: String, status: Status, data: String) {
-        self.forAction = forAction
-        self.status = status
-        self.data = data
+    public let payload: Payload?
+    public var status: Result<Payload, Failure> {
+        guard let payload else {
+            return .failure(.failure)
+        }
+        return .success(payload)
     }
     
-    public enum Status: Content, Sendable, Equatable {
-        case failedToLogin
-        case successfulLogin
+    public init(forAction: String, payload: Payload?) {
+        self.forAction = forAction
+        self.payload = payload
+    }
+    
+
+    public enum Failure: String, Error, Sendable, Codable {
+        case failure
     }
 }
 

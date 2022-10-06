@@ -21,7 +21,7 @@ extension AlertState: @unchecked Sendable {}
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
-    @Dependency(\.urlRoutingClient) var urlRoutingClient
+    @Dependency(\.urlRoutingClient) var apiClient
     
     public init() {}
 }
@@ -30,13 +30,14 @@ public extension Onboarding {
     
     struct State: Equatable, Sendable {
         public var step: Step
+        public var passwordField: String
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
         public var user: User
         public var alert: AlertState<Action>?
         
         public var passwordFulfillsRequirements: Bool {
-            if user.password.count > 5 {
+            if passwordField.count > 5 {
                 return true
             }
             return false
@@ -65,12 +66,14 @@ public extension Onboarding {
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
+            passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
             user: User = .init(email: "", password: "", jwt: "", userSettings: .init()),
             alert: AlertState<Action>? = nil
         ) {
             self.step = step
+            self.passwordField = passwordField
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.user = user
@@ -98,6 +101,8 @@ public extension Onboarding {
         }
     }
     
+    typealias JWT = String
+    
     enum Action: Equatable, Sendable {
         
         case delegate(DelegateAction)
@@ -107,7 +112,7 @@ public extension Onboarding {
             case emailAddressFieldReceivingInput(text: String)
             case passwordFieldReceivingInput(text: String)
             case loginButtonPressed
-            case loginResponse(TaskResult<ResultPayload>)
+            case loginResponse(TaskResult<JWT>)
             case signUpButtonPressed
             case nextStep
             case previousStep
@@ -115,14 +120,14 @@ public extension Onboarding {
             case goBackToLoginView
             case termsAndConditionsBoxPressed
             case defaultCurrencyChosen(Currency)
-            case sendUserDataToServer(User)
-            case userDataServerResponse(TaskResult<User>)
+            case createUserRequest(User)
+            case createUserResponse(TaskResult<JWT>)
             case alertConfirmTapped
         }
         
         public enum DelegateAction: Equatable, Sendable {
-            case userFinishedOnboarding(user: User)
-            case userLoggedIn(token: String)
+            case userFinishedOnboarding(jwt: JWT)
+            case userLoggedIn(jwt: JWT)
         }
     }
     
@@ -136,51 +141,48 @@ public extension Onboarding {
                 return .none
                 
             case let .internal(.passwordFieldReceivingInput(text: text)):
+                state.passwordField = text
                 state.user.password = text
                 return .none
                 
             case .internal(.loginButtonPressed):
                 state.isLoginInFlight = true
                 
-                return .run { [urlRoutingClient, user = state.user] send in
-                    do {
-                        return await send(.internal(.loginResponse(
-                            TaskResult {
-                                try await urlRoutingClient.decodedResponse(
-                                    for: .login(user),
-                                    as: ResultPayload.self
-                                ).value
-                            }
-                        )))
-                    }
+                return .run { [apiClient, user = state.user] send in
+                    return await send(.internal(.loginResponse(
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .login(user),
+                                as: ResultPayload<JWT>.self
+                            ).value.status.get()
+                        }
+                    )))
                 }
                 
-            case let .internal(.loginResponse(.success(result))):
+            case let .internal(.loginResponse(.success(jwt))):
                 state.isLoginInFlight = false
-                switch result.status {
-                    
-                case .failedToLogin:
-                    
-                    state.alert = AlertState(
-                         title: TextState("Error"),
-                         message: TextState(result.data),
-                         dismissButton: .cancel(TextState("Dismiss"), action: .none)
-                     )
-                    return .none
-                    
-                case .successfulLogin:
-                    return .run { [userDefaultsClient] send in
-                        await userDefaultsClient.setIsLoggedIn(true)
-                        await send(.delegate(.userLoggedIn(token: result.data)))
-                    }
+                
+                return .run { [userDefaultsClient] send in
+                    await userDefaultsClient.setIsLoggedIn(true)
+                    await send(.delegate(.userLoggedIn(jwt: jwt)))
                 }
+                
+                
+            case let .internal(.loginResponse(.failure(error))):
+                state.isLoginInFlight = false
+                state.alert = AlertState(
+                     title: TextState("Error"),
+                     message: TextState(error.localizedDescription),
+                     dismissButton: .cancel(TextState("Dismiss"), action: .none)
+                 )
+                return .none
                 
             case .internal(.signUpButtonPressed):
                 state.step = .step1_Welcome
                 return .none
                 
             case .internal(.nextStep):
-                    state.step.nextStep()
+                state.step.nextStep()
                 return .none
                 
             case .internal(.previousStep):
@@ -193,7 +195,7 @@ public extension Onboarding {
                     user = state.user
                 ] send in
                     
-                    await send(.internal(.sendUserDataToServer(user)))
+                    await send(.internal(.createUserRequest(user)))
                     
                     await userDefaultsClient.setIsLoggedIn(true)
                     
@@ -214,32 +216,31 @@ public extension Onboarding {
                 state = .init()
                 return .none
                 
-            case let .internal(.sendUserDataToServer(user)):
-                return .run { [urlRoutingClient] send in
-                    do {
+            case let .internal(.createUserRequest(user)):
+                var hexedUser = user
+                hexedUser.password = user.hexPassword(user.password)
+                
+                return .run { [apiClient] send in
                         return await send(.internal(
-                            .userDataServerResponse(
+                            .createUserResponse(
                                 TaskResult {
-                                    try await urlRoutingClient.decodedResponse(
+                                    try await apiClient.decodedResponse(
                                         for: .create(user),
-                                        as: User.self
-                                    ).value
+                                        as: ResultPayload<JWT>.self
+                                    ).value.status.get()
                                 }
                             )
                         )
                         )
-                    }
+                    
                 }
                 
-            case let .internal(.userDataServerResponse(result)):
-                guard let user = try? result.value else {
-                    return .none
-                }
+            case let .internal(.createUserResponse(.success(jwt))):
                 return .run { [mainQueue, userDefaultsClient] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
                     // TODO: DELETE OLD USERDEFAULTS
-                    await userDefaultsClient.setLoggedInUser(user)
-                    await send(.delegate(.userFinishedOnboarding(user: user )))
+                    await userDefaultsClient.setLoggedInUserJWT(jwt)
+                    await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
                 }
                 
             case .internal(.alertConfirmTapped):

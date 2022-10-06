@@ -63,7 +63,7 @@ public extension Onboarding {
                     
                     SecureField("Password",
                                 text: viewStore.binding(
-                                    get: { $0.user.password },
+                                    get: { $0.passwordField },
                                     send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )
@@ -113,7 +113,7 @@ public extension Onboarding {
                     .padding(.horizontal)
                     SecureField("Password",
                                 text: viewStore.binding(
-                                    get: { $0.user.password },
+                                    get: { $0.passwordField },
                                     send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )

@@ -8,19 +8,19 @@ public struct UserDefaultsClient: Sendable {
     public var doubleForKey: @Sendable (String) async -> Double
     public var integerForKey: @Sendable (String) async -> Int
     public var stringForKey: @Sendable (String) async -> String
-    public var userForKey: @Sendable (String) async -> User
+    public var jwtForKey: @Sendable (String) async -> String
     public var remove: @Sendable (String) async -> Void
     public var setBool: @Sendable (Bool, String) async -> Void
     public var setData: @Sendable (Data?, String) async -> Void
     public var setDouble: @Sendable (Double, String) async -> Void
     public var setInteger: @Sendable (Int, String) async -> Void
     public var setString: @Sendable (String, String) async -> Void
-    public var setUser: @Sendable (User, String) async -> Void
+    public var setJWT: @Sendable (String, String) async -> Void
 }
 
 private let isLoggedInKey: String = "isLoggedInKey"
 private let currencyKey: String = "currencyKey"
-private let userKey: String = "userKey"
+private let jwtKey: String = "jwtKey"
 
 public extension UserDefaultsClient {
     func setIsLoggedIn(_ isLoggedIn: Bool) async {
@@ -39,12 +39,12 @@ public extension UserDefaultsClient {
         await stringForKey(currencyKey)
     }
     
-    func setLoggedInUser(_ user: User) async {
-        await setUser(user, userKey)
+    func setLoggedInUserJWT(_ jwt: String) async {
+        await setJWT(jwt, jwtKey)
     }
     
-    func getLoggedInUser() async -> User {
-        await userForKey(userKey)
+    func getLoggedInUserJWT() async -> String {
+        await jwtForKey(jwtKey)
     }
  
     

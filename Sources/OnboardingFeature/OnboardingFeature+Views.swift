@@ -161,7 +161,7 @@ public extension Onboarding {
                     Text("View to fill in all information")
                     
                     Picker("Default Currency", selection: viewStore.binding(
-                        get: { $0.user.userSettings.defaultCurrency },
+                        get: { $0.userSettings.defaultCurrency },
                         send: { .internal(.defaultCurrencyChosen($0)) }
                     )
                     ) {

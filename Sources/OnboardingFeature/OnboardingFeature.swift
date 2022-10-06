@@ -35,6 +35,7 @@ public extension Onboarding {
         public var areTermsAndConditionsAccepted: Bool
         public var user: User
         public var alert: AlertState<Action>?
+        public var userSettings: UserSettings
         
         public var passwordFulfillsRequirements: Bool {
             if passwordField.count > 5 {
@@ -62,15 +63,14 @@ public extension Onboarding {
             }
         }
         
-        
-        
         public init(
             step: Step = .step0_LoginOrCreateUser,
             passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
-            user: User = .init(email: "", password: "", jwt: "", userSettings: .init()),
-            alert: AlertState<Action>? = nil
+            user: User = .init(email: "", password: "", jwt: ""),
+            alert: AlertState<Action>? = nil,
+            userSettings: UserSettings  = .init()
         ) {
             self.step = step
             self.passwordField = passwordField
@@ -78,6 +78,7 @@ public extension Onboarding {
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.user = user
             self.alert = alert
+            self.userSettings = userSettings
         }
         
         
@@ -193,14 +194,15 @@ public extension Onboarding {
             case .internal(.finishSignUp):
                 return .run { [
                     userDefaultsClient,
-                    user = state.user
+                    user = state.user,
+                    userSettings = state.userSettings
                 ] send in
                     
                     await send(.internal(.createUserRequest(user)))
                     
                     await userDefaultsClient.setIsLoggedIn(true)
                     
-                    await userDefaultsClient.setDefaultCurrency(user.userSettings.defaultCurrency.rawValue)
+                    await userDefaultsClient.setDefaultCurrency(userSettings.defaultCurrency.rawValue)
                     
                 }
                 
@@ -210,7 +212,7 @@ public extension Onboarding {
                 
                 // TODO: Make this a part of User model instead.
             case let .internal(.defaultCurrencyChosen(currency)):
-                state.user.userSettings.defaultCurrency = currency
+                state.userSettings.defaultCurrency = currency
                 return .none
                 
             case .internal(.goBackToLoginView):

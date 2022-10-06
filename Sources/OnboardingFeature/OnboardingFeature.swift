@@ -16,6 +16,7 @@ import UserModel
 
 extension AlertState: @unchecked Sendable {}
 
+
 /// Add to check UserDefaults if its the first time they open app -> Show onboarding
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -29,27 +30,47 @@ public extension Onboarding {
     
     struct State: Equatable, Sendable {
         public var step: Step
-        public var emailAddressField: String
-        public var passwordField: String
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
         public var user: User
         public var alert: AlertState<Action>?
         
+        public var passwordFulfillsRequirements: Bool {
+            if user.password.count > 5 {
+                return true
+            }
+            return false
+        }
+        
+        public var emailFulfillsRequirements: Bool {
+            guard user.email.count > 5 else {
+                return false
+            }
+            
+            guard user.email.contains("@") else {
+                return false
+            }
+            return true
+        }
+        
+        public var disableButton: Bool {
+            if !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight {
+                return true
+            } else {
+                return false
+            }
+        }
+        
         
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
-            emailAddressField: String = "",
-            passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
             user: User = .init(email: "", password: "", jwt: "", userSettings: .init()),
             alert: AlertState<Action>? = nil
         ) {
             self.step = step
-            self.emailAddressField = emailAddressField
-            self.passwordField = passwordField
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.user = user
@@ -159,7 +180,7 @@ public extension Onboarding {
                 return .none
                 
             case .internal(.nextStep):
-                state.step.nextStep()
+                    state.step.nextStep()
                 return .none
                 
             case .internal(.previousStep):
@@ -236,12 +257,10 @@ public extension Onboarding {
     }
 }
 
-public func emailRequirements(email: String) -> Bool? {
-    guard let regex = try? Regex(#"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$"#) else { return nil }
-    if email.wholeMatch(of: regex) != nil {
-        return true
-    }
-    return false
-}
-
-
+//public func doesEmailMeetRequirements(email: String) -> Bool? {
+//    guard let regex = try? Regex(#"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$"#) else { return nil }
+//    if email.wholeMatch(of: regex) != nil {
+//        return true
+//    }
+//    return false
+//}

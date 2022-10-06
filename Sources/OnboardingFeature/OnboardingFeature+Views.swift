@@ -55,7 +55,7 @@ public extension Onboarding {
                 VStack {
                     TextField("Email",
                               text: viewStore.binding(
-                                get: { $0.emailAddressField },
+                                get: { $0.user.email },
                                 send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
                               )
                     )
@@ -63,7 +63,7 @@ public extension Onboarding {
                     
                     SecureField("Password",
                                 text: viewStore.binding(
-                                    get: { $0.passwordField },
+                                    get: { $0.user.password },
                                     send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )
@@ -106,23 +106,29 @@ public extension Onboarding {
                 VStack {
                     TextField("Email",
                               text: viewStore.binding(
-                                get: { $0.emailAddressField },
+                                get: { $0.user.email },
                                 send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
                               )
                     )
-                    .padding()
-                    //
+                    .padding(.horizontal)
                     SecureField("Password",
                                 text: viewStore.binding(
-                                    get: { $0.passwordField },
+                                    get: { $0.user.password },
                                     send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )
-                    .padding()
+                    .padding(.horizontal)
+                    if !viewStore.state.emailFulfillsRequirements {
+                        Text("Email does not meet requirements")
+                    }
+                    if !viewStore.state.passwordFulfillsRequirements {
+                        Text("Password does not meet requirements")
+                    }
                     HStack {
                         Button("Next step") {
                             viewStore.send(.internal(.nextStep))
                         }
+                        .disabled(viewStore.state.disableButton)
                         if viewStore.state.step != .step1_Welcome {
                             Button("Previous Step") { viewStore.send(.internal(.previousStep), animation: .easeIn(duration: 1.0))}
                         }

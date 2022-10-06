@@ -6,7 +6,7 @@ import UserModel
 // configures your application
 public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
-    // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+//     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     
     app.mount(router, use: siteHandler)
     
@@ -23,7 +23,7 @@ func siteHandler(
         
         let jwt = constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.email))
         
-        let updatedUser = User(email: user.email, password: user.hexedPassword, jwt: jwt, userSettings: user.userSettings)
+        let updatedUser = User(email: user.email, password: user.hexedPassword, jwt: jwt)
         
         try await insertUser(db, logger: logger, user: updatedUser)
         try await db.close()

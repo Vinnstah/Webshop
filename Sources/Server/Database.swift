@@ -1,9 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-02.
-//
 
 import Foundation
 import PostgresNIO
@@ -11,10 +5,12 @@ import Logging
 import NIOPosix
 import SiteRouter
 import UserModel
+import Vapor
 
 public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 public let logger = Logger(label: "postgres-logger")
 
+// TODO: Add Username, DB and Password to environment
 public func connectDatabase() async throws -> PostgresConnection  {
     let config = PostgresConnection.Configuration(
         connection: .init(
@@ -22,9 +18,9 @@ public func connectDatabase() async throws -> PostgresConnection  {
             port: 5432
         ),
         authentication: .init(
-            username: "viktorjansson",
-            database: "webshop",
-            password: "baloo"
+            username: Environment.get("WS_USER")!,
+            database: Environment.get("WS_DB")!,
+            password: Environment.get("WS_PW")!
         ),
         tls: .disable
     )
@@ -63,8 +59,7 @@ public func returnUserRowsAsArray(_ rows: PostgresRowSequence) async throws -> [
         let user = User(
             email: try randomRow["user_name"].decode(String.self, context: .default),
             password: try randomRow["password"].decode(String.self, context: .default),
-            jwt: try randomRow["jwt"].decode(String.self, context: .default),
-            userSettings: .init())
+            jwt: try randomRow["jwt"].decode(String.self, context: .default))
         users.append(user)
     }
     return users
@@ -82,7 +77,6 @@ public func loginUser(_ db: PostgresConnection, _ email: String, _ password: Str
         return nil
     } else {
         let user = user!
-        // TODO: Implement more secure way to auth user
         if user.password == password {
             return user.jwt
         }

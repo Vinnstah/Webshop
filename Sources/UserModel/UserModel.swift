@@ -30,7 +30,6 @@ public struct User: Content, Equatable, Codable, Sendable {
         self.password = password
         self.jwt = jwt
     }
-    
 }
 
 public struct UserSettings: Content, Equatable, Sendable {
@@ -41,7 +40,6 @@ public struct UserSettings: Content, Equatable, Sendable {
     }
 }
 
-//TODO: Implement User model with local settings.
 public enum Currency: String, Equatable, Sendable, CaseIterable, Codable {
     case SEK = "SEK"
     case USD = "USD"

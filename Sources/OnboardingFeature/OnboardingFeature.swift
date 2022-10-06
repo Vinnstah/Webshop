@@ -14,10 +14,10 @@ import _URLRouting
 import URLRoutingClient
 import UserModel
 
+///Conforming AlertState to Sendable
 extension AlertState: @unchecked Sendable {}
 
 
-/// Add to check UserDefaults if its the first time they open app -> Show onboarding
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
@@ -30,20 +30,20 @@ public extension Onboarding {
     
     struct State: Equatable, Sendable {
         public var step: Step
-        public var passwordField: String
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
         public var user: User
         public var alert: AlertState<Action>?
         public var userSettings: UserSettings
         
+        ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
         public var passwordFulfillsRequirements: Bool {
-            if passwordField.count > 5 {
+            if user.password.count > 5 {
                 return true
             }
             return false
         }
-        
+        ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
         public var emailFulfillsRequirements: Bool {
             guard user.email.count > 5 else {
                 return false
@@ -55,6 +55,7 @@ public extension Onboarding {
             return true
         }
         
+        ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
         public var disableButton: Bool {
             if !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight {
                 return true
@@ -65,7 +66,6 @@ public extension Onboarding {
         
         public init(
             step: Step = .step0_LoginOrCreateUser,
-            passwordField: String = "",
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
             user: User = .init(email: "", password: "", jwt: ""),
@@ -73,7 +73,6 @@ public extension Onboarding {
             userSettings: UserSettings  = .init()
         ) {
             self.step = step
-            self.passwordField = passwordField
             self.isLoginInFlight = isLoginInFlight
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.user = user
@@ -81,17 +80,18 @@ public extension Onboarding {
             self.userSettings = userSettings
         }
         
-        
+        ///Enum for the different Onboarding steps.
         public enum Step: Int, Equatable, CaseIterable, Comparable, Sendable {
             case step0_LoginOrCreateUser
             case step1_Welcome
             case step2_FillInYourInformation
             case step3_TermsAndConditions
             
+            ///Function to skip to the next step
             mutating func nextStep() {
                 self = Self(rawValue: self.rawValue + 1) ?? Self.allCases.last!
             }
-            
+            ///Function to go back to the previous step
             mutating func previousStep() {
                 self = Self(rawValue: self.rawValue - 1) ?? Self.allCases.first!
             }
@@ -136,16 +136,17 @@ public extension Onboarding {
         Reduce { state, action in
             
             switch action {
-                
+                ///Set user.email when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.user.email = text
                 return .none
-                
+            
+                ///Set  `user.password` when passwordField receives input.
             case let .internal(.passwordFieldReceivingInput(text: text)):
-                state.passwordField = text
                 state.user.password = text
                 return .none
                 
+                /// When loginButton is pressed set `loginInFlight` to `true`. Send a api request to login endpoint with `state.user` and receive the TaskResult back.
             case .internal(.loginButtonPressed):
                 state.isLoginInFlight = true
                 
@@ -160,6 +161,7 @@ public extension Onboarding {
                     )))
                 }
                 
+                /// If login is successful we set `loginInFlight` to `false`. We then set userDefaults `isLoggedIn` to `true` and add the user JWT.
             case let .internal(.loginResponse(.success(jwt))):
                 state.isLoginInFlight = false
                 
@@ -169,7 +171,7 @@ public extension Onboarding {
                     await send(.delegate(.userLoggedIn(jwt: jwt)))
                 }
                 
-                
+                /// If login fails we show an alert.
             case let .internal(.loginResponse(.failure(error))):
                 state.isLoginInFlight = false
                 state.alert = AlertState(
@@ -243,6 +245,14 @@ public extension Onboarding {
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
                     await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
                 }
+                
+            case let .internal(.createUserResponse(.failure(error))):
+                state.alert = AlertState(
+                     title: TextState("Error"),
+                     message: TextState(error.localizedDescription),
+                     dismissButton: .cancel(TextState("Dismiss"), action: .none)
+                 )
+                return .none
                 
             case .internal(.alertConfirmTapped):
                 state.alert = nil

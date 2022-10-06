@@ -10,7 +10,6 @@ import Vapor
 public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 public let logger = Logger(label: "postgres-logger")
 
-// TODO: Add Username, DB and Password to environment
 public func connectDatabase() async throws -> PostgresConnection  {
     let config = PostgresConnection.Configuration(
         connection: .init(
@@ -65,12 +64,16 @@ public func returnUserRowsAsArray(_ rows: PostgresRowSequence) async throws -> [
     return users
 }
 
-public func loginUser(_ db: PostgresConnection, _ email: String, _ password: String) async throws -> String? {
+public func loginUser(
+    _ db: PostgresConnection,
+    _ email: String,
+    _ password: String
+) async throws -> String? {
     let rows = try await db.query(
-                                  """
-                                  SELECT * FROM users WHERE user_name=\(email);
-                                  """,
-                                  logger: logger
+                    """
+                    SELECT * FROM users WHERE user_name=\(email);
+                    """,
+                    logger: logger
     )
     let user = try await returnUserRowsAsArray(rows).first
     if user == nil {

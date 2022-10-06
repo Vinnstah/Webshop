@@ -52,6 +52,7 @@ public extension Splash {
             case .delegate:
                 return .none
                 
+                // On appear send action to userDefaultsClient to check if user is logged in
             case .internal(.onAppear):
                 return .run { [userDefaultsClient, mainQueue] send in
                     try await mainQueue.sleep(for: .milliseconds(700))

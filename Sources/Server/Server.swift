@@ -19,8 +19,10 @@ func siteHandler(
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case let .create(user):
-        let db = try await connectDatabase()       
+        let db = try await connectDatabase()
+        
         let jwt = constructJWT(secretKey: user.password, header: JWT.Header.init(), payload: JWT.Payload(name: user.email))
+        
         let updatedUser = User(email: user.email, password: user.hexedPassword, jwt: jwt, userSettings: user.userSettings)
         
         try await insertUser(db, logger: logger, user: updatedUser)

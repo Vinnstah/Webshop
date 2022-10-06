@@ -145,12 +145,3 @@ public extension App {
         }
     }
 }
-//
-//public enum FirstBoot: Equatable, Sendable {
-//    case firstTimeBootingApp
-//    case appHasBeenBootedBefore
-//
-//    public init(_ firstBoot: Bool) {
-//        self = firstBoot ? .appHasBeenBootedBefore : .firstTimeBootingApp
-//    }
-//}

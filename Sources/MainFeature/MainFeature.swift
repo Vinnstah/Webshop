@@ -37,6 +37,7 @@ public extension Main {
                 
             case .internal(.logOutUser):
                 return .run { [userDefaultsClient] send in
+                    await userDefaultsClient.removeLoggedInUserJWT()
                     await userDefaultsClient.setIsLoggedIn(false)
                     await send(.delegate(.userIsLoggedOut))
                 }

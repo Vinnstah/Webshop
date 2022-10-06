@@ -46,6 +46,10 @@ public extension UserDefaultsClient {
     func getLoggedInUserJWT() async -> String {
         await jwtForKey(jwtKey)
     }
+    
+    func removeLoggedInUserJWT() async -> Void {
+        await remove(jwtKey)
+    }
  
     
 }

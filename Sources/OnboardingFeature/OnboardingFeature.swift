@@ -164,6 +164,7 @@ public extension Onboarding {
                 
                 return .run { [userDefaultsClient] send in
                     await userDefaultsClient.setIsLoggedIn(true)
+                    await userDefaultsClient.setLoggedInUserJWT(jwt)
                     await send(.delegate(.userLoggedIn(jwt: jwt)))
                 }
                 
@@ -217,8 +218,6 @@ public extension Onboarding {
                 return .none
                 
             case let .internal(.createUserRequest(user)):
-                var hexedUser = user
-                hexedUser.password = user.hexPassword(user.password)
                 
                 return .run { [apiClient] send in
                         return await send(.internal(
@@ -238,7 +237,7 @@ public extension Onboarding {
             case let .internal(.createUserResponse(.success(jwt))):
                 return .run { [mainQueue, userDefaultsClient] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
-                    // TODO: DELETE OLD USERDEFAULTS
+                    await userDefaultsClient.removeLoggedInUserJWT()
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
                     await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
                 }

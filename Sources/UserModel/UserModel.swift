@@ -41,12 +41,6 @@ public struct User: Content, Equatable, Codable, Sendable {
             self.defaultCurrency = defaultCurrency
         }
     }
-    
-    public func hexPassword(_ password: String) -> String {
-        let utf8ConvertedPassword = password.data(using: .utf8)!
-        let sha256password = Data(SHA256.hash(data: utf8ConvertedPassword))
-        return sha256password.base64EncodedString()
-    }
 }
 
 //TODO: Implement User model with local settings.

@@ -65,7 +65,6 @@ public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Pay
     
     let token = [headerBase64String, payloadBase64String, signatureBase64String].joined(separator: ".")
     return token
-//    return ["token": token]
 }
 
 

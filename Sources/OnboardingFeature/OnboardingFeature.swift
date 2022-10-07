@@ -142,12 +142,12 @@ public extension Onboarding {
         Reduce { state, action in
             
             switch action {
-                ///Set `user.email` when emailField recceives input
+                ///Set `email` when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.email = text
                 return .none
                 
-                ///Set  `user.password` when passwordField receives input.
+                ///Set  `password` when passwordField receives input.
             case let .internal(.passwordFieldReceivingInput(text: text)):
                 state.password = text
                 return .none
@@ -177,8 +177,6 @@ public extension Onboarding {
                 
                 return .run { [userDefaultsClient] send in
                     
-                    /// Set `isLoggedIn` to `true` in userDefaults
-                    await userDefaultsClient.setIsLoggedIn(true)
                     /// Set `LoggedInUserJWT` in `userDefaults` to the `jwt` we received back from the server
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
                     /// Delegate the action `userLoggedIn` with the given `jwt`
@@ -221,8 +219,6 @@ public extension Onboarding {
                     guard let user else {
                         return await send(.internal(.createUserResponse(.failure(ClientError.failedToCreateUser("No user found")))))
                     }
-                    /// Set `isLoggedIn` to `true` in userDefaults
-                    await userDefaultsClient.setIsLoggedIn(true)
                     /// Set the `defaultCurrency` to the chosen currency
                     await userDefaultsClient.setDefaultCurrency(userSettings.defaultCurrency.rawValue)
                     /// Delegate to the `createUserRequest` action with the currenct `user`

@@ -53,10 +53,15 @@ public extension App {
             switch action {
                 
                 /// If user is logged in we receive action from splash delegate and then send action to userDefaults to get the logged in user's JWT.
-            case .splash(.delegate(.loadIsLoggedInResult(.isLoggedIn))):
-                return .run { [userDefaultsClient] send in
+            case let .splash(.delegate(.loadIsLoggedInResult(jwt))):
+                guard let jwt else {
+                    state = .onboarding(.init(step: .step0_LoginOrCreateUser))
+                    return .none
+                }
+                
+                return .run { send in
                     await send(
-                        .internal(.userIsLoggedIn(userDefaultsClient.getLoggedInUserJWT())
+                        .internal(.userIsLoggedIn(jwt)
                                  )
                     )
                 }
@@ -64,11 +69,6 @@ public extension App {
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
             case let .internal(.userIsLoggedIn(jwt)):
                 state = .main(.init(jwt: jwt))
-                return .none
-                
-                ///If a user is not logged in we will initialize onboarding.
-            case .splash(.delegate(.loadIsLoggedInResult(.notLoggedIn))):
-                state = .onboarding(.init(step: .step0_LoginOrCreateUser))
                 return .none
                 
                 ///When a user logs out from `main` we initialize onboarding again.

@@ -37,14 +37,14 @@ public extension Splash {
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable, Sendable {
-            case loadIsLoggedInResult(IsLoggedIn)
+            case loadIsLoggedInResult(String?)
         }
         
         public enum InternalAction: Equatable, Sendable {
             case onAppear
         }
     }
-     
+    
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
@@ -58,9 +58,7 @@ public extension Splash {
                     try await mainQueue.sleep(for: .milliseconds(700))
                     await send(
                         .delegate(
-                            .loadIsLoggedInResult(
-                                .init(userDefaultsClient.getIsLoggedIn())
-                            )
+                            .loadIsLoggedInResult(userDefaultsClient.getLoggedInUserJWT())
                         )
                     )
                 }

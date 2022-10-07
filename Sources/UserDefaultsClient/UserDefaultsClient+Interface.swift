@@ -18,18 +18,10 @@ public struct UserDefaultsClient: Sendable {
     public var setJWT: @Sendable (String, String) async -> Void
 }
 
-private let isLoggedInKey: String = "isLoggedInKey"
 private let currencyKey: String = "currencyKey"
 private let jwtKey: String = "jwtKey"
 
 public extension UserDefaultsClient {
-    func setIsLoggedIn(_ isLoggedIn: Bool) async {
-        await setBool(isLoggedIn, isLoggedInKey)
-    }
-    
-    func getIsLoggedIn() async -> Bool {
-        await boolForKey(isLoggedInKey)
-    }
     
     func setDefaultCurrency(_ currency: String) async {
         await setString(currency, currencyKey)
@@ -43,8 +35,11 @@ public extension UserDefaultsClient {
         await setJWT(jwt, jwtKey)
     }
     
-    func getLoggedInUserJWT() async -> String {
-        await jwtForKey(jwtKey)
+    func getLoggedInUserJWT() async -> String? {
+        guard (await jwtForKey(jwtKey)) != "" else {
+            return nil
+        }
+       return await jwtForKey(jwtKey)
     }
     
     func removeLoggedInUserJWT() async -> Void {

@@ -32,24 +32,26 @@ public extension Onboarding {
         public var step: Step
         public var isLoginInFlight: Bool
         public var areTermsAndConditionsAccepted: Bool
-        public var user: User
+        public var user: User?
         public var alert: AlertState<Action>?
         public var userSettings: UserSettings
+        public var email: String
+        public var password: String
         
         ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
         public var passwordFulfillsRequirements: Bool {
-            if user.password.count > 5 {
+            if password.count > 5 {
                 return true
             }
             return false
         }
         ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
         public var emailFulfillsRequirements: Bool {
-            guard user.email.count > 5 else {
+            guard email.count > 5 else {
                 return false
             }
             
-            guard user.email.contains("@") else {
+            guard email.contains("@") else {
                 return false
             }
             return true
@@ -68,9 +70,11 @@ public extension Onboarding {
             step: Step = .step0_LoginOrCreateUser,
             isLoginInFlight: Bool = false,
             areTermsAndConditionsAccepted: Bool = false,
-            user: User = .init(email: "", password: "", jwt: ""),
+            user: User? = nil,
             alert: AlertState<Action>? = nil,
-            userSettings: UserSettings  = .init()
+            userSettings: UserSettings  = .init(),
+            email: String = "",
+            password: String = ""
         ) {
             self.step = step
             self.isLoginInFlight = isLoginInFlight
@@ -78,6 +82,8 @@ public extension Onboarding {
             self.user = user
             self.alert = alert
             self.userSettings = userSettings
+            self.email = email
+            self.password = password
         }
         
         ///Enum for the different Onboarding steps.
@@ -136,21 +142,25 @@ public extension Onboarding {
         Reduce { state, action in
             
             switch action {
-                ///Set user.email when emailField recceives input
+                ///Set `user.email` when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
-                state.user.email = text
+                state.email = text
                 return .none
-            
+                
                 ///Set  `user.password` when passwordField receives input.
             case let .internal(.passwordFieldReceivingInput(text: text)):
-                state.user.password = text
+                state.password = text
                 return .none
                 
                 /// When loginButton is pressed set `loginInFlight` to `true`. Send a api request to login endpoint with `state.user` and receive the TaskResult back.
             case .internal(.loginButtonPressed):
                 state.isLoginInFlight = true
+                state.user = User(email: state.email, password: state.password, jwt: "")
                 
                 return .run { [apiClient, user = state.user] send in
+                    guard let user else {
+                       return await send(.internal(.loginResponse(.failure(ClientError.failedToLogin("No user found")))))
+                    }
                     return await send(.internal(.loginResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(
@@ -166,8 +176,12 @@ public extension Onboarding {
                 state.isLoginInFlight = false
                 
                 return .run { [userDefaultsClient] send in
+                    
+                    /// Set `isLoggedIn` to `true` in userDefaults
                     await userDefaultsClient.setIsLoggedIn(true)
+                    /// Set `LoggedInUserJWT` in `userDefaults` to the `jwt` we received back from the server
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
+                    /// Delegate the action `userLoggedIn` with the given `jwt`
                     await send(.delegate(.userLoggedIn(jwt: jwt)))
                 }
                 
@@ -175,39 +189,48 @@ public extension Onboarding {
             case let .internal(.loginResponse(.failure(error))):
                 state.isLoginInFlight = false
                 state.alert = AlertState(
-                     title: TextState("Error"),
-                     message: TextState(error.localizedDescription),
-                     dismissButton: .cancel(TextState("Dismiss"), action: .none)
-                 )
+                    title: TextState("Error"),
+                    message: TextState(error.localizedDescription),
+                    dismissButton: .cancel(TextState("Dismiss"), action: .none)
+                )
                 return .none
                 
+                /// We move to the Welcome step when `signUpButton` is pressed
             case .internal(.signUpButtonPressed):
                 state.step = .step1_Welcome
                 return .none
                 
+                /// Move to the next step
             case .internal(.nextStep):
                 state.step.nextStep()
                 return .none
                 
+                /// Move to the previous step
             case .internal(.previousStep):
                 state.step.previousStep()
                 return .none
                 
+                /// When user has finished onboarding we:
             case .internal(.finishSignUp):
+                state.user = User(email: state.email, password: state.password, jwt: "")
                 return .run { [
                     userDefaultsClient,
                     user = state.user,
                     userSettings = state.userSettings
                 ] send in
-                    
-                    await send(.internal(.createUserRequest(user)))
-                    
+                    guard let user else {
+                        return await send(.internal(.createUserResponse(.failure(ClientError.failedToCreateUser("No user found")))))
+                    }
+                    /// Set `isLoggedIn` to `true` in userDefaults
                     await userDefaultsClient.setIsLoggedIn(true)
-                    
+                    /// Set the `defaultCurrency` to the chosen currency
                     await userDefaultsClient.setDefaultCurrency(userSettings.defaultCurrency.rawValue)
+                    /// Delegate to the `createUserRequest` action with the currenct `user`
+                    await send(.internal(.createUserRequest(user)))
                     
                 }
                 
+                /// Toggle a bool when `termsAndConditionsBox` is pressed in order to update UI
             case .internal(.termsAndConditionsBoxPressed):
                 state.areTermsAndConditionsAccepted.toggle()
                 return .none
@@ -217,43 +240,51 @@ public extension Onboarding {
                 state.userSettings.defaultCurrency = currency
                 return .none
                 
+                /// Go back to the `LoginView` when the user clicks `cancel`
             case .internal(.goBackToLoginView):
                 state = .init()
                 return .none
                 
+                /// Create User request sends a request to the server endpoint `create` with the given `user`. The server then respons with a `ResultPayload` that either gives us a `jwt` for the user if the request is successful or throws an error if it's not.
             case let .internal(.createUserRequest(user)):
                 
                 return .run { [apiClient] send in
-                        return await send(.internal(
-                            .createUserResponse(
-                                TaskResult {
-                                    try await apiClient.decodedResponse(
-                                        for: .create(user),
-                                        as: ResultPayload<JWT>.self
-                                    ).value.status.get()
-                                }
-                            )
+                    return await send(.internal(
+                        .createUserResponse(
+                            TaskResult {
+                                try await apiClient.decodedResponse(
+                                    for: .create(user),
+                                    as: ResultPayload<JWT>.self
+                                ).value.status.get()
+                            }
                         )
-                        )
+                    )
+                    )
                     
                 }
                 
+                /// If the `createUserRequest` is successfull we receive a `jwt` back in the response
             case let .internal(.createUserResponse(.success(jwt))):
                 return .run { [mainQueue, userDefaultsClient] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
+                    /// First we remove the saved `jwt` from `userDefaults`, if there is any.
                     await userDefaultsClient.removeLoggedInUserJWT()
+                    /// Then we add the newly received `jwt` to `userDefaults`
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
+                    /// We delegate the action back to `AppFeature` that the user has finished onboarding and provide the `jwt`
                     await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
                 }
                 
+                /// If the `createUserRequest` fails we show an error
             case let .internal(.createUserResponse(.failure(error))):
                 state.alert = AlertState(
-                     title: TextState("Error"),
-                     message: TextState(error.localizedDescription),
-                     dismissButton: .cancel(TextState("Dismiss"), action: .none)
-                 )
+                    title: TextState("Error"),
+                    message: TextState(error.localizedDescription),
+                    dismissButton: .cancel(TextState("Dismiss"), action: .none)
+                )
                 return .none
                 
+                /// When the user clicks confirm on the alert we set the `state.alert` to `nil` to remove the alert
             case .internal(.alertConfirmTapped):
                 state.alert = nil
                 return .none
@@ -276,3 +307,8 @@ public extension Onboarding {
 //    }
 //    return false
 //}
+
+public enum ClientError: Error, Equatable {
+    case failedToLogin(String)
+    case failedToCreateUser(String)
+}

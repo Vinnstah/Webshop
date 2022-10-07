@@ -55,7 +55,7 @@ public extension Onboarding {
                 VStack {
                     TextField("Email",
                               text: viewStore.binding(
-                                get: { $0.user.email },
+                                get: { $0.email},
                                 send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
                               )
                     )
@@ -63,7 +63,7 @@ public extension Onboarding {
                     
                     SecureField("Password",
                                 text: viewStore.binding(
-                                    get: { $0.user.password },
+                                    get: { $0.password },
                                     send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )
@@ -106,14 +106,14 @@ public extension Onboarding {
                 VStack {
                     TextField("Email",
                               text: viewStore.binding(
-                                get: { $0.user.email },
+                                get: { $0.email },
                                 send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
                               )
                     )
                     .padding(.horizontal)
                     SecureField("Password",
                                 text: viewStore.binding(
-                                    get: { $0.user.password },
+                                    get: { $0.password },
                                     send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                                 )
                     )

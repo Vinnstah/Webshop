@@ -98,6 +98,12 @@ public extension App {
             case .internal(_):
                 return .none
                 
+            case .onboarding(.welcome(_)):
+                return .none
+            case .onboarding(.userInformation(_)):
+                return .none
+            case .onboarding(.termsAndConditions(_)):
+                return .none
             }
         }
         ///Changing View depending on which state is initialized.

@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Viktor Jansson on 2022-09-24.
 //
@@ -13,6 +13,9 @@ import SiteRouter
 import _URLRouting
 import URLRoutingClient
 import UserModel
+import WelcomeFeature
+import UserInformationFeature
+import TermsAndConditionsFeature
 
 ///Conforming AlertState to Sendable
 extension AlertState: @unchecked Sendable {}
@@ -29,12 +32,13 @@ public struct Onboarding: ReducerProtocol {
 public extension Onboarding {
     
     struct State: Equatable, Sendable {
+        public var welcome: Welcome.State?
+        public var userInformation: UserInformation.State?
+        public var termsAndConditions: TermsAndConditions.State?
+        public var user: User?
         public var step: Step
         public var isLoginInFlight: Bool
-        public var areTermsAndConditionsAccepted: Bool
-        public var user: User?
         public var alert: AlertState<Action>?
-        public var userSettings: UserSettings
         public var email: String
         public var password: String
         
@@ -67,21 +71,23 @@ public extension Onboarding {
         }
         
         public init(
+            welcome: Welcome.State? = nil,
+            userInformation: UserInformation.State? = nil,
+            termsAndConditions: TermsAndConditions.State? = nil,
+            user: User? = nil,
             step: Step = .step0_LoginOrCreateUser,
             isLoginInFlight: Bool = false,
-            areTermsAndConditionsAccepted: Bool = false,
-            user: User? = nil,
             alert: AlertState<Action>? = nil,
-            userSettings: UserSettings  = .init(),
             email: String = "",
             password: String = ""
         ) {
+            self.welcome = welcome
+            self.userInformation = userInformation
+            self.termsAndConditions = termsAndConditions
+            self.user = user
             self.step = step
             self.isLoginInFlight = isLoginInFlight
-            self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
-            self.user = user
             self.alert = alert
-            self.userSettings = userSettings
             self.email = email
             self.password = password
         }
@@ -90,7 +96,7 @@ public extension Onboarding {
         public enum Step: Int, Equatable, CaseIterable, Comparable, Sendable {
             case step0_LoginOrCreateUser
             case step1_Welcome
-            case step2_FillInYourInformation
+            case step2_ChooseUserSettings
             case step3_TermsAndConditions
             
             ///Function to skip to the next step
@@ -114,6 +120,9 @@ public extension Onboarding {
         
         case delegate(DelegateAction)
         case `internal`(InternalAction)
+        case welcome(Welcome.Action)
+        case userInformation(UserInformation.Action)
+        case termsAndConditions(TermsAndConditions.Action)
         
         public enum InternalAction: Equatable, Sendable {
             case emailAddressFieldReceivingInput(text: String)
@@ -125,10 +134,6 @@ public extension Onboarding {
             case previousStep
             case finishSignUp
             case goBackToLoginView
-            case termsAndConditionsBoxPressed
-            case defaultCurrencyChosen(Currency)
-            case createUserRequest(User)
-            case createUserResponse(TaskResult<JWT>)
             case alertConfirmTapped
         }
         
@@ -142,6 +147,7 @@ public extension Onboarding {
         Reduce { state, action in
             
             switch action {
+            
                 ///Set `email` when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.email = text
@@ -196,6 +202,7 @@ public extension Onboarding {
                 /// We move to the Welcome step when `signUpButton` is pressed
             case .internal(.signUpButtonPressed):
                 state.step = .step1_Welcome
+                state.welcome = .init()
                 return .none
                 
                 /// Move to the next step
@@ -207,77 +214,10 @@ public extension Onboarding {
             case .internal(.previousStep):
                 state.step.previousStep()
                 return .none
-                
-                /// When user has finished onboarding we:
-            case .internal(.finishSignUp):
-                state.user = User(email: state.email, password: state.password, jwt: "")
-                return .run { [
-                    userDefaultsClient,
-                    user = state.user,
-                    userSettings = state.userSettings
-                ] send in
-                    guard let user else {
-                        return await send(.internal(.createUserResponse(.failure(ClientError.failedToCreateUser("No user found")))))
-                    }
-                    /// Set the `defaultCurrency` to the chosen currency
-                    await userDefaultsClient.setDefaultCurrency(userSettings.defaultCurrency.rawValue)
-                    /// Delegate to the `createUserRequest` action with the currenct `user`
-                    await send(.internal(.createUserRequest(user)))
-                    
-                }
-                
-                /// Toggle a bool when `termsAndConditionsBox` is pressed in order to update UI
-            case .internal(.termsAndConditionsBoxPressed):
-                state.areTermsAndConditionsAccepted.toggle()
-                return .none
-                
-                // TODO: Make this a part of User model instead.
-            case let .internal(.defaultCurrencyChosen(currency)):
-                state.userSettings.defaultCurrency = currency
-                return .none
-                
+
                 /// Go back to the `LoginView` when the user clicks `cancel`
             case .internal(.goBackToLoginView):
                 state = .init()
-                return .none
-                
-                /// Create User request sends a request to the server endpoint `create` with the given `user`. The server then respons with a `ResultPayload` that either gives us a `jwt` for the user if the request is successful or throws an error if it's not.
-            case let .internal(.createUserRequest(user)):
-                
-                return .run { [apiClient] send in
-                    return await send(.internal(
-                        .createUserResponse(
-                            TaskResult {
-                                try await apiClient.decodedResponse(
-                                    for: .create(user),
-                                    as: ResultPayload<JWT>.self
-                                ).value.status.get()
-                            }
-                        )
-                    )
-                    )
-                    
-                }
-                
-                /// If the `createUserRequest` is successfull we receive a `jwt` back in the response
-            case let .internal(.createUserResponse(.success(jwt))):
-                return .run { [mainQueue, userDefaultsClient] send in
-                    try await mainQueue.sleep(for: .milliseconds(700))
-                    /// First we remove the saved `jwt` from `userDefaults`, if there is any.
-                    await userDefaultsClient.removeLoggedInUserJWT()
-                    /// Then we add the newly received `jwt` to `userDefaults`
-                    await userDefaultsClient.setLoggedInUserJWT(jwt)
-                    /// We delegate the action back to `AppFeature` that the user has finished onboarding and provide the `jwt`
-                    await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
-                }
-                
-                /// If the `createUserRequest` fails we show an error
-            case let .internal(.createUserResponse(.failure(error))):
-                state.alert = AlertState(
-                    title: TextState("Error"),
-                    message: TextState(error.localizedDescription),
-                    dismissButton: .cancel(TextState("Dismiss"), action: .none)
-                )
                 return .none
                 
                 /// When the user clicks confirm on the alert we set the `state.alert` to `nil` to remove the alert
@@ -291,11 +231,38 @@ public extension Onboarding {
             case .delegate(_):
                 return .none
                 
+            case let .welcome(.delegate(.goToNextStep(user))):
+                state.user = user
+                state.step.nextStep()
+                return .run { send in
+                    await send(.internal(.nextStep))
+                }
+                
+            case .welcome(.delegate(.goToThePreviousStep)):
+                return .run { send in
+                    await send(.internal(.previousStep))
+                }
+                
+            case .welcome(.delegate(.goBackToLoginView)):
+                return .run { send in
+                    await send(.internal(.goBackToLoginView))
+                }
+                
+            case .welcome(_):
+                return .none
+            case .userInformation(_):
+                return .none
+            case .termsAndConditions(_):
+                return .none
             }
         }
     }
 }
 
+public enum ClientError: Error, Equatable {
+    case failedToLogin(String)
+    case failedToCreateUser(String)
+}
 //public func doesEmailMeetRequirements(email: String) -> Bool? {
 //    guard let regex = try? Regex(#"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$"#) else { return nil }
 //    if email.wholeMatch(of: regex) != nil {
@@ -303,8 +270,4 @@ public extension Onboarding {
 //    }
 //    return false
 //}
-
-public enum ClientError: Error, Equatable {
-    case failedToLogin(String)
-    case failedToCreateUser(String)
-}
+//

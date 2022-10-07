@@ -10,6 +10,9 @@ import ComposableArchitecture
 import SwiftUI
 import UserDefaultsClient
 import UserModel
+import WelcomeFeature
+import UserInformationFeature
+import TermsAndConditionsFeature
 
 public extension Onboarding {
     struct View: SwiftUI.View {
@@ -28,13 +31,40 @@ public extension Onboarding {
                         Onboarding.LoginView(store: store)
                         
                     case .step1_Welcome:
-                        Onboarding.WelcomeView(store: store)
                         
-                    case .step2_FillInYourInformation:
-                        Onboarding.PersonalInformationView(store: store)
+                            IfLetStore(self.store.scope(
+                                state: \.welcome,
+                                action: Onboarding.Action.welcome),
+                                       then:Welcome.View.init(store:)
+                            )
+                        
+//                        Welcome.View(
+//                            store: Store(
+//                                initialState: Welcome.State.init(),
+//                                reducer: Welcome.init()
+//                            )
+//                        )
+                        
+                    case .step2_ChooseUserSettings:
+                        IfLetStore(self.store.scope(
+                            state: \.userInformation,
+                            action: Onboarding.Action.userInformation),
+                                   then:UserInformation.View.init(store:)
+                        )
+//                        UserInformation.View(
+//                            store: Store(
+//                                initialState: UserInformation.State.init(),
+//                                reducer: UserInformation.init()
+//                            )
+//                        )
                         
                     case .step3_TermsAndConditions:
-                        Onboarding.TermsAndConditionsView(store: store)
+                        TermsAndConditions.View(
+                            store: Store(
+                                initialState: TermsAndConditions.State.init(),
+                                reducer: TermsAndConditions.init()
+                            )
+                        )
                     }
                 }
             }
@@ -87,155 +117,6 @@ public extension Onboarding {
                         ),
                     dismiss: .internal(.alertConfirmTapped)
                 )
-            }
-        }
-    }
-}
-
-public extension Onboarding {
-    struct WelcomeView: SwiftUI.View {
-        public let store: StoreOf<Onboarding>
-        
-        public init(store: StoreOf<Onboarding>) {
-            self.store = store
-        }
-        
-        public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
-                Text("WELCOME TO SIGNUP")
-                VStack {
-                    TextField("Email",
-                              text: viewStore.binding(
-                                get: { $0.email },
-                                send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
-                              )
-                    )
-                    .padding(.horizontal)
-                    SecureField("Password",
-                                text: viewStore.binding(
-                                    get: { $0.password },
-                                    send: { .internal(.passwordFieldReceivingInput(text: $0)) }
-                                )
-                    )
-                    .padding(.horizontal)
-                    if !viewStore.state.emailFulfillsRequirements {
-                        Text("Email does not meet requirements")
-                    }
-                    if !viewStore.state.passwordFulfillsRequirements {
-                        Text("Password does not meet requirements")
-                    }
-                    HStack {
-                        Button("Next step") {
-                            viewStore.send(.internal(.nextStep))
-                        }
-                        .disabled(viewStore.state.disableButton)
-                        if viewStore.state.step != .step1_Welcome {
-                            Button("Previous Step") { viewStore.send(.internal(.previousStep), animation: .easeIn(duration: 1.0))}
-                        }
-                    }
-                    
-                }
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            viewStore.send(.internal(.goBackToLoginView))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-public extension Onboarding {
-    struct PersonalInformationView: SwiftUI.View {
-        public let store: StoreOf<Onboarding>
-        
-        public init(store: StoreOf<Onboarding>) {
-            self.store = store
-        }
-        
-        public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
-                VStack {
-                    Text("View to fill in all information")
-                    
-                    Picker("Default Currency", selection: viewStore.binding(
-                        get: { $0.userSettings.defaultCurrency },
-                        send: { .internal(.defaultCurrencyChosen($0)) }
-                    )
-                    ) {
-                        ForEach(Currency.allCases, id: \.self) {
-                            Text($0.rawValue)
-                        }
-                    }
-                    .padding()
-                    
-                    Button("Next step") {
-                        viewStore.send(.internal(.nextStep))
-                    }
-                    if viewStore.state.step != .step1_Welcome {
-                        Button("Previous Step") { viewStore.send(.internal(.previousStep))}
-                    }
-                }
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            viewStore.send(.internal(.goBackToLoginView))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-public extension Onboarding {
-    struct TermsAndConditionsView: SwiftUI.View {
-        
-        public let store: StoreOf<Onboarding>
-        
-        public init(store: StoreOf<Onboarding>) {
-            self.store = store
-        }
-        
-        public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
-                VStack {
-                    ScrollView(.vertical) {
-                        Text("""
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                        """)
-                    }
-                    .frame(width: 200, height: 400)
-                    
-                    HStack {
-                        Text("Accept Terms and Conditions")
-                        
-                        /// This variable should be in a ViewState instead?
-                        Image(systemName: viewStore.state.areTermsAndConditionsAccepted ? "checkmark.square" : "square")
-                            .onTapGesture {
-                                viewStore.send(.internal(.termsAndConditionsBoxPressed))
-                            }
-                    }
-                    
-                    Button("Finish Sign Up") {
-                        viewStore.send(.internal(.finishSignUp))
-                    }
-                    .disabled(!viewStore.areTermsAndConditionsAccepted)
-                    
-                    if viewStore.state.step != .step1_Welcome {
-                        Button("Previous Step") { viewStore.send(.internal(.previousStep)) }
-                    }
-                }
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            viewStore.send(.internal(.goBackToLoginView))
-                        }
-                    }
-                }
             }
         }
     }

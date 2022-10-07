@@ -39,6 +39,9 @@ let package = Package(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
         .library(
+            name: "TermsAndConditionsFeature",
+            targets: ["TermsAndConditionsFeature"]),
+        .library(
             name: "URLRoutingClient",
             targets: ["URLRoutingClient"]),
         .library(
@@ -47,6 +50,12 @@ let package = Package(
         .library(
             name: "UserModel",
             targets: ["UserModel"]),
+        .library(
+            name: "UserInformationFeature",
+            targets: ["UserInformationFeature"]),
+        .library(
+            name: "WelcomeFeature",
+            targets: ["WelcomeFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
@@ -93,9 +102,12 @@ let package = Package(
                 name: "OnboardingFeature",
                 dependencies: [
                     "SiteRouter",
+                    "TermsAndConditionsFeature",
                     "URLRoutingClient",
                     "UserDefaultsClient",
+                    "UserInformationFeature",
                     "UserModel",
+                    "WelcomeFeature",
                     tca,
                     urlRouting,
                 ],
@@ -154,6 +166,13 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "TermsAndConditionsFeature",
+            dependencies: [
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
         
             .target(
                 name: "UserDefaultsClient",
@@ -172,5 +191,21 @@ let package = Package(
                 dependencies: [vapor],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "UserInformationFeature",
+            dependencies: [
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "WelcomeFeature",
+            dependencies: [
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
     ]
 )

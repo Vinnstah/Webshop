@@ -50,8 +50,8 @@ public extension Welcome {
         public init(
             user: User? = nil,
             alert: AlertState<Action>? = nil,
-            email: String = "tatatta@",
-            password: String = "tatatat"
+            email: String = "",
+            password: String = ""
         ) {
             self.user = user
             self.alert = alert
@@ -94,16 +94,8 @@ public extension Welcome {
                 return .none
                 
             case .internal(.nextStep):
-                print("test")
                 state.user = User(email: state.email, password: state.password, jwt: "")
-//                guard let user = state.user else {
-//                    state.alert = AlertState(
-//                        title: TextState("Error"),
-//                        message: TextState("Please enter your information"),
-//                        dismissButton: .cancel(TextState("Dismiss"), action: .none)
-//                    )
-//                    return .none
-//                }
+//                
                 return .run { [user = state.user] send in
                     await send(.delegate(.goToNextStep(user!)))
                 }

@@ -29,36 +29,23 @@ public extension Onboarding {
                     switch viewStore.step {
                     case .step0_LoginOrCreateUser:
                         Onboarding.LoginView(store: store)
-                        
+
                     case .step1_Welcome:
-                        
+
                             IfLetStore(self.store.scope(
                                 state: \.welcome,
-                                action: Onboarding.Action.welcome),
+                                action: Action.welcome),
                                        then:Welcome.View.init(store:)
                             )
-                        
-//                        Welcome.View(
-//                            store: Store(
-//                                initialState: Welcome.State.init(),
-//                                reducer: Welcome.init()
-//                            )
-//                        )
-                        
+//
                     case .step2_ChooseUserSettings:
                         IfLetStore(self.store.scope(
                             state: \.userInformation,
-                            action: Onboarding.Action.userInformation),
+                            action: Action.userInformation),
                                    then:UserInformation.View.init(store:)
                         )
-//                        UserInformation.View(
-//                            store: Store(
-//                                initialState: UserInformation.State.init(),
-//                                reducer: UserInformation.init()
-//                            )
-//                        )
-                        
                     case .step3_TermsAndConditions:
+                        
                         TermsAndConditions.View(
                             store: Store(
                                 initialState: TermsAndConditions.State.init(),
@@ -66,6 +53,20 @@ public extension Onboarding {
                             )
                         )
                     }
+////                        Welcome.View(
+////                            store: Store(
+////                                initialState: Welcome.State.init(),
+////                                reducer: Welcome.init()
+////                            )
+////                        )
+//
+////                        UserInformation.View(
+////                            store: Store(
+////                                initialState: UserInformation.State.init(),
+////                                reducer: UserInformation.init()
+////                            )
+////                        )
+//
                 }
             }
         }

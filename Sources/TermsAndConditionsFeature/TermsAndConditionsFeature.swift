@@ -42,6 +42,8 @@ public extension TermsAndConditions {
             case alertConfirmTapped
             case finishSignUpButtonPressed
             case termsAndConditionsBoxPressed
+//            case createUserRequest(User)
+//            case createUserResponse(TaskResult<JWT>)
         }
         
         public enum DelegateAction: Equatable, Sendable {

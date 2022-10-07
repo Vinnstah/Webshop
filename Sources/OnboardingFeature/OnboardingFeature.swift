@@ -208,6 +208,16 @@ public extension Onboarding {
                 /// Move to the next step
             case .internal(.nextStep):
                 state.step.nextStep()
+                switch state.step {
+                case .step2_ChooseUserSettings:
+                    state.userInformation = .init()
+                case .step0_LoginOrCreateUser:
+                    state = .init()
+                case .step1_Welcome:
+                    state.welcome = .init()
+                case .step3_TermsAndConditions:
+                    state.termsAndConditions = .init()
+                }
                 return .none
                 
                 /// Move to the previous step
@@ -225,15 +235,8 @@ public extension Onboarding {
                 state.alert = nil
                 return .none
                 
-            case .internal(_):
-                return .none
-                
-            case .delegate(_):
-                return .none
-                
             case let .welcome(.delegate(.goToNextStep(user))):
                 state.user = user
-                state.step.nextStep()
                 return .run { send in
                     await send(.internal(.nextStep))
                 }
@@ -246,7 +249,38 @@ public extension Onboarding {
             case .welcome(.delegate(.goBackToLoginView)):
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
+                    
                 }
+            case .userInformation(.delegate(.goBackToLoginView)):
+                state = .init()
+                return .none
+                
+            case .userInformation(.delegate(.nextStep)):
+                return .run { send in
+                    await send(.internal(.nextStep))
+                }
+                
+            case .userInformation(.delegate(.previousStep)):
+                return .run { send in
+                    await send(.internal(.previousStep))
+                }
+                
+            case .termsAndConditions(.delegate(.previousStep)):
+                return .run { send in
+                    await send(.internal(.previousStep))
+                }
+                
+            case .termsAndConditions(.delegate(.goBackToLoginView)):
+                state = .init()
+                return .none
+                
+            case .termsAndConditions(.delegate(.finishSignUp)):
+                
+            case .internal(_):
+                return .none
+                
+            case .delegate(_):
+                return .none
                 
             case .welcome(_):
                 return .none
@@ -256,6 +290,34 @@ public extension Onboarding {
                 return .none
             }
         }
+        
+        .ifLet(\.welcome, action: /Action.welcome) {
+            Welcome()
+        }
+        .ifLet(\.userInformation, action: /Action.userInformation) {
+            UserInformation()
+        }
+        .ifLet(\.termsAndConditions, action: /Action.termsAndConditions) {
+            TermsAndConditions()
+        }
+//        .ifCaseLet(
+//            /State.welcome,
+//             action: /Action.welcome
+//        ) {
+//            Welcome()
+//        }
+//        .ifCaseLet(
+//            /State.userInformation,
+//             action: /Action.userInformation
+//        ) {
+//            UserInformation()
+//        }
+//        .ifCaseLet(
+//            /State.termsAndConditions,
+//             action: /Action.termsAndConditions
+//        ) {
+//            TermsAndConditions()
+//        }
     }
 }
 

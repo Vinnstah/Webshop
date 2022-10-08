@@ -55,7 +55,7 @@ public extension App {
                 /// If user is logged in we receive action from splash delegate and then send action to userDefaults to get the logged in user's JWT.
             case let .splash(.delegate(.loadIsLoggedInResult(jwt))):
                 guard let jwt else {
-                    state = .onboarding(.init(login: .init(), step: .step0_LoginOrCreateUser))
+                    state = .onboarding(.init(signIn: .init(), step: .step0_LoginOrCreateUser))
                     return .none
                 }
                 
@@ -73,7 +73,7 @@ public extension App {
                 
                 ///When a user logs out from `main` we initialize onboarding again.
             case .main(.delegate(.userIsLoggedOut)):
-                state = .onboarding(.init(login: .init(), step: .step0_LoginOrCreateUser))
+                state = .onboarding(.init(signIn: .init(), step: .step0_LoginOrCreateUser))
                 return .none
                 
                 ///After a user have finished onboarding and received the jwt we will send them through to `main`
@@ -98,13 +98,13 @@ public extension App {
             case .internal(_):
                 return .none
                 
-            case .onboarding(.welcome(_)):
+            case .onboarding(.signUp(_)):
                 return .none
             case .onboarding(.userInformation(_)):
                 return .none
             case .onboarding(.termsAndConditions(_)):
                 return .none
-            case .onboarding(.login(_)):
+            case .onboarding(.signIn(_)):
                 return .none
             }
         }

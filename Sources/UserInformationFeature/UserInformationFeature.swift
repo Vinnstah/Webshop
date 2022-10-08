@@ -19,12 +19,12 @@ public struct UserInformation: ReducerProtocol {
 public extension UserInformation {
     
     struct State: Equatable, Sendable {
-        public var userSettings: UserSettings?
+        public var userSettings: UserSettings
         public var alert: AlertState<Action>?
         
         
         public init(
-            userSettings: UserSettings? = nil,
+            userSettings: UserSettings = .init(),
             alert: AlertState<Action>? = nil
         ) {
             self.userSettings = userSettings
@@ -69,7 +69,7 @@ public extension UserInformation {
             
                 
             case let .internal(.defaultCurrencyChosen(currency)):
-                state.userSettings?.defaultCurrency = currency
+                state.userSettings.defaultCurrency = currency
                 return .none
                 
             case .internal(.cancelButtonPressed):

@@ -6,12 +6,12 @@ import UserModel
 ///Conforming AlertState to Sendable
 extension AlertState: @unchecked Sendable {}
 
-public struct Welcome: ReducerProtocol {
+public struct SignUp: ReducerProtocol {
     
     public init() {}
 }
 
-public extension Welcome {
+public extension SignUp {
     
     struct State: Equatable, Sendable {
         public var user: User?

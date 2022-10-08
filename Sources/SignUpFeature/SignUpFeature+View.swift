@@ -9,11 +9,11 @@ import Foundation
 import SwiftUI
 import ComposableArchitecture
 
-public extension Welcome {
+public extension SignUp {
      struct View: SwiftUI.View {
-        public let store: StoreOf<Welcome>
+        public let store: StoreOf<SignUp>
         
-        public init(store: StoreOf<Welcome>) {
+        public init(store: StoreOf<SignUp>) {
             self.store = store
         }
         

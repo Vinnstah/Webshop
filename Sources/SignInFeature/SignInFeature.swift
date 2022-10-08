@@ -18,7 +18,7 @@ import UserModel
 extension AlertState: @unchecked Sendable {}
 
 
-public struct Login: ReducerProtocol {
+public struct SignIn: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.urlRoutingClient) var apiClient
@@ -26,7 +26,7 @@ public struct Login: ReducerProtocol {
     public init() {}
 }
 
-public extension Login {
+public extension SignIn {
     
     struct State: Equatable, Sendable {
         public var user: User?
@@ -122,7 +122,10 @@ public extension Login {
                 
                 return .run { [apiClient, user = state.user] send in
                     guard let user else {
-                        return await send(.internal(.loginResponse(.failure(ClientError.failedToLogin("No user found")))))
+                        return await send(
+                            .internal(
+                                .loginResponse(
+                                    .failure(ClientError.failedToLogin("No user found")))))
                     }
                     return await send(.internal(.loginResponse(
                         TaskResult {

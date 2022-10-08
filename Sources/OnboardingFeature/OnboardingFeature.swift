@@ -13,10 +13,10 @@ import SiteRouter
 import _URLRouting
 import URLRoutingClient
 import UserModel
-import WelcomeFeature
+import SignUpFeature
 import UserInformationFeature
 import TermsAndConditionsFeature
-import LoginFeature
+import SignInFeature
 
 ///Conforming AlertState to Sendable
 extension AlertState: @unchecked Sendable {}
@@ -33,8 +33,8 @@ public struct Onboarding: ReducerProtocol {
 public extension Onboarding {
     
     struct State: Equatable, Sendable {
-        public var login: Login.State?
-        public var welcome: Welcome.State?
+        public var signIn: SignIn.State?
+        public var signUp: SignUp.State?
         public var userInformation: UserInformation.State?
         public var termsAndConditions: TermsAndConditions.State?
         public var user: User?
@@ -73,8 +73,8 @@ public extension Onboarding {
         }
         
         public init(
-            login: Login.State? = nil,
-            welcome: Welcome.State? = nil,
+            signIn: SignIn.State? = nil,
+            signUp: SignUp.State? = nil,
             userInformation: UserInformation.State? = nil,
             termsAndConditions: TermsAndConditions.State? = nil,
             user: User? = nil,
@@ -84,8 +84,8 @@ public extension Onboarding {
             email: String = "",
             password: String = ""
         ) {
-            self.login = login
-            self.welcome = welcome
+            self.signIn = signIn
+            self.signUp = signUp
             self.userInformation = userInformation
             self.termsAndConditions = termsAndConditions
             self.user = user
@@ -124,22 +124,16 @@ public extension Onboarding {
         
         case delegate(DelegateAction)
         case `internal`(InternalAction)
-        case login(Login.Action)
-        case welcome(Welcome.Action)
+        case signIn(SignIn.Action)
+        case signUp(SignUp.Action)
         case userInformation(UserInformation.Action)
         case termsAndConditions(TermsAndConditions.Action)
         
         public enum InternalAction: Equatable, Sendable {
-            case emailAddressFieldReceivingInput(text: String)
-            case passwordFieldReceivingInput(text: String)
-            case loginButtonPressed
-            case loginResponse(TaskResult<JWT>)
-            case signUpButtonPressed
+            case alertConfirmTapped
             case nextStep
             case previousStep
-            case finishSignUp
             case goBackToLoginView
-            case alertConfirmTapped
         }
         
         public enum DelegateAction: Equatable, Sendable {
@@ -152,76 +146,18 @@ public extension Onboarding {
         Reduce { state, action in
             
             switch action {
-            
-                ///Set `email` when emailField recceives input
-            case let .internal(.emailAddressFieldReceivingInput(text: text)):
-                state.email = text
-                return .none
-                
-                ///Set  `password` when passwordField receives input.
-            case let .internal(.passwordFieldReceivingInput(text: text)):
-                state.password = text
-                return .none
-                
-                /// When loginButton is pressed set `loginInFlight` to `true`. Send a api request to login endpoint with `state.user` and receive the TaskResult back.
-            case .internal(.loginButtonPressed):
-                state.isLoginInFlight = true
-                state.user = User(email: state.email, password: state.password, jwt: "")
-                
-                return .run { [apiClient, user = state.user] send in
-                    guard let user else {
-                       return await send(.internal(.loginResponse(.failure(ClientError.failedToLogin("No user found")))))
-                    }
-                    return await send(.internal(.loginResponse(
-                        TaskResult {
-                            try await apiClient.decodedResponse(
-                                for: .login(user),
-                                as: ResultPayload<JWT>.self
-                            ).value.status.get()
-                        }
-                    )))
-                }
-                
-                /// If login is successful we set `loginInFlight` to `false`. We then set userDefaults `isLoggedIn` to `true` and add the user JWT.
-            case let .internal(.loginResponse(.success(jwt))):
-                state.isLoginInFlight = false
-                
-                return .run { [userDefaultsClient] send in
-                    
-                    /// Set `LoggedInUserJWT` in `userDefaults` to the `jwt` we received back from the server
-                    await userDefaultsClient.setLoggedInUserJWT(jwt)
-                    /// Delegate the action `userLoggedIn` with the given `jwt`
-                    await send(.delegate(.userLoggedIn(jwt: jwt)))
-                }
-                
-                /// If login fails we show an alert.
-            case let .internal(.loginResponse(.failure(error))):
-                state.isLoginInFlight = false
-                state.alert = AlertState(
-                    title: TextState("Error"),
-                    message: TextState(error.localizedDescription),
-                    dismissButton: .cancel(TextState("Dismiss"), action: .none)
-                )
-                return .none
-                
-                /// We move to the Welcome step when `signUpButton` is pressed
-            case .internal(.signUpButtonPressed):
-                state.step = .step1_Welcome
-                state.welcome = .init()
-                return .none
-                
                 /// Move to the next step
             case .internal(.nextStep):
                 state.step.nextStep()
                 switch state.step {
+                case .step0_LoginOrCreateUser:
+                    state.signIn = .init()
+                case .step1_Welcome:
+                    state.signUp = .init()
                 case .step2_ChooseUserSettings:
                     state.userInformation = .init()
-                case .step0_LoginOrCreateUser:
-                    state.login = .init()
-                case .step1_Welcome:
-                    state.welcome = .init()
                 case .step3_TermsAndConditions:
-                    state.termsAndConditions = .init()
+                    state.termsAndConditions = .init(user: state.user!)
                 }
                 return .none
                 
@@ -232,7 +168,8 @@ public extension Onboarding {
 
                 /// Go back to the `LoginView` when the user clicks `cancel`
             case .internal(.goBackToLoginView):
-                state = .init()
+                state.step = .step0_LoginOrCreateUser
+                state.signIn = .init()
                 return .none
                 
                 /// When the user clicks confirm on the alert we set the `state.alert` to `nil` to remove the alert
@@ -240,25 +177,26 @@ public extension Onboarding {
                 state.alert = nil
                 return .none
                 
-            case let .welcome(.delegate(.goToNextStep(user))):
+            case let .signUp(.delegate(.goToNextStep(user))):
                 state.user = user
                 return .run { send in
                     await send(.internal(.nextStep))
                 }
                 
-            case .welcome(.delegate(.goToThePreviousStep)):
+            case .signUp(.delegate(.goToThePreviousStep)):
                 return .run { send in
                     await send(.internal(.previousStep))
                 }
                 
-            case .welcome(.delegate(.goBackToLoginView)):
+            case .signUp(.delegate(.goBackToLoginView)):
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                     
                 }
             case .userInformation(.delegate(.goBackToLoginView)):
-                state = .init()
-                return .none
+                return .run { send in
+                    await send(.internal(.goBackToLoginView))
+                }
                 
             case .userInformation(.delegate(.nextStep)):
                 return .run { send in
@@ -276,11 +214,25 @@ public extension Onboarding {
                 }
                 
             case .termsAndConditions(.delegate(.goBackToLoginView)):
-                state = .init()
+                return .run { send in
+                    await send(.internal(.goBackToLoginView))
+                }
+                
+                
+            case .signIn(.delegate(.userPressedSignUp)):
+                state.step = .step1_Welcome
+                state.signUp = .init()
                 return .none
                 
-            case .termsAndConditions(.delegate(.finishSignUp)):
-                fatalError()
+            case let .signIn(.delegate(.userLoggedIn(jwt: jwt))):
+                return .run { send in
+                    await send(.delegate(.userLoggedIn(jwt: jwt)))
+                }
+                
+            case let .termsAndConditions(.delegate(.userFinishedOnboarding(jwt))):
+                return .run { send in
+                    await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
+                }
                 
             case .internal(_):
                 return .none
@@ -288,21 +240,21 @@ public extension Onboarding {
             case .delegate(_):
                 return .none
                 
-            case .welcome(_):
+            case .signUp(_):
                 return .none
             case .userInformation(_):
                 return .none
             case .termsAndConditions(_):
                 return .none
-            case .login(_):
+            case .signIn(_):
                 return .none
             }
         }
-        .ifLet(\.login, action: /Action.login) {
-            Login()
+        .ifLet(\.signIn, action: /Action.signIn) {
+            SignIn()
         }
-        .ifLet(\.welcome, action: /Action.welcome) {
-            Welcome()
+        .ifLet(\.signUp, action: /Action.signUp) {
+            SignUp()
         }
         .ifLet(\.userInformation, action: /Action.userInformation) {
             UserInformation()

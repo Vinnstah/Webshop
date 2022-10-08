@@ -24,8 +24,8 @@ let package = Package(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
-            name: "LoginFeature",
-            targets: ["LoginFeature"]),
+            name: "SignInFeature",
+            targets: ["SignInFeature"]),
         .library(
             name: "MainFeature",
             targets: ["MainFeature"]),
@@ -57,8 +57,8 @@ let package = Package(
             name: "UserInformationFeature",
             targets: ["UserInformationFeature"]),
         .library(
-            name: "WelcomeFeature",
-            targets: ["WelcomeFeature"]),
+            name: "SignUpFeature",
+            targets: ["SignUpFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
@@ -97,18 +97,6 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-        .target(
-            name: "LoginFeature",
-            dependencies: [
-                "SiteRouter",
-                "URLRoutingClient",
-                "UserDefaultsClient",
-                "UserModel",
-                tca,
-                urlRouting,
-            ],
-            swiftSettings: swiftSettings
-        ),
         .testTarget(
             name: "MainFeatureTests",
             dependencies: ["MainFeature"]),
@@ -116,14 +104,14 @@ let package = Package(
             .target(
                 name: "OnboardingFeature",
                 dependencies: [
-                    "LoginFeature",
+                    "SignInFeature",
+                    "SignUpFeature",
                     "SiteRouter",
                     "TermsAndConditionsFeature",
                     "URLRoutingClient",
                     "UserDefaultsClient",
                     "UserInformationFeature",
                     "UserModel",
-                    "WelcomeFeature",
                     tca,
                     urlRouting,
                 ],
@@ -148,6 +136,26 @@ let package = Package(
             ),
         
         
+            .target(
+                name: "SignInFeature",
+                dependencies: [
+                    "SiteRouter",
+                    "URLRoutingClient",
+                    "UserDefaultsClient",
+                    "UserModel",
+                    tca,
+                    urlRouting,
+                ],
+                swiftSettings: swiftSettings
+            ),
+            .target(
+                name: "SignUpFeature",
+                dependencies: [
+                    "UserModel",
+                    tca,
+                ],
+                swiftSettings: swiftSettings
+            ),
             .target(
                 name: "SiteRouter",
                 dependencies: [
@@ -174,6 +182,17 @@ let package = Package(
             dependencies: ["SplashFeature"]),
         
             .target(
+                name: "TermsAndConditionsFeature",
+                dependencies: [
+                    "SiteRouter",
+                    "URLRoutingClient",
+                    "UserDefaultsClient",
+                    "UserModel",
+                    tca,
+                ],
+                swiftSettings: swiftSettings
+            ),
+            .target(
                 name: "URLRoutingClient",
                 dependencies: [
                     "SiteRouter",
@@ -182,13 +201,6 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-        .target(
-            name: "TermsAndConditionsFeature",
-            dependencies: [
-                tca,
-            ],
-            swiftSettings: swiftSettings
-        ),
         
             .target(
                 name: "UserDefaultsClient",
@@ -209,14 +221,6 @@ let package = Package(
             ),
         .target(
             name: "UserInformationFeature",
-            dependencies: [
-                "UserModel",
-                tca,
-            ],
-            swiftSettings: swiftSettings
-        ),
-        .target(
-            name: "WelcomeFeature",
             dependencies: [
                 "UserModel",
                 tca,

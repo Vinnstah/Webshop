@@ -49,3 +49,9 @@ public enum Currency: String, Equatable, Sendable, CaseIterable, Codable {
         self = Currency(rawValue: rawValue) ?? .SEK
     }
 }
+
+
+public enum ClientError: Error, Equatable {
+    case failedToLogin(String)
+    case failedToCreateUser(String)
+}

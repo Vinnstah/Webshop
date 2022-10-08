@@ -24,6 +24,9 @@ let package = Package(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
+            name: "LoginFeature",
+            targets: ["LoginFeature"]),
+        .library(
             name: "MainFeature",
             targets: ["MainFeature"]),
         .library(
@@ -94,6 +97,18 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "LoginFeature",
+            dependencies: [
+                "SiteRouter",
+                "URLRoutingClient",
+                "UserDefaultsClient",
+                "UserModel",
+                tca,
+                urlRouting,
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "MainFeatureTests",
             dependencies: ["MainFeature"]),
@@ -101,6 +116,7 @@ let package = Package(
             .target(
                 name: "OnboardingFeature",
                 dependencies: [
+                    "LoginFeature",
                     "SiteRouter",
                     "TermsAndConditionsFeature",
                     "URLRoutingClient",

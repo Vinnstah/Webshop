@@ -13,6 +13,7 @@ import UserModel
 import WelcomeFeature
 import UserInformationFeature
 import TermsAndConditionsFeature
+import LoginFeature
 
 public extension Onboarding {
     struct View: SwiftUI.View {
@@ -28,7 +29,11 @@ public extension Onboarding {
                 Group {
                     switch viewStore.step {
                     case .step0_LoginOrCreateUser:
-                        Onboarding.LoginView(store: store)
+                        IfLetStore(self.store.scope(
+                            state: \.login,
+                            action: Action.login),
+                                   then:Login.View.init(store:)
+                        )
 
                     case .step1_Welcome:
 
@@ -73,53 +78,4 @@ public extension Onboarding {
     }
 }
 
-public extension Onboarding {
-    struct LoginView: SwiftUI.View {
-        public let store: StoreOf<Onboarding>
-        
-        public init(store: StoreOf<Onboarding>) {
-            self.store = store
-        }
-        
-        public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
-                VStack {
-                    TextField("Email",
-                              text: viewStore.binding(
-                                get: { $0.email},
-                                send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
-                              )
-                    )
-                    .padding()
-                    
-                    SecureField("Password",
-                                text: viewStore.binding(
-                                    get: { $0.password },
-                                    send: { .internal(.passwordFieldReceivingInput(text: $0)) }
-                                )
-                    )
-                    .padding()
-                    
-                    Button("Login") {
-                        viewStore.send(.internal(.loginButtonPressed), animation: .default)
-                    }
-                    .disabled(viewStore.state.isLoginInFlight)
-                    
-                    Button("Sign Up") {
-                        viewStore.send(.internal(.signUpButtonPressed))
-                    }
-                }
-                
-                .alert(
-                    self
-                        .store
-                        .scope(
-                            state: \.alert
-                        ),
-                    dismiss: .internal(.alertConfirmTapped)
-                )
-            }
-        }
-    }
-}
 

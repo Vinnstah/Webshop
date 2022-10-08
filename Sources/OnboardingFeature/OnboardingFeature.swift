@@ -16,6 +16,7 @@ import UserModel
 import WelcomeFeature
 import UserInformationFeature
 import TermsAndConditionsFeature
+import LoginFeature
 
 ///Conforming AlertState to Sendable
 extension AlertState: @unchecked Sendable {}
@@ -32,6 +33,7 @@ public struct Onboarding: ReducerProtocol {
 public extension Onboarding {
     
     struct State: Equatable, Sendable {
+        public var login: Login.State?
         public var welcome: Welcome.State?
         public var userInformation: UserInformation.State?
         public var termsAndConditions: TermsAndConditions.State?
@@ -71,6 +73,7 @@ public extension Onboarding {
         }
         
         public init(
+            login: Login.State? = nil,
             welcome: Welcome.State? = nil,
             userInformation: UserInformation.State? = nil,
             termsAndConditions: TermsAndConditions.State? = nil,
@@ -81,6 +84,7 @@ public extension Onboarding {
             email: String = "",
             password: String = ""
         ) {
+            self.login = login
             self.welcome = welcome
             self.userInformation = userInformation
             self.termsAndConditions = termsAndConditions
@@ -120,6 +124,7 @@ public extension Onboarding {
         
         case delegate(DelegateAction)
         case `internal`(InternalAction)
+        case login(Login.Action)
         case welcome(Welcome.Action)
         case userInformation(UserInformation.Action)
         case termsAndConditions(TermsAndConditions.Action)
@@ -212,7 +217,7 @@ public extension Onboarding {
                 case .step2_ChooseUserSettings:
                     state.userInformation = .init()
                 case .step0_LoginOrCreateUser:
-                    state = .init()
+                    state.login = .init()
                 case .step1_Welcome:
                     state.welcome = .init()
                 case .step3_TermsAndConditions:
@@ -275,6 +280,7 @@ public extension Onboarding {
                 return .none
                 
             case .termsAndConditions(.delegate(.finishSignUp)):
+                fatalError()
                 
             case .internal(_):
                 return .none
@@ -288,9 +294,13 @@ public extension Onboarding {
                 return .none
             case .termsAndConditions(_):
                 return .none
+            case .login(_):
+                return .none
             }
         }
-        
+        .ifLet(\.login, action: /Action.login) {
+            Login()
+        }
         .ifLet(\.welcome, action: /Action.welcome) {
             Welcome()
         }
@@ -321,10 +331,7 @@ public extension Onboarding {
     }
 }
 
-public enum ClientError: Error, Equatable {
-    case failedToLogin(String)
-    case failedToCreateUser(String)
-}
+
 //public func doesEmailMeetRequirements(email: String) -> Bool? {
 //    guard let regex = try? Regex(#"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$"#) else { return nil }
 //    if email.wholeMatch(of: regex) != nil {

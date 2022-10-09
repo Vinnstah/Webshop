@@ -27,36 +27,29 @@ public extension Onboarding {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 Group {
-//                    switch viewStore.step {
-//
-//                    case .step0_SignIn:
                         IfLetStore(self.store.scope(
                             state: \.signIn,
-                            action: Action.signIn),
+                            action: Action.InternalAction.signIn),
                                    then:SignIn.View.init(store:)
                         )
 
-//                    case .step1_SignUp:
                             IfLetStore(self.store.scope(
                                 state: \.signUp,
-                                action: Action.signUp),
+                                action: Action.internal(.signUp) ),
                                        then: SignUp.View.init(store:)
                             )
 
-//                    case .step2_UserSettings:
                         IfLetStore(self.store.scope(
                             state: \.userInformation,
                             action: Action.userInformation),
                                    then: UserInformation.View.init(store:)
                         )
                         
-//                    case .step3_TermsAndConditions:
                         IfLetStore(self.store.scope(
                             state: \.termsAndConditions,
                             action: Action.termsAndConditions),
                                    then: TermsAndConditions.View.init(store:)
                         )
-//                    }
                 }
             }
         }

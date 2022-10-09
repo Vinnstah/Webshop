@@ -37,70 +37,31 @@ public extension Onboarding {
         public var signUp: SignUp.State?
         public var userInformation: UserInformation.State?
         public var termsAndConditions: TermsAndConditions.State?
-        public var user: User?
         public var step: Step
-        public var isLoginInFlight: Bool
         public var alert: AlertState<Action>?
-        public var email: String
-        public var password: String
-        
-        ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
-        public var passwordFulfillsRequirements: Bool {
-            if password.count > 5 {
-                return true
-            }
-            return false
-        }
-        ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
-        public var emailFulfillsRequirements: Bool {
-            guard email.count > 5 else {
-                return false
-            }
-            
-            guard email.contains("@") else {
-                return false
-            }
-            return true
-        }
-        
-        ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
-        public var disableButton: Bool {
-            if !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight {
-                return true
-            } else {
-                return false
-            }
-        }
+
         
         public init(
-            signIn: SignIn.State? = nil,
+            signIn: SignIn.State? = .init(),
             signUp: SignUp.State? = nil,
             userInformation: UserInformation.State? = nil,
             termsAndConditions: TermsAndConditions.State? = nil,
-            user: User? = nil,
-            step: Step = .step0_LoginOrCreateUser,
-            isLoginInFlight: Bool = false,
-            alert: AlertState<Action>? = nil,
-            email: String = "",
-            password: String = ""
+            step: Step = .step0_SignIn,
+            alert: AlertState<Action>? = nil
         ) {
             self.signIn = signIn
             self.signUp = signUp
             self.userInformation = userInformation
             self.termsAndConditions = termsAndConditions
-            self.user = user
             self.step = step
-            self.isLoginInFlight = isLoginInFlight
             self.alert = alert
-            self.email = email
-            self.password = password
         }
         
         ///Enum for the different Onboarding steps.
         public enum Step: Int, Equatable, CaseIterable, Comparable, Sendable {
-            case step0_LoginOrCreateUser
-            case step1_Welcome
-            case step2_ChooseUserSettings
+            case step0_SignIn
+            case step1_SignUp
+            case step2_UserSettings
             case step3_TermsAndConditions
             
             ///Function to skip to the next step
@@ -149,16 +110,16 @@ public extension Onboarding {
                 /// Move to the next step
             case .internal(.nextStep):
                 state.step.nextStep()
-                switch state.step {
-                case .step0_LoginOrCreateUser:
-                    state.signIn = .init()
-                case .step1_Welcome:
-                    state.signUp = .init()
-                case .step2_ChooseUserSettings:
-                    state.userInformation = .init()
-                case .step3_TermsAndConditions:
-                    state.termsAndConditions = .init(user: state.user!)
-                }
+//                switch state.step {
+//                case .step0_LoginOrCreateUser:
+//                    state.signIn = .init()
+//                case .step1_Welcome:
+//                    state.signUp = .init()
+//                case .step2_ChooseUserSettings:
+//                    state.userInformation = .init()
+//                case .step3_TermsAndConditions:
+//                    state.termsAndConditions = .init(user: state.user!)
+//                }
                 return .none
                 
                 /// Move to the previous step
@@ -168,7 +129,7 @@ public extension Onboarding {
 
                 /// Go back to the `LoginView` when the user clicks `cancel`
             case .internal(.goBackToLoginView):
-                state.step = .step0_LoginOrCreateUser
+                state.step = .step0_SignIn
                 state.signIn = .init()
                 return .none
                 
@@ -178,50 +139,57 @@ public extension Onboarding {
                 return .none
                 
             case let .signUp(.delegate(.goToNextStep(user))):
-                state.user = user
-                return .run { send in
-                    await send(.internal(.nextStep))
-                }
+                state.signUp = nil
+                state.userInformation = .init(user: user)
+                state.step = .step2_UserSettings
+                return .none
                 
             case .signUp(.delegate(.goToThePreviousStep)):
-                return .run { send in
-                    await send(.internal(.previousStep))
-                }
+                state.signUp = nil
+                state.signIn = .init()
+                state.step.previousStep()
+                return .none
                 
             case .signUp(.delegate(.goBackToLoginView)):
+                state.signUp = nil
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                     
                 }
             case .userInformation(.delegate(.goBackToLoginView)):
+                state.userInformation = nil
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                 }
                 
-            case .userInformation(.delegate(.nextStep)):
-                return .run { send in
-                    await send(.internal(.nextStep))
-                }
+            case let .userInformation(.delegate(.nextStep(user))):
+                state.userInformation = nil
+                state.termsAndConditions = .init(user: user)
+                state.step.nextStep()
+                return .none
                 
-            case .userInformation(.delegate(.previousStep)):
-                return .run { send in
-                    await send(.internal(.previousStep))
-                }
+            case let .userInformation(.delegate(.previousStep(user))):
+                state.userInformation = nil
+                state.signUp = .init(user: user, email: user.email, password: user.password)
+                state.step.nextStep()
+                return .none
                 
-            case .termsAndConditions(.delegate(.previousStep)):
-                return .run { send in
-                    await send(.internal(.previousStep))
-                }
+            case let .termsAndConditions(.delegate(.previousStep(user))):
+                state.termsAndConditions = nil
+                state.userInformation = .init(user: user)
+                state.step.previousStep()
+                return .none
                 
             case .termsAndConditions(.delegate(.goBackToLoginView)):
+                state.termsAndConditions = nil
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                 }
                 
-                
             case .signIn(.delegate(.userPressedSignUp)):
-                state.step = .step1_Welcome
+                state.signIn = nil
                 state.signUp = .init()
+                state.step = .step1_SignUp
                 return .none
                 
             case let .signIn(.delegate(.userLoggedIn(jwt: jwt))):
@@ -236,10 +204,8 @@ public extension Onboarding {
                 
             case .internal(_):
                 return .none
-                
             case .delegate(_):
                 return .none
-                
             case .signUp(_):
                 return .none
             case .userInformation(_):
@@ -262,24 +228,6 @@ public extension Onboarding {
         .ifLet(\.termsAndConditions, action: /Action.termsAndConditions) {
             TermsAndConditions()
         }
-//        .ifCaseLet(
-//            /State.welcome,
-//             action: /Action.welcome
-//        ) {
-//            Welcome()
-//        }
-//        .ifCaseLet(
-//            /State.userInformation,
-//             action: /Action.userInformation
-//        ) {
-//            UserInformation()
-//        }
-//        .ifCaseLet(
-//            /State.termsAndConditions,
-//             action: /Action.termsAndConditions
-//        ) {
-//            TermsAndConditions()
-//        }
     }
 }
 

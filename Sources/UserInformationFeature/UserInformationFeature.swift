@@ -21,14 +21,17 @@ public extension UserInformation {
     struct State: Equatable, Sendable {
         public var userSettings: UserSettings
         public var alert: AlertState<Action>?
+        public var user: User
         
         
         public init(
             userSettings: UserSettings = .init(),
-            alert: AlertState<Action>? = nil
+            alert: AlertState<Action>? = nil,
+            user: User
         ) {
             self.userSettings = userSettings
             self.alert = alert
+            self.user = user
         }
     }
     
@@ -46,8 +49,8 @@ public extension UserInformation {
         }
         
         public enum DelegateAction: Equatable, Sendable {
-            case nextStep
-            case previousStep
+            case nextStep(User)
+            case previousStep(User)
             case goBackToLoginView
         }
     }
@@ -58,13 +61,13 @@ public extension UserInformation {
             switch action {
                 
             case .internal(.nextStep):
-                return .run { send in
-                    await send(.delegate(.nextStep))
+                return .run { [user = state.user] send in
+                    await send(.delegate(.nextStep(user)))
                 }
                 
             case .internal(.previousStep):
-                return .run { send in
-                    await send(.delegate(.previousStep))
+                return .run { [user = state.user] send in
+                    await send(.delegate(.previousStep(user)))
                 }
             
                 

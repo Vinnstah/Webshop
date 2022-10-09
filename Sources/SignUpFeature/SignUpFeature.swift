@@ -86,11 +86,13 @@ public extension SignUp {
                 ///Set `email` when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.email = text
+//                state.user.email = text
                 return .none
                 
                 ///Set  `password` when passwordField receives input.
             case let .internal(.passwordFieldReceivingInput(text: text)):
                 state.password = text
+//                state.user.password = text
                 return .none
                 
             case .internal(.nextStep):

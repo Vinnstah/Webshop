@@ -43,11 +43,11 @@ public extension SignUp {
                     }
                     HStack {
                         Button("Next step") {
-                            viewStore.send(.internal(.nextStep))
+                            viewStore.send(.internal(.nextStep), animation: .default)
                         }
                         .disabled(viewStore.state.disableButton)
                         
-                        Button("Previous Step") { viewStore.send(.delegate(.goToThePreviousStep), animation: .easeIn(duration: 1.0))}
+                        Button("Previous Step") { viewStore.send(.delegate(.goToThePreviousStep), animation: .default)}
                         
                     }
                     
@@ -55,7 +55,7 @@ public extension SignUp {
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
-                            viewStore.send(.delegate(.goBackToLoginView))
+                            viewStore.send(.delegate(.goBackToLoginView), animation: .default)
                         }
                     }
                 }

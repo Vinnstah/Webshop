@@ -26,13 +26,13 @@ public extension TermsAndConditions {
     struct State: Equatable, Sendable {
         public var areTermsAndConditionsAccepted: Bool
         public var alert: AlertState<Action>?
-        public var user: User?
+        public var user: User
         
         
         public init(
             areTermsAndConditionsAccepted: Bool = false,
             alert: AlertState<Action>? = nil,
-            user: User? = nil
+            user: User
         ) {
             self.areTermsAndConditionsAccepted = areTermsAndConditionsAccepted
             self.alert = alert
@@ -59,7 +59,7 @@ public extension TermsAndConditions {
         
         public enum DelegateAction: Equatable, Sendable {
             case userFinishedOnboarding(JWT)
-            case previousStep
+            case previousStep(User)
             case goBackToLoginView
         }
     }
@@ -75,8 +75,8 @@ public extension TermsAndConditions {
                 }
                 
             case .internal(.previousStep):
-                return .run { send in
-                    await send(.delegate(.previousStep))
+                return .run { [user = state.user] send in
+                    await send(.delegate(.previousStep(user)))
                 }
                 
             case .internal(.cancelButtonPressed):
@@ -97,7 +97,7 @@ public extension TermsAndConditions {
                     user = state.user
                 ] send in
                     
-                    await send(.internal(.createUserRequest(user!)))
+                    await send(.internal(.createUserRequest(user)))
                 }
                 
             case let .internal(.createUserRequest(user)):

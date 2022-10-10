@@ -148,25 +148,29 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-            .target(
-                name: "SignUpFeature",
-                dependencies: [
-                    "UserModel",
-                    tca,
-                ],
-                swiftSettings: swiftSettings
-            ),
-            .target(
-                name: "SiteRouter",
-                dependencies: [
-                    "UserModel",
-                    tca,
-                    urlRouting,
-                    vapor,
-                    vaporRouting,
-                ],
-                swiftSettings: swiftSettings
-            ),
+        .testTarget(
+            name: "SignInFeatureTests",
+            dependencies: ["SignInFeature"]),
+        
+        .target(
+            name: "SignUpFeature",
+            dependencies: [
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "SiteRouter",
+            dependencies: [
+                "UserModel",
+                tca,
+                urlRouting,
+                vapor,
+                vaporRouting,
+            ],
+            swiftSettings: swiftSettings
+        ),
         
         
             .target(
@@ -192,15 +196,15 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-            .target(
-                name: "URLRoutingClient",
-                dependencies: [
-                    "SiteRouter",
-                    tca,
-                    vaporRouting,
-                ],
-                swiftSettings: swiftSettings
-            ),
+        .target(
+            name: "URLRoutingClient",
+            dependencies: [
+                "SiteRouter",
+                tca,
+                vaporRouting,
+            ],
+            swiftSettings: swiftSettings
+        ),
         
             .target(
                 name: "UserDefaultsClient",

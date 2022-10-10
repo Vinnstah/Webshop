@@ -11,7 +11,7 @@ final class SplashFeatureTests: XCTestCase {
         XCTAssert(true)
     }
     
-    func test__GIVEN__initial_state__WHEN__onAppear__THEN__userDefaults_calls_isLoggedIn_mock_isLoggedIn() async throws {
+    func test__GIVEN__initial_state__WHEN__onAppear__THEN__userDefaults_calls_getLoggedInUserJWT_mock_isLoggedIn() async throws {
         
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
@@ -19,24 +19,24 @@ final class SplashFeatureTests: XCTestCase {
         
         store.dependencies.mainQueue = mainQueue.eraseToAnyScheduler()
         
-        let hasIsLoggedInBeenCalled = ActorIsolated(false)
-        store.dependencies.userDefaultsClient.boolForKey = { _ in
-            await hasIsLoggedInBeenCalled.setValue(true)
-            return true
+        let hasGetLoggedInUserJwtBeenCalled = ActorIsolated(false)
+        store.dependencies.userDefaultsClient.jwtForKey = { _ in
+            await hasGetLoggedInUserJwtBeenCalled.setValue(true)
+            return "JWT"
         }
         
         // WHEN onAppear
         _ = await store.send(.internal(.onAppear))
         await self.mainQueue.advance(by: .seconds(1))
-        await store.receive(.delegate(.loadIsLoggedInResult(.isLoggedIn)))
+        await store.receive(.delegate(.loadIsLoggedInResult("JWT")))
         
-        // THEN calls isLoggedIn
-        await hasIsLoggedInBeenCalled.withValue {
+        // THEN calls getLoggedInUserJWT
+        await hasGetLoggedInUserJwtBeenCalled.withValue {
             XCTAssertTrue($0)
         }
     }
     
-    func test__GIVEN__initial_state__WHEN__onAppear__THEN__userDefaults_calls_isLoggedIn_mock_isNotLoggedIn() async throws {
+    func test__GIVEN__initial_state__WHEN__onAppear__THEN__userDefaults_calls_getLoggedInUserJWT_mock_isNotLoggedIn() async throws {
         
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
@@ -44,19 +44,19 @@ final class SplashFeatureTests: XCTestCase {
         
         store.dependencies.mainQueue = mainQueue.eraseToAnyScheduler()
         
-        let hasIsLoggedInBeenCalled = ActorIsolated(false)
-        store.dependencies.userDefaultsClient.boolForKey = { _ in
-            await hasIsLoggedInBeenCalled.setValue(true)
-            return false
+        let hasGetLoggedInUserJwtBeenCalled = ActorIsolated(false)
+        store.dependencies.userDefaultsClient.jwtForKey = { _ in
+            await hasGetLoggedInUserJwtBeenCalled.setValue(true)
+            return ""
         }
         
         // WHEN onAppear
         _ = await store.send(.internal(.onAppear))
         await self.mainQueue.advance(by: .seconds(1))
-        await store.receive(.delegate(.loadIsLoggedInResult(.notLoggedIn)))
+        await store.receive(.delegate(.loadIsLoggedInResult(nil)))
         
-        // THEN calls isLoggedIn
-        await hasIsLoggedInBeenCalled.withValue({
+        // THEN calls getLoggedInUserJWT
+        await hasGetLoggedInUserJwtBeenCalled.withValue({
             XCTAssertTrue($0)
         })
     }
@@ -68,7 +68,7 @@ final class SplashFeatureTests: XCTestCase {
         
         //GIVEN delegate action is sent
         //WHEN received
-        _ = await store.send(.delegate(.loadIsLoggedInResult(.isLoggedIn)))
+        _ = await store.send(.delegate(.loadIsLoggedInResult("JWT")))
         
         // THEN do nothing
         

@@ -26,7 +26,6 @@ public extension Onboarding {
         }
         
         public var body: some SwiftUI.View {
-//            WithViewStore(self.store) { viewStore in
                 Group {
                     IfLetStore(self.store.scope(
                             state: \.signIn,
@@ -52,7 +51,6 @@ public extension Onboarding {
                                    then: TermsAndConditions.View.init(store:)
                         )
                 }
-//            }
         }
     }
 }

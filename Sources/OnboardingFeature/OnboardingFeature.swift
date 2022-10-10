@@ -39,7 +39,7 @@ public extension Onboarding {
         public var termsAndConditions: TermsAndConditions.State?
         public var step: Step
         public var alert: AlertState<Action>?
-
+        
         
         public init(
             signIn: SignIn.State? = .init(),
@@ -89,7 +89,6 @@ public extension Onboarding {
         case signUp(SignUp.Action)
         case userInformation(UserInformation.Action)
         case termsAndConditions(TermsAndConditions.Action)
-
         
         public enum InternalAction: Equatable, Sendable {
             case alertConfirmTapped

@@ -35,10 +35,10 @@ public extension App {
         }
     }
     enum Action: Equatable, Sendable {
+        case `internal`(InternalAction)
         case splash(Splash.Action)
         case onboarding(Onboarding.Action)
         case main(Main.Action)
-        case `internal`(InternalAction)
         
         
         public enum InternalAction: Equatable, Sendable {
@@ -97,7 +97,15 @@ public extension App {
                 
             case .internal(_):
                 return .none
-                
+//
+            case .onboarding(.signIn(_)):
+                return .none
+            case .onboarding(.signUp(_)):
+                return .none
+            case .onboarding(.userInformation(_)):
+                return .none
+            case .onboarding(.termsAndConditions(_)):
+                return .none
             }
         }
         ///Changing View depending on which state is initialized.

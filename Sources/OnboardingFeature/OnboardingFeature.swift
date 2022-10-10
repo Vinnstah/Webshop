@@ -85,13 +85,13 @@ public extension Onboarding {
         
         case delegate(DelegateAction)
         case `internal`(InternalAction)
+        case signIn(SignIn.Action)
+        case signUp(SignUp.Action)
+        case userInformation(UserInformation.Action)
+        case termsAndConditions(TermsAndConditions.Action)
 
         
         public enum InternalAction: Equatable, Sendable {
-            case signIn(SignIn.Action)
-            case signUp(SignUp.Action)
-            case userInformation(UserInformation.Action)
-            case termsAndConditions(TermsAndConditions.Action)
             case alertConfirmTapped
             case nextStep
             case previousStep
@@ -129,66 +129,66 @@ public extension Onboarding {
                 state.alert = nil
                 return .none
                 
-            case let .internal(.signUp(.delegate(.goToNextStep(user)))):
+            case let .signUp(.delegate(.goToNextStep(user))):
                 state.signUp = nil
                 state.userInformation = .init(user: user)
                 state.step = .step2_UserSettings
                 return .none
                 
-            case .internal(.signUp(.delegate(.goToThePreviousStep))):
+            case .signUp(.delegate(.goToThePreviousStep)):
                 state.signUp = nil
                 state.signIn = .init()
                 state.step.previousStep()
                 return .none
                 
-            case .internal(.signUp(.delegate(.goBackToLoginView))):
+            case .signUp(.delegate(.goBackToLoginView)):
                 state.signUp = nil
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                     
                 }
-            case .internal(.userInformation(.delegate(.goBackToLoginView))):
+            case .userInformation(.delegate(.goBackToLoginView)):
                 state.userInformation = nil
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                 }
                 
-            case let .internal(.userInformation(.delegate(.nextStep(user)))):
+            case let .userInformation(.delegate(.nextStep(user))):
                 state.userInformation = nil
                 state.termsAndConditions = .init(user: user)
                 state.step.nextStep()
                 return .none
                 
-            case let .internal(.userInformation(.delegate(.previousStep(user)))):
+            case let .userInformation(.delegate(.previousStep(user))):
                 state.userInformation = nil
                 state.signUp = .init(user: user, email: user.email, password: user.password)
                 state.step.nextStep()
                 return .none
                 
-            case let .internal(.termsAndConditions(.delegate(.previousStep(user)))):
+            case let .termsAndConditions(.delegate(.previousStep(user))):
                 state.termsAndConditions = nil
                 state.userInformation = .init(user: user)
                 state.step.previousStep()
                 return .none
                 
-            case .internal(.termsAndConditions(.delegate(.goBackToLoginView))):
+            case .termsAndConditions(.delegate(.goBackToLoginView)):
                 state.termsAndConditions = nil
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                 }
                 
-            case .internal(.signIn(.delegate(.userPressedSignUp))):
+            case .signIn(.delegate(.userPressedSignUp)):
                 state.signIn = nil
                 state.signUp = .init()
                 state.step = .step1_SignUp
                 return .none
                 
-            case let .internal(.signIn(.delegate(.userLoggedIn(jwt: jwt)))):
+            case let .signIn(.delegate(.userLoggedIn(jwt: jwt))):
                 return .run { send in
                     await send(.delegate(.userLoggedIn(jwt: jwt)))
                 }
                 
-            case let .internal(.termsAndConditions(.delegate(.userFinishedOnboarding(jwt)))):
+            case let .termsAndConditions(.delegate(.userFinishedOnboarding(jwt))):
                 return .run { send in
                     await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
                 }
@@ -197,18 +197,26 @@ public extension Onboarding {
                 return .none
             case .delegate(_):
                 return .none
+            case .signIn(.internal(_)):
+                return .none
+            case .signUp(.internal(_)):
+                return .none
+            case .userInformation(.internal(_)):
+                return .none
+            case .termsAndConditions(.internal(_)):
+                return .none
             }
         }
-        .ifLet(\.signIn, action: /Action.internal(.signIn)) {
+        .ifLet(\.signIn, action: /Action.signIn) {
             SignIn()
         }
-        .ifLet(\.signUp, action: /Action.internal(.signUp)) {
+        .ifLet(\.signUp, action: /Action.signUp) {
             SignUp()
         }
-        .ifLet(\.userInformation, action: /Action.internal(.userInformation)) {
+        .ifLet(\.userInformation, action: /Action.userInformation) {
             UserInformation()
         }
-        .ifLet(\.termsAndConditions, action: /Action.internal(.termsAndConditions)) {
+        .ifLet(\.termsAndConditions, action: /Action.termsAndConditions) {
             TermsAndConditions()
         }
     }

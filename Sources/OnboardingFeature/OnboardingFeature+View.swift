@@ -18,6 +18,7 @@ import SignInFeature
 public extension Onboarding {
     struct View: SwiftUI.View {
         
+        
         public let store: StoreOf<Onboarding>
         
         public init(store: StoreOf<Onboarding>) {
@@ -25,17 +26,17 @@ public extension Onboarding {
         }
         
         public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: { $0 }) { viewStore in
+//            WithViewStore(self.store) { viewStore in
                 Group {
-                        IfLetStore(self.store.scope(
+                    IfLetStore(self.store.scope(
                             state: \.signIn,
-                            action: Action.InternalAction.signIn),
+                            action:  Action.signIn),
                                    then:SignIn.View.init(store:)
                         )
 
                             IfLetStore(self.store.scope(
                                 state: \.signUp,
-                                action: Action.internal(.signUp) ),
+                                action: Action.signUp ),
                                        then: SignUp.View.init(store:)
                             )
 
@@ -51,7 +52,7 @@ public extension Onboarding {
                                    then: TermsAndConditions.View.init(store:)
                         )
                 }
-            }
+//            }
         }
     }
 }

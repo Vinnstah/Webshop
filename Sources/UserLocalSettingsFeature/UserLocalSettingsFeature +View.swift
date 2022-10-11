@@ -10,11 +10,11 @@ import ComposableArchitecture
 import SwiftUI
 import UserModel
 
-public extension UserInformation {
+public extension UserLocalSettings {
     struct View: SwiftUI.View {
-        public let store: StoreOf<UserInformation>
+        public let store: StoreOf<UserLocalSettings>
         
-        public init(store: StoreOf<UserInformation>) {
+        public init(store: StoreOf<UserLocalSettings>) {
             self.store = store
         }
         

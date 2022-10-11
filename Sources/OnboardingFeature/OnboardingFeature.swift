@@ -14,7 +14,7 @@ import _URLRouting
 import URLRoutingClient
 import UserModel
 import SignUpFeature
-import UserInformationFeature
+import UserLocalSettingsFeature
 import TermsAndConditionsFeature
 import SignInFeature
 
@@ -35,7 +35,7 @@ public extension Onboarding {
     struct State: Equatable, Sendable {
         public var signIn: SignIn.State?
         public var signUp: SignUp.State?
-        public var userInformation: UserInformation.State?
+        public var userLocalSettings: UserLocalSettings.State?
         public var termsAndConditions: TermsAndConditions.State?
         public var step: Step
         public var alert: AlertState<Action>?
@@ -44,14 +44,14 @@ public extension Onboarding {
         public init(
             signIn: SignIn.State? = .init(),
             signUp: SignUp.State? = nil,
-            userInformation: UserInformation.State? = nil,
+            userLocalSettings: UserLocalSettings.State? = nil,
             termsAndConditions: TermsAndConditions.State? = nil,
             step: Step = .step0_SignIn,
             alert: AlertState<Action>? = nil
         ) {
             self.signIn = signIn
             self.signUp = signUp
-            self.userInformation = userInformation
+            self.userLocalSettings = userLocalSettings
             self.termsAndConditions = termsAndConditions
             self.step = step
             self.alert = alert
@@ -87,7 +87,7 @@ public extension Onboarding {
         case `internal`(InternalAction)
         case signIn(SignIn.Action)
         case signUp(SignUp.Action)
-        case userInformation(UserInformation.Action)
+        case userLocalSettings(UserLocalSettings.Action)
         case termsAndConditions(TermsAndConditions.Action)
         
         public enum InternalAction: Equatable, Sendable {
@@ -130,7 +130,7 @@ public extension Onboarding {
                 
             case let .signUp(.delegate(.goToNextStep(user))):
                 state.signUp = nil
-                state.userInformation = .init(user: user)
+                state.userLocalSettings = .init(user: user)
                 state.step = .step2_UserSettings
                 return .none
                 
@@ -146,27 +146,27 @@ public extension Onboarding {
                     await send(.internal(.goBackToLoginView))
                     
                 }
-            case .userInformation(.delegate(.goBackToLoginView)):
-                state.userInformation = nil
+            case .userLocalSettings(.delegate(.goBackToLoginView)):
+                state.userLocalSettings = nil
                 return .run { send in
                     await send(.internal(.goBackToLoginView))
                 }
                 
-            case let .userInformation(.delegate(.nextStep(user))):
-                state.userInformation = nil
+            case let .userLocalSettings(.delegate(.nextStep(user))):
+                state.userLocalSettings = nil
                 state.termsAndConditions = .init(user: user)
                 state.step.nextStep()
                 return .none
                 
-            case let .userInformation(.delegate(.previousStep(user))):
-                state.userInformation = nil
+            case let .userLocalSettings(.delegate(.previousStep(user))):
+                state.userLocalSettings = nil
                 state.signUp = .init(user: user, email: user.email, password: user.password)
                 state.step.nextStep()
                 return .none
                 
             case let .termsAndConditions(.delegate(.previousStep(user))):
                 state.termsAndConditions = nil
-                state.userInformation = .init(user: user)
+                state.userLocalSettings = .init(user: user)
                 state.step.previousStep()
                 return .none
                 
@@ -200,7 +200,7 @@ public extension Onboarding {
                 return .none
             case .signUp(.internal(_)):
                 return .none
-            case .userInformation(.internal(_)):
+            case .userLocalSettings(.internal(_)):
                 return .none
             case .termsAndConditions(.internal(_)):
                 return .none
@@ -212,8 +212,8 @@ public extension Onboarding {
         .ifLet(\.signUp, action: /Action.signUp) {
             SignUp()
         }
-        .ifLet(\.userInformation, action: /Action.userInformation) {
-            UserInformation()
+        .ifLet(\.userLocalSettings, action: /Action.userLocalSettings) {
+            UserLocalSettings()
         }
         .ifLet(\.termsAndConditions, action: /Action.termsAndConditions) {
             TermsAndConditions()

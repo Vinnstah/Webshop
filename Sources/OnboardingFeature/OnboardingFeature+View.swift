@@ -11,7 +11,7 @@ import SwiftUI
 import UserDefaultsClient
 import UserModel
 import SignUpFeature
-import UserInformationFeature
+import UserLocalSettingsFeature
 import TermsAndConditionsFeature
 import SignInFeature
 
@@ -40,9 +40,9 @@ public extension Onboarding {
                             )
 
                         IfLetStore(self.store.scope(
-                            state: \.userInformation,
-                            action: Action.userInformation),
-                                   then: UserInformation.View.init(store:)
+                            state: \.userLocalSettings,
+                            action: Action.userLocalSettings),
+                                   then: UserLocalSettings.View.init(store:)
                         )
                         
                         IfLetStore(self.store.scope(

@@ -11,12 +11,12 @@ import SwiftUI
 import UserModel
 
 extension AlertState: @unchecked Sendable {}
-public struct UserInformation: ReducerProtocol {
+public struct UserLocalSettings: ReducerProtocol {
     public init() {}
 }
 
 
-public extension UserInformation {
+public extension UserLocalSettings {
     
     struct State: Equatable, Sendable {
         public var userSettings: UserSettings

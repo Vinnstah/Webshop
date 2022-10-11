@@ -54,8 +54,8 @@ let package = Package(
             name: "UserModel",
             targets: ["UserModel"]),
         .library(
-            name: "UserInformationFeature",
-            targets: ["UserInformationFeature"]),
+            name: "UserLocalSettingsFeature",
+            targets: ["UserLocalSettingsFeature"]),
         .library(
             name: "SignUpFeature",
             targets: ["SignUpFeature"]),
@@ -110,7 +110,7 @@ let package = Package(
                     "TermsAndConditionsFeature",
                     "URLRoutingClient",
                     "UserDefaultsClient",
-                    "UserInformationFeature",
+                    "UserLocalSettingsFeature",
                     "UserModel",
                     tca,
                     urlRouting,
@@ -227,12 +227,15 @@ let package = Package(
                 swiftSettings: swiftSettings
             ),
         .target(
-            name: "UserInformationFeature",
+            name: "UserLocalSettingsFeature",
             dependencies: [
                 "UserModel",
                 tca,
             ],
             swiftSettings: swiftSettings
         ),
+        .testTarget(
+            name: "UserLocalSettingsFeatureTests",
+            dependencies: ["UserLocalSettingsFeature"]),
     ]
 )

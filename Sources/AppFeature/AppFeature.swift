@@ -102,7 +102,7 @@ public extension App {
                 return .none
             case .onboarding(.signUp(_)):
                 return .none
-            case .onboarding(.userInformation(_)):
+            case .onboarding(.userLocalSettings(_)):
                 return .none
             case .onboarding(.termsAndConditions(_)):
                 return .none

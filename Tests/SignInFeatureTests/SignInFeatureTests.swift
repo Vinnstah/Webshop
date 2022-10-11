@@ -157,8 +157,8 @@ final class SignInFeatureTests: XCTestCase {
     func test__GIVEN__alert_state__WHEN__signUpButtonIsPressed__THEN___do_nothing() async throws {
         
         let store = TestStore(
-            initialState: .init(alert: .init(title: TextState("Error"), message: TextState("The operation couldn’t be completed. (UserModel.ClientError error 0.)"), dismissButton: .cancel(TextState("Dismiss"), action: .none)), //GIVEN initial state
-                                reducer: SignIn()))
+            initialState: .init(alert: .init(title: TextState("Error"), message: TextState("The operation couldn’t be completed. (UserModel.ClientError error 0.)"), dismissButton: .cancel(TextState("Dismiss"), action: .none))), //GIVEN initial state
+                                reducer: SignIn())
         
         _ = await store.send(.internal(.signUpButtonPressed))
         await store.receive(.delegate(.userPressedSignUp))

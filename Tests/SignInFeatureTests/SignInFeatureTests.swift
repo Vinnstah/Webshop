@@ -42,7 +42,7 @@ final class SignInFeatureTests: XCTestCase {
             reducer: SignIn())
         
         //         WHEN passwordFieldReceivingInput
-        //        // THEN state.password is updated
+        //         THEN state.password is updated
         _ = await store.send(.internal(.passwordFieldReceivingInput(text: "test123"))) {
             $0.password = "test123"
         }
@@ -149,17 +149,19 @@ final class SignInFeatureTests: XCTestCase {
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
             reducer: SignIn())
-        
+        //WHEN signUpButtonPressed
         _ = await store.send(.internal(.signUpButtonPressed))
+        //THEN do nothing and delegate
         await store.receive(.delegate(.userPressedSignUp))
     }
     
     func test__GIVEN__alert_state__WHEN__alertConfirmTapped__THEN___set_alertState_nil() async throws {
         
         let store = TestStore(
-            initialState: .init(alert: .init(title: TextState("Error"), message: TextState("The operation couldn’t be completed. (UserModel.ClientError error 0.)"), dismissButton: .cancel(TextState("Dismiss"), action: .none))), //GIVEN initial state
+            initialState: .init(alert: .init(title: TextState("Error"), message: TextState("The operation couldn’t be completed. (UserModel.ClientError error 0.)"), dismissButton: .cancel(TextState("Dismiss"), action: .none))), //GIVEN alert state
                                 reducer: SignIn())
-        
+        //WHEN alertConfirmTapped
+        //THEN state.alert = nil
         _ = await store.send(.internal(.alertConfirmTapped)) {
             $0.alert = nil
         }

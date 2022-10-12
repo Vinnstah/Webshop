@@ -9,14 +9,14 @@ import Foundation
 import ComposableArchitecture
 import UserModel
 import UserDefaultsClient
-import URLRoutingClient
+import ApiClient
 import SiteRouter
 
 extension AlertState: @unchecked Sendable {}
 public struct TermsAndConditions: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
-    @Dependency(\.urlRoutingClient) var apiClient
+    @Dependency(\.apiClient) var apiClient
     public init() {}
 }
 

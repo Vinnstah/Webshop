@@ -21,6 +21,9 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
+            name: "ApiClient",
+            targets: ["ApiClient"]),
+        .library(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
@@ -44,9 +47,6 @@ let package = Package(
         .library(
             name: "TermsAndConditionsFeature",
             targets: ["TermsAndConditionsFeature"]),
-        .library(
-            name: "URLRoutingClient",
-            targets: ["URLRoutingClient"]),
         .library(
             name: "UserDefaultsClient",
             targets: ["UserDefaultsClient"]),
@@ -73,13 +73,23 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
+            name: "ApiClient",
+            dependencies: [
+                "SiteRouter",
+                tca,
+                vaporRouting,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        
+        .target(
             name: "AppFeature",
             dependencies: [
                 tca,
                 "MainFeature",
                 "OnboardingFeature",
                 "SplashFeature",
-                "URLRoutingClient",
+                "ApiClient",
                 "UserModel",
             ],
             swiftSettings: swiftSettings
@@ -108,7 +118,7 @@ let package = Package(
                     "SignUpFeature",
                     "SiteRouter",
                     "TermsAndConditionsFeature",
-                    "URLRoutingClient",
+                    "ApiClient",
                     "UserDefaultsClient",
                     "UserLocalSettingsFeature",
                     "UserModel",
@@ -140,7 +150,7 @@ let package = Package(
                 name: "SignInFeature",
                 dependencies: [
                     "SiteRouter",
-                    "URLRoutingClient",
+                    "ApiClient",
                     "UserDefaultsClient",
                     "UserModel",
                     tca,
@@ -192,23 +202,13 @@ let package = Package(
                 name: "TermsAndConditionsFeature",
                 dependencies: [
                     "SiteRouter",
-                    "URLRoutingClient",
+                    "ApiClient",
                     "UserDefaultsClient",
                     "UserModel",
                     tca,
                 ],
                 swiftSettings: swiftSettings
             ),
-        .target(
-            name: "URLRoutingClient",
-            dependencies: [
-                "SiteRouter",
-                tca,
-                vaporRouting,
-            ],
-            swiftSettings: swiftSettings
-        ),
-        
             .target(
                 name: "UserDefaultsClient",
                 dependencies: [

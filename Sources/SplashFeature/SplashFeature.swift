@@ -1,23 +1,9 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-22.
-//
 
 import Foundation
 import ComposableArchitecture
 import SwiftUI
 import UserDefaultsClient
 
-public enum IsLoggedIn: Equatable, Sendable {
-    case isLoggedIn
-    case notLoggedIn
-    
-    public init(_ isLoggedIn: Bool) {
-        self = isLoggedIn ? .isLoggedIn : .notLoggedIn
-    }
-}
 
 /// Determine if user should be onboarded or not and reporting the result back to AppFeature
 public struct Splash: ReducerProtocol {
@@ -81,10 +67,12 @@ public extension Splash {
                     .onAppear {
                         viewStore.send(.internal(.onAppear))
                     }
-                    .background(Color.red)
-                
+                    .background(Color(red: 52, green: 73, blue: 102))
+                    .frame(width: 600, height: 400)
+               
                 
             }
+            .background(Color(red: 13, green: 24, blue: 33))
         }
     }
 }

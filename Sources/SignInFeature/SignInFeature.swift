@@ -11,7 +11,7 @@ import SwiftUI
 import UserDefaultsClient
 import SiteRouter
 import _URLRouting
-import URLRoutingClient
+import ApiClient
 import UserModel
 
 ///Conforming AlertState to Sendable
@@ -21,7 +21,7 @@ extension AlertState: @unchecked Sendable {}
 public struct SignIn: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
-    @Dependency(\.urlRoutingClient) var apiClient
+    @Dependency(\.apiClient) var apiClient
     
     public init() {}
 }
@@ -37,30 +37,16 @@ public extension SignIn {
         
         ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
         public var passwordFulfillsRequirements: Bool {
-            if password.count > 5 {
-                return true
-            }
-            return false
+            password.count > 5
         }
         ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
         public var emailFulfillsRequirements: Bool {
-            guard email.count > 5 else {
-                return false
-            }
-            
-            guard email.contains("@") else {
-                return false
-            }
-            return true
+            email.count > 5 && email.contains("@")
         }
         
         ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
         public var disableButton: Bool {
-            if !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight {
-                return true
-            } else {
-                return false
-            }
+             !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight
         }
         
         public init(
@@ -142,7 +128,6 @@ public extension SignIn {
                 state.isLoginInFlight = false
                 
                 return .run { [userDefaultsClient] send in
-                    
                     /// Set `LoggedInUserJWT` in `userDefaults` to the `jwt` we received back from the server
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
                     /// Delegate the action `userLoggedIn` with the given `jwt`

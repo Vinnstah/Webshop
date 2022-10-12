@@ -21,30 +21,16 @@ public extension SignUp {
         
         ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
         public var passwordFulfillsRequirements: Bool {
-            if password.count > 5 {
-                return true
-            }
-            return false
+            password.count > 5
         }
         ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
         public var emailFulfillsRequirements: Bool {
-            guard email.count > 5 else {
-                return false
-            }
-            
-            guard email.contains("@") else {
-                return false
-            }
-            return true
+            email.count > 5 && email.contains("@")
         }
         
         ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
         public var disableButton: Bool {
-            if !passwordFulfillsRequirements || !emailFulfillsRequirements {
-                return true
-            } else {
-                return false
-            }
+             !passwordFulfillsRequirements || !emailFulfillsRequirements
         }
         
         public init(
@@ -86,13 +72,11 @@ public extension SignUp {
                 ///Set `email` when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.email = text
-//                state.user.email = text
                 return .none
                 
                 ///Set  `password` when passwordField receives input.
             case let .internal(.passwordFieldReceivingInput(text: text)):
                 state.password = text
-//                state.user.password = text
                 return .none
                 
             case .internal(.nextStep):

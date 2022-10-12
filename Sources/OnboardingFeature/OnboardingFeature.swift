@@ -11,7 +11,6 @@ import SwiftUI
 import UserDefaultsClient
 import SiteRouter
 import _URLRouting
-import URLRoutingClient
 import UserModel
 import SignUpFeature
 import UserLocalSettingsFeature
@@ -25,7 +24,6 @@ extension AlertState: @unchecked Sendable {}
 public struct Onboarding: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
-    @Dependency(\.urlRoutingClient) var apiClient
     
     public init() {}
 }
@@ -37,7 +35,6 @@ public extension Onboarding {
         public var signUp: SignUp.State?
         public var userLocalSettings: UserLocalSettings.State?
         public var termsAndConditions: TermsAndConditions.State?
-        public var step: Step
         public var alert: AlertState<Action>?
         
         
@@ -46,36 +43,13 @@ public extension Onboarding {
             signUp: SignUp.State? = nil,
             userLocalSettings: UserLocalSettings.State? = nil,
             termsAndConditions: TermsAndConditions.State? = nil,
-            step: Step = .step0_SignIn,
             alert: AlertState<Action>? = nil
         ) {
             self.signIn = signIn
             self.signUp = signUp
             self.userLocalSettings = userLocalSettings
             self.termsAndConditions = termsAndConditions
-            self.step = step
             self.alert = alert
-        }
-        
-        ///Enum for the different Onboarding steps.
-        public enum Step: Int, Equatable, CaseIterable, Comparable, Sendable {
-            case step0_SignIn
-            case step1_SignUp
-            case step2_UserSettings
-            case step3_TermsAndConditions
-            
-            ///Function to skip to the next step
-            mutating func nextStep() {
-                self = Self(rawValue: self.rawValue + 1) ?? Self.allCases.last!
-            }
-            ///Function to go back to the previous step
-            mutating func previousStep() {
-                self = Self(rawValue: self.rawValue - 1) ?? Self.allCases.first!
-            }
-            
-            public static func < (lhs: Self, rhs: Self) -> Bool {
-                lhs.rawValue < rhs.rawValue
-            }
         }
     }
     
@@ -107,19 +81,9 @@ public extension Onboarding {
         Reduce { state, action in
             
             switch action {
-                /// Move to the next step
-            case .internal(.nextStep):
-                state.step.nextStep()
-                return .none
-                
-                /// Move to the previous step
-            case .internal(.previousStep):
-                state.step.previousStep()
-                return .none
 
                 /// Go back to the `LoginView` when the user clicks `cancel`
             case .internal(.goBackToLoginView):
-                state.step = .step0_SignIn
                 state.signIn = .init()
                 return .none
                 
@@ -131,13 +95,11 @@ public extension Onboarding {
             case let .signUp(.delegate(.goToNextStep(user))):
                 state.signUp = nil
                 state.userLocalSettings = .init(user: user)
-                state.step = .step2_UserSettings
                 return .none
                 
             case .signUp(.delegate(.goToThePreviousStep)):
                 state.signUp = nil
                 state.signIn = .init()
-                state.step.previousStep()
                 return .none
                 
             case .signUp(.delegate(.goBackToLoginView)):
@@ -155,19 +117,16 @@ public extension Onboarding {
             case let .userLocalSettings(.delegate(.nextStep(user))):
                 state.userLocalSettings = nil
                 state.termsAndConditions = .init(user: user)
-                state.step.nextStep()
                 return .none
                 
             case let .userLocalSettings(.delegate(.previousStep(user))):
                 state.userLocalSettings = nil
                 state.signUp = .init(user: user, email: user.email, password: user.password)
-                state.step.nextStep()
                 return .none
                 
             case let .termsAndConditions(.delegate(.previousStep(user))):
                 state.termsAndConditions = nil
                 state.userLocalSettings = .init(user: user)
-                state.step.previousStep()
                 return .none
                 
             case .termsAndConditions(.delegate(.goBackToLoginView)):
@@ -179,7 +138,6 @@ public extension Onboarding {
             case .signIn(.delegate(.userPressedSignUp)):
                 state.signIn = nil
                 state.signUp = .init()
-                state.step = .step1_SignUp
                 return .none
                 
             case let .signIn(.delegate(.userLoggedIn(jwt: jwt))):

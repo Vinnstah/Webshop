@@ -35,18 +35,18 @@ public struct User: Content, Equatable, Codable, Sendable {
 public struct UserSettings: Content, Equatable, Sendable {
     public var defaultCurrency: Currency
     
-    public init(defaultCurrency: Currency = .SEK) {
+    public init(defaultCurrency: Currency = .sek) {
         self.defaultCurrency = defaultCurrency
     }
 }
 
 public enum Currency: String, Equatable, Sendable, CaseIterable, Codable {
-    case SEK = "SEK"
-    case USD = "USD"
+    case sek = "SEK"
+    case usd = "USD"
 
     
     public init(_ rawValue: String) {
-        self = Currency(rawValue: rawValue) ?? .SEK
+        self = Currency(rawValue: rawValue) ?? .sek
     }
 }
 

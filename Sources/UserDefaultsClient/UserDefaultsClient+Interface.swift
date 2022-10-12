@@ -32,14 +32,14 @@ public extension UserDefaultsClient {
     }
     
     func setLoggedInUserJWT(_ jwt: String) async {
-        await setJWT(jwt, jwtKey)
+        await setString(jwt, jwtKey)
     }
     
     func getLoggedInUserJWT() async -> String? {
-        guard (await jwtForKey(jwtKey)) != "" else {
+        guard !(await stringForKey(jwtKey)).isEmpty else {
             return nil
         }
-       return await jwtForKey(jwtKey)
+       return await stringForKey(jwtKey)
     }
     
     func removeLoggedInUserJWT() async -> Void {

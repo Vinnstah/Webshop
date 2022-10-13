@@ -2,6 +2,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
+import UserModel
 
 public extension Main {
     struct View: SwiftUI.View {
@@ -16,13 +17,15 @@ public extension Main {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 VStack {
                     ScrollView(.horizontal) {
-                        ForEach(viewStore.state.productList, id: \.self) { prod in
-                            ProductView(store: store, title: prod)
+                        HStack {
+                            ForEach(viewStore.state.productList, id: \.self) { prod in
+                                ProductView(store: store, product: prod)
+                                    .frame(maxWidth: 150, maxHeight: 200)
+                            }
                         }
                     }
                     Text("Main Feature goes here")
                     
-
                     
                     HStack {
                         Text("JWT TOKEN: ")
@@ -33,6 +36,12 @@ public extension Main {
                         viewStore.send(.internal(.logOutUser))
                     }
                 }
+                .onAppear {
+                    viewStore.send(.internal(.onAppear))
+                }
+                .refreshable {
+                    viewStore.send(.internal(.onAppear))
+                }
             }
         }
     }
@@ -40,11 +49,11 @@ public extension Main {
 
 public struct ProductView: SwiftUI.View {
     public let store: StoreOf<Main>
-    let title: String
+    let product: Product
     
-    public init(store: StoreOf<Main>, title: String) {
+    public init(store: StoreOf<Main>, product: Product) {
         self.store = store
-        self.title = title
+        self.product = product
     }
     
     public var body: some SwiftUI.View {
@@ -53,8 +62,14 @@ public struct ProductView: SwiftUI.View {
                 Rectangle()
                     .frame(width: 200, height: 250)
                     .background(Color(.blue))
-                Text(title)
-                    .foregroundColor(Color.black)
+                VStack {
+                    AsyncImage(url: URL(string: product.imageURL))
+                        .frame(width: 50, height: 50)
+                    Text(product.title)
+                        .foregroundColor(Color.black)
+                    Text(product.description)
+                        .foregroundColor(Color.teal)
+                }
             }
         }
     }

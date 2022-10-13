@@ -40,7 +40,14 @@ func siteHandler(
         let jwt = try await loginUser(db, request.email, request.hexedPassword)
         try await db.close()
         return ResultPayload(forAction: "login", payload: jwt)
+        
+    case .getProducts:
+        let db = try await connectDatabase()
+        let products = try await getAllProducts(db)
+        try await db.close()
+        return ResultPayload(forAction: "getProducts", payload: products)
     }
+    
 }
 
 

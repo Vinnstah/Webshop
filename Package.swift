@@ -100,6 +100,8 @@ let package = Package(
             .target(
                 name: "MainFeature",
                 dependencies: [
+                    "ApiClient",
+                    "SiteRouter",
                     "UserDefaultsClient",
                     "UserModel",
                     tca,
@@ -218,7 +220,7 @@ let package = Package(
         
             .target(
                 name: "UserModel",
-                dependencies: [vapor],
+                dependencies: [postgres, vapor],
                 swiftSettings: swiftSettings
             ),
         .target(

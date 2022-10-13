@@ -7,6 +7,7 @@ import UserModel
 public enum SiteRoute: Equatable {
     case create(User)
     case login(User)
+    case getProducts
 }
 
 
@@ -20,6 +21,9 @@ public let router = OneOf {
         Path { "login" }
         Method.post
         Body(.json(User.self))
+    }
+    Route(.case(SiteRoute.getProducts)) {
+        Path { "getProducts" }
     }
 }
 

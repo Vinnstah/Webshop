@@ -1,7 +1,7 @@
 import XCTest
 @testable import SignInFeature
 import ComposableArchitecture
-import URLRoutingClient
+import ApiClient
 import UserModel
 import SiteRouter
 import VaporRouting
@@ -9,7 +9,7 @@ import Vapor
 
 fileprivate extension DependencyValues {
     mutating func setUpDefaults() {
-        self.urlRoutingClient = .failing
+        self.apiClient = .failing
     }
 }
 

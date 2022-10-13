@@ -87,26 +87,33 @@ public func loginUser(
     }
 }
 
+public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Product] {
+    var products: [Product] = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let product = Product(
+            title: try randomRow["title"].decode(String.self, context: .default),
+            description: try randomRow["description"].decode(String.self, context: .default),
+            imageURL: try randomRow["image_url"].decode(String.self, context: .default),
+            price: try randomRow["price"].decode(Int.self, context: .default),
+            category: try randomRow["category"].decode(String.self, context: .default),
+            subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
+            sku: try randomRow["sku"].decode(String.self, context: .default))
+        products.append(product)
+       
+    }
+    return products
+}
 
-///"""
-/// DB Model
-/// Tables:
-/// users - add Admin value - active session
-/// active sessions (link with jwt)  - products / UUID
-/// products - title / description / image URL / price / category / SKU (UUID)
-/// categories - title / products
-///
-///
-/// Create a bootstrap init to add tables if they dont exist
-///
-///
-///"""
-
-CREATE TABLE products (
-    title VARCHAR ( 50 ) PRIMARY UNIQUE NOT NULL,
-    description VARCHAR ( 250 ) UNIQUE,
-    image_url VARCHAR ( 100 ) NOT NULL,
-    price INT ( 20 ) UNIQUE NOT NULL,
-    category VARCHAR ( 50 ) NOT NULL,
-    sku VARCHAR ( 50 ) UNIQUE NOT NULL,
-);
+public func getAllProducts(
+    _ db: PostgresConnection
+) async throws -> [Product] {
+    let rows = try await db.query(
+                    """
+                    SELECT * FROM products;
+                    """,
+                    logger: logger
+    )
+    let products = try await returnProductRowsAsArray(rows)
+    return products
+}

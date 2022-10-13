@@ -17,7 +17,7 @@ var swiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "Webshop",
-    platforms: [.iOS(.v15), .macOS(.v12)],
+    platforms: [.iOS(.v16), .macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -62,10 +62,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "protocol-beta"),
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.66.1"),
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
-        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.1.0"),
+        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.10.0"),
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],

@@ -50,10 +50,11 @@ public struct ProductView: SwiftUI.View {
     public var body: some SwiftUI.View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
-                Text(title)
                 Rectangle()
                     .frame(width: 200, height: 250)
                     .background(Color(.blue))
+                Text(title)
+                    .foregroundColor(Color.black)
             }
         }
     }

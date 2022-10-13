@@ -5,4 +5,5 @@ final class UserDefaultsClientTests: XCTestCase {
     func testTrivial() throws {
         XCTAssert(true)
     }
+    
 }

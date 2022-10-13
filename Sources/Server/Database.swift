@@ -86,3 +86,27 @@ public func loginUser(
         return nil
     }
 }
+
+
+///"""
+/// DB Model
+/// Tables:
+/// users - add Admin value - active session
+/// active sessions (link with jwt)  - products / UUID
+/// products - title / description / image URL / price / category / SKU (UUID)
+/// categories - title / products
+///
+///
+/// Create a bootstrap init to add tables if they dont exist
+///
+///
+///"""
+
+CREATE TABLE products (
+    title VARCHAR ( 50 ) PRIMARY UNIQUE NOT NULL,
+    description VARCHAR ( 250 ) UNIQUE,
+    image_url VARCHAR ( 100 ) NOT NULL,
+    price INT ( 20 ) UNIQUE NOT NULL,
+    category VARCHAR ( 50 ) NOT NULL,
+    sku VARCHAR ( 50 ) UNIQUE NOT NULL,
+);

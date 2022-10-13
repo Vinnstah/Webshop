@@ -1,23 +1,12 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-22.
-//
-
 import Foundation
 import SwiftUI
 import ComposableArchitecture
 import SplashFeature
 import OnboardingFeature
 import MainFeature
-import UserDefaultsClient
-import URLRoutingClient
 import UserModel
 
 public struct App: ReducerProtocol {
-    @Dependency(\.userDefaultsClient) var userDefaultsClient
-    @Dependency(\.apiClient) var apiClient
     public init() {}
 }
 
@@ -128,35 +117,5 @@ public extension App {
             Main()
         }
         
-    }
-}
-
-
-public extension App {
-    struct View: SwiftUI.View {
-        let store: StoreOf<App>
-        
-        public init(store: StoreOf<App>) {
-            self.store = store
-        }
-        ///Scoping the correct store depending on the state
-        public var body: some SwiftUI.View {
-            IfLetStore(self.store.scope(
-                state: /App.State.splash,
-                action: App.Action.splash),
-                       then:Splash.View.init(store:)
-            )
-            IfLetStore(self.store.scope(
-                state: /App.State.onboarding,
-                action: App.Action.onboarding),
-                       then:Onboarding.View.init(store:)
-            )
-            IfLetStore(self.store.scope(
-                state: /App.State.main,
-                action: App.Action.main),
-                       then:Main.View.init(store:)
-            )
-            
-        }
     }
 }

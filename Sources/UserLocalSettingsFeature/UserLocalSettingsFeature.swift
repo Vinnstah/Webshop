@@ -1,20 +1,13 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-07.
-//
-
 import Foundation
 import ComposableArchitecture
 import SwiftUI
 import UserModel
 
 extension AlertState: @unchecked Sendable {}
+
 public struct UserLocalSettings: ReducerProtocol {
     public init() {}
 }
-
 
 public extension UserLocalSettings {
     

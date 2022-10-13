@@ -15,6 +15,11 @@ public extension Main {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 VStack {
+                    ScrollView(.horizontal) {
+                        ForEach(viewStore.state.productList, id: \.self) { prod in
+                            ProductView(store: store, title: prod)
+                        }
+                    }
                     Text("Main Feature goes here")
                     
 
@@ -33,3 +38,25 @@ public extension Main {
     }
 }
 
+public struct ProductView: SwiftUI.View {
+    public let store: StoreOf<Main>
+    let title: String
+    
+    public init(store: StoreOf<Main>, title: String) {
+        self.store = store
+        self.title = title
+    }
+    
+    public var body: some SwiftUI.View {
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
+            ZStack {
+                Text(title)
+                Rectangle()
+                    .frame(width: 200, height: 250)
+                    .background(Color(.blue))
+            }
+        }
+    }
+    
+    
+}

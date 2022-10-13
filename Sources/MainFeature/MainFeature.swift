@@ -12,9 +12,11 @@ public struct Main: ReducerProtocol {
 public extension Main {
     struct State: Equatable {
         public var jwt: String
+        public var productList: [String]
         
-        public init(jwt: String) {
+        public init(jwt: String, productList: [String] = ["Test1", "Test2", "Test3"]) {
             self.jwt = jwt
+            self.productList = productList
         }
     }
     

@@ -89,7 +89,6 @@ let package = Package(
                 "MainFeature",
                 "OnboardingFeature",
                 "SplashFeature",
-                "ApiClient",
                 "UserModel",
             ],
             swiftSettings: swiftSettings
@@ -116,14 +115,10 @@ let package = Package(
                 dependencies: [
                     "SignInFeature",
                     "SignUpFeature",
-                    "SiteRouter",
                     "TermsAndConditionsFeature",
-                    "ApiClient",
-                    "UserDefaultsClient",
                     "UserLocalSettingsFeature",
                     "UserModel",
                     tca,
-                    urlRouting,
                 ],
                 swiftSettings: swiftSettings
             ),

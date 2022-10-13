@@ -1,14 +1,6 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-08.
-//
-
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-
 
 public extension SignIn {
     struct View: SwiftUI.View {

@@ -8,9 +8,6 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-import UserDefaultsClient
-import SiteRouter
-import _URLRouting
 import UserModel
 import SignUpFeature
 import UserLocalSettingsFeature
@@ -22,8 +19,6 @@ extension AlertState: @unchecked Sendable {}
 
 
 public struct Onboarding: ReducerProtocol {
-    @Dependency(\.userDefaultsClient) var userDefaultsClient
-    @Dependency(\.mainQueue) var mainQueue
     
     public init() {}
 }
@@ -178,13 +173,3 @@ public extension Onboarding {
         }
     }
 }
-
-
-//public func doesEmailMeetRequirements(email: String) -> Bool? {
-//    guard let regex = try? Regex(#"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$"#) else { return nil }
-//    if email.wholeMatch(of: regex) != nil {
-//        return true
-//    }
-//    return false
-//}
-//

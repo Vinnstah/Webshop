@@ -1,72 +1,61 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-import UserDefaultsClient
-import UserModel
-import ApiClient
-import SiteRouter
+import HomeFeature
 
 public struct Main: ReducerProtocol {
-    @Dependency(\.userDefaultsClient) var userDefaultsClient
-    @Dependency(\.apiClient) var apiClient
     public init() {}
 }
 
 public extension Main {
     struct State: Equatable, Sendable {
-        public var jwt: String
-        public var productList: [Product]
         
-        public init(jwt: String, productList: [Product] = []) {
-            self.jwt = jwt
-            self.productList = productList
+        public var selectedTab: Tab
+        public var home: Home.State
+        
+        public init(
+            selectedTab: Tab = .home,
+            home: Home.State = .init()
+        ) {
+            
+            self.selectedTab = selectedTab
+            self.home = home
+        }
+        
+        public enum Tab: Equatable, Sendable {
+            case home
+            case products
+            case settings
+            case checkout
         }
     }
     
     enum Action: Equatable, Sendable {
         case `internal`(InternalAction)
         case delegate(DelegateAction)
+        case home(Home.Action)
         
         public enum DelegateAction: Equatable, Sendable {
             case userIsLoggedOut
         }
         
         public enum InternalAction: Equatable, Sendable {
-            case logOutUser
-            case onAppear
-            case getProductResponse(TaskResult<[Product]>)
+            case tabSelected
         }
     }
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
-                
-            case .internal(.logOutUser):
-                return .run { [userDefaultsClient] send in
-                    await userDefaultsClient.removeLoggedInUserJWT()
+            case .home(.delegate(.userIsLoggedOut)):
+                return .run { send in
                     await send(.delegate(.userIsLoggedOut))
                 }
             case .delegate(_):
                 return .none
-            case .internal(.onAppear):
-                return .run { [apiClient] send in
-                    return await send(.internal(.getProductResponse(
-                    TaskResult {
-                        try await apiClient.decodedResponse(
-                            for: .getProducts,
-                            as: ResultPayload<[Product]>.self).value.status.get()
-                    }
-                    )))
-                }
-                
-                
-            case let .internal(.getProductResponse(.success(products))):
-                state.productList = products
+            case .home(_):
                 return .none
-                
-            case let .internal(.getProductResponse(.failure(error))):
-                print(error)
+            case .internal(_):
                 return .none
             }
         }

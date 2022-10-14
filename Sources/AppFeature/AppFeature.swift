@@ -57,22 +57,22 @@ public extension App {
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
             case let .internal(.userIsLoggedIn(jwt)):
-                state = .main(.init(jwt: jwt))
+                state = .main(.init())
                 return .none
                 
                 ///When a user logs out from `main` we initialize onboarding again.
-            case .main(.delegate(.userIsLoggedOut)):
+            case .main((.delegate(.userIsLoggedOut))):
                 state = .onboarding(.init(signIn: .init()))
                 return .none
                 
                 ///After a user have finished onboarding and received the jwt we will send them through to `main`
             case let .onboarding(.delegate(.userFinishedOnboarding(jwt))):
-                state = .main(.init(jwt: jwt))
+                state = .main(.init())
                 return .none
                
                 ///When a user logs in through onboarding we change state to `main` and send their jwt through.
             case let .onboarding(.delegate(.userLoggedIn(jwt))):
-                state = .main(.init(jwt: jwt))
+                state = .main(.init())
                 return .none
                 
             case .splash(.internal(_)):
@@ -94,6 +94,10 @@ public extension App {
             case .onboarding(.userLocalSettings(_)):
                 return .none
             case .onboarding(.termsAndConditions(_)):
+                return .none
+            case .main(.home(.internal(_))):
+                return .none
+            case .main(.home(.delegate(_))):
                 return .none
             }
         }

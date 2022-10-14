@@ -27,14 +27,20 @@ let package = Package(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
-            name: "SignInFeature",
-            targets: ["SignInFeature"]),
+            name: "HomeFeature",
+            targets: ["HomeFeature"]),
         .library(
             name: "MainFeature",
             targets: ["MainFeature"]),
         .library(
             name: "OnboardingFeature",
             targets: ["OnboardingFeature"]),
+        .library(
+            name: "SignInFeature",
+            targets: ["SignInFeature"]),
+        .library(
+            name: "SignUpFeature",
+            targets: ["SignUpFeature"]),
         .library(
             name: "Server",
             targets: ["Server"]),
@@ -56,9 +62,6 @@ let package = Package(
         .library(
             name: "UserLocalSettingsFeature",
             targets: ["UserLocalSettingsFeature"]),
-        .library(
-            name: "SignUpFeature",
-            targets: ["SignUpFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
@@ -96,14 +99,22 @@ let package = Package(
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
+        .target(
+            name: "HomeFeature",
+            dependencies: [
+                "ApiClient",
+                "SiteRouter",
+                "UserDefaultsClient",
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
         
             .target(
                 name: "MainFeature",
                 dependencies: [
-                    "ApiClient",
-                    "SiteRouter",
-                    "UserDefaultsClient",
-                    "UserModel",
+                    "HomeFeature",
                     tca,
                 ],
                 swiftSettings: swiftSettings
@@ -206,6 +217,9 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
+        .testTarget(
+            name: "TermsAndConditionsFeatureTests",
+            dependencies: ["TermsAndConditionsFeature"]),
             .target(
                 name: "UserDefaultsClient",
                 dependencies: [

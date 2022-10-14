@@ -7,9 +7,7 @@
 
 import Foundation
 import Vapor
-//import PostgresNIO
 
-// TODO: Separate userSettings
 public struct User: Content, Equatable, Codable, Sendable {
     public var email: String
     public var password: String

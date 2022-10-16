@@ -1,18 +1,15 @@
 import Foundation
 import ComposableArchitecture
-import SwiftUI
 import UserModel
-import UserDefaultsClient
 import ApiClient
 import SiteRouter
 
-public struct Home: ReducerProtocol {
-    @Dependency(\.userDefaultsClient) var userDefaultsClient
+public struct Products: ReducerProtocol {
     @Dependency(\.apiClient) var apiClient
     public init() {}
 }
 
-public extension Home {
+public extension Products {
      struct State: Equatable, Sendable {
         public var productList: [Product]
         
@@ -26,11 +23,9 @@ public extension Home {
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable, Sendable {
-            case userIsLoggedOut
         }
         
         public enum InternalAction: Equatable, Sendable {
-            case logOutUser
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
         }
@@ -40,11 +35,6 @@ public extension Home {
         Reduce { state, action in
             switch action {
                 
-            case .internal(.logOutUser):
-                return .run { [userDefaultsClient] send in
-                    await userDefaultsClient.removeLoggedInUserJWT()
-                    await send(.delegate(.userIsLoggedOut))
-                }
                 
             case .internal(.onAppear):
                 return .run { [apiClient] send in

@@ -3,20 +3,18 @@ import SwiftUI
 import ComposableArchitecture
 import UserModel
 
-public extension Home {
+public extension Products {
     struct View: SwiftUI.View {
         
-        public let store: StoreOf<Home>
+        public let store: StoreOf<Products>
         
-        public init(store: StoreOf<Home>) {
+        public init(store: StoreOf<Products>) {
             self.store = store
         }
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 VStack {
-                    Text("Welcome back USER")
-                        .padding(.horizontal, 14)
                     ScrollView(.horizontal) {
                         HStack {
                             ForEach(viewStore.state.productList, id: \.self) { prod in
@@ -25,13 +23,7 @@ public extension Home {
                             }
                         }
                     }
-                    Text("Main Feature goes here")
-                    
-                    
-                    
-                    Button("Log out user") {
-                        viewStore.send(.internal(.logOutUser))
-                    }
+                    Text("Product Feature goes here")
                 }
                 .onAppear {
                     viewStore.send(.internal(.onAppear))
@@ -45,10 +37,10 @@ public extension Home {
 }
 
 public struct ProductView: SwiftUI.View {
-    public let store: StoreOf<Home>
+    public let store: StoreOf<Products>
     let product: Product
     
-    public init(store: StoreOf<Home>,
+    public init(store: StoreOf<Products>,
                 product: Product
     ) {
         self.store = store

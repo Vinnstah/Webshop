@@ -99,6 +99,8 @@ public extension App {
                 return .none
             case .main(.home(.delegate(_))):
                 return .none
+            case .main(.products(_)):
+                return .none
             }
         }
         ///Changing View depending on which state is initialized.

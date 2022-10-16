@@ -17,7 +17,7 @@ var swiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "Webshop",
-    platforms: [.iOS(.v16), .macOS(.v12)],
+    platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -35,6 +35,9 @@ let package = Package(
         .library(
             name: "OnboardingFeature",
             targets: ["OnboardingFeature"]),
+        .library(
+            name: "ProductsFeature",
+            targets: ["ProductsFeature"]),
         .library(
             name: "SignInFeature",
             targets: ["SignInFeature"]),
@@ -115,6 +118,7 @@ let package = Package(
                 name: "MainFeature",
                 dependencies: [
                     "HomeFeature",
+                    "ProductsFeature",
                     tca,
                 ],
                 swiftSettings: swiftSettings
@@ -141,6 +145,16 @@ let package = Package(
         
             .executableTarget(name: "runner", dependencies: [.target(name: "Server")]),
         
+            .target(
+                name: "ProductsFeature",
+                dependencies: [
+                    "ApiClient",
+                    "SiteRouter",
+                    "UserModel",
+                    tca,
+                ],
+                swiftSettings: swiftSettings
+            ),
             .target(
                 name: "Server",
                 dependencies: [

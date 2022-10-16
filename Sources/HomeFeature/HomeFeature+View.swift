@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-14.
-//
-
 import Foundation
 import SwiftUI
 import ComposableArchitecture

@@ -27,7 +27,7 @@ extension UserDefaultsClient {
         doubleForKey: XCTUnimplemented("\(Self.self).doubleForKey", placeholder: 0),
         integerForKey: XCTUnimplemented("\(Self.self).integerForKey", placeholder: 0),
         stringForKey: XCTUnimplemented("\(Self.self).stringForKey", placeholder: ""),
-        jwtForKey: XCTUnimplemented("\(Self.self).jwtForKey", placeholder: ""),
+        jwtForKey: XCTUnimplemented("\(Self.self).jwtForKey", placeholder: "jwtKey"),
         remove: XCTUnimplemented("\(Self.self).remove"),
         setBool: XCTUnimplemented("\(Self.self).setBool"),
         setData: XCTUnimplemented("\(Self.self).setData"),
@@ -51,6 +51,10 @@ extension UserDefaultsClient {
     
     public mutating func override(integer: Int, forKey key: String) {
         self.integerForKey = { [self] in await $0 == key ? integer : self.integerForKey(key) }
+    }
+    
+    public mutating func override(jwt: String, forKey key: String) {
+        self.jwtForKey = { [self] in await $0 == key ? jwt : self.jwtForKey(key) }
     }
 }
 #endif

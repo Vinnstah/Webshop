@@ -17,18 +17,30 @@ var swiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "Webshop",
-    platforms: [.iOS(.v15), .macOS(.v12)],
+    platforms: [.iOS(.v16), .macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
+            name: "ApiClient",
+            targets: ["ApiClient"]),
+        .library(
             name: "AppFeature",
             targets: ["AppFeature"]),
+        .library(
+            name: "HomeFeature",
+            targets: ["HomeFeature"]),
         .library(
             name: "MainFeature",
             targets: ["MainFeature"]),
         .library(
             name: "OnboardingFeature",
             targets: ["OnboardingFeature"]),
+        .library(
+            name: "SignInFeature",
+            targets: ["SignInFeature"]),
+        .library(
+            name: "SignUpFeature",
+            targets: ["SignUpFeature"]),
         .library(
             name: "Server",
             targets: ["Server"]),
@@ -39,21 +51,24 @@ let package = Package(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
         .library(
-            name: "URLRoutingClient",
-            targets: ["URLRoutingClient"]),
+            name: "TermsAndConditionsFeature",
+            targets: ["TermsAndConditionsFeature"]),
         .library(
             name: "UserDefaultsClient",
             targets: ["UserDefaultsClient"]),
         .library(
             name: "UserModel",
             targets: ["UserModel"]),
+        .library(
+            name: "UserLocalSettingsFeature",
+            targets: ["UserLocalSettingsFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "protocol-beta"),
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.66.1"),
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
-        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.1.0"),
+        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.10.0"),
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
@@ -61,13 +76,22 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
+            name: "ApiClient",
+            dependencies: [
+                "SiteRouter",
+                tca,
+                vaporRouting,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        
+        .target(
             name: "AppFeature",
             dependencies: [
                 tca,
                 "MainFeature",
                 "OnboardingFeature",
                 "SplashFeature",
-                "URLRoutingClient",
                 "UserModel",
             ],
             swiftSettings: swiftSettings
@@ -75,12 +99,22 @@ let package = Package(
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
+        .target(
+            name: "HomeFeature",
+            dependencies: [
+                "ApiClient",
+                "SiteRouter",
+                "UserDefaultsClient",
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
         
             .target(
                 name: "MainFeature",
                 dependencies: [
-                    "UserDefaultsClient",
-                    "UserModel",
+                    "HomeFeature",
                     tca,
                 ],
                 swiftSettings: swiftSettings
@@ -92,12 +126,12 @@ let package = Package(
             .target(
                 name: "OnboardingFeature",
                 dependencies: [
-                    "SiteRouter",
-                    "URLRoutingClient",
-                    "UserDefaultsClient",
+                    "SignInFeature",
+                    "SignUpFeature",
+                    "TermsAndConditionsFeature",
+                    "UserLocalSettingsFeature",
                     "UserModel",
                     tca,
-                    urlRouting,
                 ],
                 swiftSettings: swiftSettings
             ),
@@ -121,16 +155,43 @@ let package = Package(
         
         
             .target(
-                name: "SiteRouter",
+                name: "SignInFeature",
                 dependencies: [
+                    "SiteRouter",
+                    "ApiClient",
+                    "UserDefaultsClient",
                     "UserModel",
                     tca,
                     urlRouting,
-                    vapor,
-                    vaporRouting,
                 ],
                 swiftSettings: swiftSettings
             ),
+        .testTarget(
+            name: "SignInFeatureTests",
+            dependencies: ["SignInFeature"]),
+        
+        .target(
+            name: "SignUpFeature",
+            dependencies: [
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "SignUpFeatureTests",
+            dependencies: ["SignUpFeature"]),
+        .target(
+            name: "SiteRouter",
+            dependencies: [
+                "UserModel",
+                tca,
+                urlRouting,
+                vapor,
+                vaporRouting,
+            ],
+            swiftSettings: swiftSettings
+        ),
         
         
             .target(
@@ -146,15 +207,19 @@ let package = Package(
             dependencies: ["SplashFeature"]),
         
             .target(
-                name: "URLRoutingClient",
+                name: "TermsAndConditionsFeature",
                 dependencies: [
                     "SiteRouter",
+                    "ApiClient",
+                    "UserDefaultsClient",
+                    "UserModel",
                     tca,
-                    vaporRouting,
                 ],
                 swiftSettings: swiftSettings
             ),
-        
+        .testTarget(
+            name: "TermsAndConditionsFeatureTests",
+            dependencies: ["TermsAndConditionsFeature"]),
             .target(
                 name: "UserDefaultsClient",
                 dependencies: [
@@ -169,8 +234,19 @@ let package = Package(
         
             .target(
                 name: "UserModel",
-                dependencies: [vapor],
+                dependencies: [postgres, vapor],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "UserLocalSettingsFeature",
+            dependencies: [
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "UserLocalSettingsFeatureTests",
+            dependencies: ["UserLocalSettingsFeature"]),
     ]
 )

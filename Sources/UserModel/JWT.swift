@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-28.
-//
-
 import Foundation
 import CryptoKit
 

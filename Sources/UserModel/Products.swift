@@ -1,17 +1,10 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-13.
-//
-
 import Foundation
-import Vapor
+//import Vapor
 import PostgresNIO
 
 extension URL: @unchecked Sendable {}
 
-public struct Product: Equatable, Content, Sendable, Hashable, Identifiable {
+public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
     
     public let title: String
     public let description: String

@@ -20,9 +20,9 @@ let package = Package(
     platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
-        .library(
-            name: "ApiClient",
-            targets: ["ApiClient"]),
+//        .library(
+//            name: "ApiClient",
+//            targets: ["ApiClient"]),
         .library(
             name: "AppFeature",
             targets: ["AppFeature"]),
@@ -44,12 +44,12 @@ let package = Package(
         .library(
             name: "SignUpFeature",
             targets: ["SignUpFeature"]),
-        .library(
-            name: "Server",
-            targets: ["Server"]),
-        .library(
-            name: "SiteRouter",
-            targets: ["SiteRouter"]),
+//        .library(
+//            name: "Server",
+//            targets: ["Server"]),
+//        .library(
+//            name: "SiteRouter",
+//            targets: ["SiteRouter"]),
         .library(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
@@ -83,7 +83,7 @@ let package = Package(
             dependencies: [
                 "SiteRouter",
                 tca,
-                vaporRouting,
+                urlRouting,
             ],
             swiftSettings: swiftSettings
         ),
@@ -195,14 +195,14 @@ let package = Package(
         .testTarget(
             name: "SignUpFeatureTests",
             dependencies: ["SignUpFeature"]),
+        
         .target(
             name: "SiteRouter",
             dependencies: [
                 "UserModel",
                 tca,
-                urlRouting,
-                vapor,
                 vaporRouting,
+                urlRouting,
             ],
             swiftSettings: swiftSettings
         ),
@@ -248,7 +248,9 @@ let package = Package(
         
             .target(
                 name: "UserModel",
-                dependencies: [postgres, vapor],
+                dependencies: [
+                    postgres,
+                              ],
                 swiftSettings: swiftSettings
             ),
         .target(

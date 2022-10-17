@@ -1,14 +1,9 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-29.
-//
 
 import Foundation
-import Vapor
+//import Vapor
+import CryptoKit
 
-public struct User: Content, Equatable, Codable, Sendable {
+public struct User: Equatable, Codable, Sendable {
     public var email: String
     public var password: String
     public var jwt: String
@@ -30,7 +25,7 @@ public struct User: Content, Equatable, Codable, Sendable {
     }
 }
 
-public struct UserSettings: Content, Equatable, Sendable {
+public struct UserSettings: Codable, Equatable, Sendable {
     public var defaultCurrency: Currency
     
     public init(defaultCurrency: Currency = .sek) {

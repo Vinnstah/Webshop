@@ -10,15 +10,20 @@ public struct Products: ReducerProtocol {
 }
 
 public extension Products {
-     struct State: Equatable, Sendable {
+    struct State: Equatable, Sendable {
         public var productList: [Product]
+        public var searchText: String
         
-        public init(productList: [Product] = []) {
+        public init(
+            productList: [Product] = [],
+            searchText: String = ""
+        ) {
             self.productList = productList
+            self.searchText = searchText
         }
     }
     
-     enum Action: Equatable, Sendable {
+    enum Action: Equatable, Sendable {
         case `internal`(InternalAction)
         case delegate(DelegateAction)
         
@@ -28,10 +33,11 @@ public extension Products {
         public enum InternalAction: Equatable, Sendable {
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
+            case searchTextReceivesInput(String)
         }
     }
     
-     var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
                 
@@ -39,11 +45,11 @@ public extension Products {
             case .internal(.onAppear):
                 return .run { [apiClient] send in
                     return await send(.internal(.getProductResponse(
-                    TaskResult {
-                        try await apiClient.decodedResponse(
-                            for: .getProducts,
-                            as: ResultPayload<[Product]>.self).value.status.get()
-                    }
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .getProducts,
+                                as: ResultPayload<[Product]>.self).value.status.get()
+                        }
                     )))
                 }
                 
@@ -53,6 +59,10 @@ public extension Products {
                 
             case let .internal(.getProductResponse(.failure(error))):
                 print(error)
+                return .none
+                
+            case let .internal(.searchTextReceivesInput(text)):
+                state.searchText = text
                 return .none
                 
             case .delegate(_):

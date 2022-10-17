@@ -1,5 +1,4 @@
-import Vapor
-import VaporRouting
+import URLRouting
 import ComposableArchitecture
 import UserModel
 
@@ -28,7 +27,7 @@ public let router = OneOf {
 }
 
 
-public struct ResultPayload<Payload: Sendable & Equatable & Codable>: Content, Sendable, Equatable {
+public struct ResultPayload<Payload: Sendable & Equatable & Codable>: Codable, Sendable, Equatable {
     public let forAction: String
     public let payload: Payload?
     public var status: Result<Payload, Failure> {
@@ -50,7 +49,7 @@ public struct ResultPayload<Payload: Sendable & Equatable & Codable>: Content, S
 }
 
 
-public struct CreateUserResponse: Content, Equatable {
+public struct CreateUserResponse: Codable, Equatable {
     let email: String
     let jwt: String
     let status: String

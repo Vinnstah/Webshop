@@ -17,17 +17,19 @@ public extension Home {
                 VStack {
                     Text("Welcome back USER")
                         .padding(.horizontal, 14)
+                    
+                    Text("Show popular items")
+                    
                     ScrollView(.horizontal) {
-                        HStack {
+                        HStack(spacing: 20) {
                             ForEach(viewStore.state.productList, id: \.self) { prod in
                                 ProductView(store: store, product: prod)
-                                    .frame(maxWidth: 150, maxHeight: 200)
+                                    .onTapGesture {
+                                        viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                    }
                             }
                         }
                     }
-                    Text("Main Feature goes here")
-                    
-                    
                     
                     Button("Log out user") {
                         viewStore.send(.internal(.logOutUser))
@@ -39,6 +41,13 @@ public extension Home {
                 .refreshable {
                     viewStore.send(.internal(.onAppear))
                 }
+                .sheet(isPresented:
+                        viewStore.binding(
+                            get: \.isProductDetailSheetPresented,
+                            send: .internal(.toggleSheet))
+                ) {
+                    ProductDetailView(store: store, product: viewStore.state.productDetailView!)
+                }
             }
         }
     }
@@ -46,10 +55,11 @@ public extension Home {
 
 public struct ProductView: SwiftUI.View {
     public let store: StoreOf<Home>
-    let product: Product
+    public let product: Product
     
-    public init(store: StoreOf<Home>,
-                product: Product
+    public init(
+        store: StoreOf<Home>,
+        product: Product
     ) {
         self.store = store
         self.product = product
@@ -60,18 +70,96 @@ public struct ProductView: SwiftUI.View {
             ZStack {
                 Rectangle()
                     .frame(width: 200, height: 250)
-                    .background(Color(.blue))
+                    .foregroundColor(.indigo)
+                    .cornerRadius(25)
                 VStack {
-                    AsyncImage(url: URL(string: product.imageURL))
-                        .frame(width: 50, height: 50)
+                    AsyncImage(url: URL(string: product.imageURL)) { maybeImage in
+                        if let image = maybeImage.image {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 150, height: 150)
+                            
+                        } else if maybeImage.error != nil {
+                            Text("No image available")
+                            
+                        } else {
+                            Image(systemName: "photo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        }
+                    }
+                    .padding()
+                    
                     Text(product.title)
-                        .foregroundColor(Color.black)
-                    Text(product.description)
-                        .foregroundColor(Color.teal)
+                        .foregroundColor(Color.white)
+                        .font(.title.bold())
+                        .multilineTextAlignment(.center)
                 }
             }
+            .frame(width: 200, height: 250)
         }
     }
-    
-    
 }
+
+public struct ProductDetailView: SwiftUI.View {
+    public let store: StoreOf<Home>
+    public let product: Product
+    
+    public init(
+        store: StoreOf<Home>,
+        product: Product
+    ) {
+        self.store = store
+        self.product = product
+    }
+    
+    public var body: some SwiftUI.View {
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
+            ScrollView(.vertical) {
+                
+                VStack(spacing: 20) {
+                AsyncImage(url: URL(string: product.imageURL)) { maybeImage in
+                    if let image = maybeImage.image {
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 250, height: 250)
+                        
+                    } else if maybeImage.error != nil {
+                        Text("No image available")
+                        
+                    } else {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    }
+                }
+                .padding(.top)
+                    
+                    Text(product.title)
+                        .font(.largeTitle)
+                        .bold()
+                        .padding()
+                    
+                    HStack(spacing: 15) {
+                        Text(product.category)
+                            .font(.body)
+                        Text(product.subCategory)
+                            .font(.footnote)
+                        Text(product.sku)
+                            .font(.footnote)
+                    }
+                    Text(product.description)
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
+                        .frame(width: 250)
+                    
+                    Text("\(product.price) kr")
+                        .font(.largeTitle)
+            }
+        }
+        }
+    }
+}
+

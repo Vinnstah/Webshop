@@ -2,11 +2,12 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+
 let postgres: Target.Dependency = .product(name: "PostgresNIO", package: "postgres-nio")
 let tca: Target.Dependency = .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
 let vapor: Target.Dependency = .product(name: "Vapor", package: "vapor")
 let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "vapor-routing")
-let urlRouting: Target.Dependency = .product(name: "_URLRouting", package: "swift-parsing")
+let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift-url-routing")
 
 var swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
@@ -20,9 +21,9 @@ let package = Package(
     platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
-//        .library(
-//            name: "ApiClient",
-//            targets: ["ApiClient"]),
+        .library(
+            name: "ApiClient",
+            targets: ["ApiClient"]),
         .library(
             name: "AppFeature",
             targets: ["AppFeature"]),
@@ -44,12 +45,12 @@ let package = Package(
         .library(
             name: "SignUpFeature",
             targets: ["SignUpFeature"]),
-//        .library(
-//            name: "Server",
-//            targets: ["Server"]),
-//        .library(
-//            name: "SiteRouter",
-//            targets: ["SiteRouter"]),
+        .library(
+            name: "Server",
+            targets: ["Server"]),
+        .library(
+            name: "SiteRouter",
+            targets: ["SiteRouter"]),
         .library(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
@@ -71,9 +72,7 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.66.1"),
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
-        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.10.0"),
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.3.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -201,7 +200,6 @@ let package = Package(
             dependencies: [
                 "UserModel",
                 tca,
-                vaporRouting,
                 urlRouting,
             ],
             swiftSettings: swiftSettings

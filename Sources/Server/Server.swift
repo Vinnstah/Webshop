@@ -51,3 +51,4 @@ func siteHandler(
 }
 
 
+extension ResultPayload: Content {}

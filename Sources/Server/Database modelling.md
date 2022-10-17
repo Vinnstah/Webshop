@@ -17,7 +17,7 @@
 MVP of productTable
 CREATE TABLE products (
     title VARCHAR ( 50 ) PRIMARY KEY UNIQUE NOT NULL,
-    description VARCHAR ( 250 ) UNIQUE,
+    description VARCHAR ( 1000 ),
     image_url VARCHAR ( 100 ) NOT NULL,
     price integer UNIQUE NOT NULL,
     category VARCHAR ( 50 ) NOT NULL,
@@ -31,6 +31,13 @@ VALUES('Catan', 'Your adventurous settlers seek to tame the remote but rich isle
 
 INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
 VALUES('Ticket to Ride', '2004 vann Ticket To Ride det prestigefyllda ”Spiel des Jahres” och det är numera i mångas ögon det perfekta gateway-spelet. Spelets enkla regler, med hög interaktion passar i princip alla, från nybörjare till inbitna brädspelare.', 'https://www.dragonslair.se/images/5883/product', 479, 'Games', 'Board Games', 'TTR101');
+
+INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
+VALUES('Caylus 1303', 'A classic game is back! As one of the first worker placement games, Caylus stands among the true board game classics of the 2000s. The original designers team, together with the Space Cowboys, have now created a revamped version!', 'https://www.dragonslair.se/images/58046/product', 525, 'Games', 'Board Games', 'CLU101');
+
+INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
+VALUES('Diamant', 'iamant är ett snabbspelat och roligt bluffspel för hela familjen.  Spelare är äventyrare som tillsammans utforskar en grotta genom att vända upp ett kort åt gången som visar vad nästa sektion i grottgången har att erbjuda, skatter eller fällor eller ingenting. Men innan nästa kort vänds upp måste spelare var för sig bestämma om de vill stanna kvar och fortsätta utforska eller om de vill vända hemåt med de skatter de samlat in, om du går hemåt får du både de skatter du själv bär på samt de som ligger bakom dig i grottan, men kruxet är att du måste dela dem med alla som går hem samtidigt som du.', 'https://www.dragonslair.se/images/41410/product', 279, 'Games', 'Board Games', 'DMT101');
+
 
 
 

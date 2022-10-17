@@ -13,15 +13,23 @@ public struct Home: ReducerProtocol {
 }
 
 public extension Home {
-     struct State: Equatable, Sendable {
+    struct State: Equatable, Sendable {
         public var productList: [Product]
+        public var isProductDetailSheetPresented: Bool
+        public var productDetailView: Product?
         
-        public init(productList: [Product] = []) {
+        public init(
+            productList: [Product] = [],
+            isProductDetailSheetPresented: Bool = false,
+            productDetailView: Product? = nil
+        ) {
             self.productList = productList
+            self.isProductDetailSheetPresented = isProductDetailSheetPresented
+            self.productDetailView = productDetailView
         }
     }
     
-     enum Action: Equatable, Sendable {
+    enum Action: Equatable, Sendable {
         case `internal`(InternalAction)
         case delegate(DelegateAction)
         
@@ -33,10 +41,12 @@ public extension Home {
             case logOutUser
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
+            case toggleSheet
+            case showProductDetailViewFor(Product)
         }
     }
     
-     var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
                 
@@ -49,11 +59,11 @@ public extension Home {
             case .internal(.onAppear):
                 return .run { [apiClient] send in
                     return await send(.internal(.getProductResponse(
-                    TaskResult {
-                        try await apiClient.decodedResponse(
-                            for: .getProducts,
-                            as: ResultPayload<[Product]>.self).value.status.get()
-                    }
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .getProducts,
+                                as: ResultPayload<[Product]>.self).value.status.get()
+                        }
                     )))
                 }
                 
@@ -65,7 +75,16 @@ public extension Home {
                 print(error)
                 return .none
                 
+            case let .internal(.showProductDetailViewFor(product)):
+                state.productDetailView = product
+                state.isProductDetailSheetPresented.toggle()
+                return .none
+                
             case .delegate(_):
+                return .none
+                
+            case .internal(.toggleSheet):
+                state.isProductDetailSheetPresented.toggle()
                 return .none
             }
         }

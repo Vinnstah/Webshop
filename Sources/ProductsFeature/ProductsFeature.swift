@@ -13,13 +13,16 @@ public extension Products {
     struct State: Equatable, Sendable {
         public var productList: [Product]
         public var searchText: String
+        public var searchResults: [Product]?
         
         public init(
             productList: [Product] = [],
-            searchText: String = ""
+            searchText: String = "",
+            searchResults: [Product]? = nil
         ) {
             self.productList = productList
             self.searchText = searchText
+            self.searchResults = searchResults
         }
     }
     
@@ -40,7 +43,6 @@ public extension Products {
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
-                
                 
             case .internal(.onAppear):
                 return .run { [apiClient] send in
@@ -63,6 +65,7 @@ public extension Products {
                 
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
+                state.productList.filter { $0.title.contains(text)  }
                 return .none
                 
             case .delegate(_):

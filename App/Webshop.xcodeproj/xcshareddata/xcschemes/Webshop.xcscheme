@@ -20,6 +20,132 @@
                ReferencedContainer = "container:Webshop.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AppFeatureTests"
+               BuildableName = "AppFeatureTests"
+               BlueprintName = "AppFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SplashFeatureTests"
+               BuildableName = "SplashFeatureTests"
+               BlueprintName = "SplashFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UserDefaultsClientTests"
+               BuildableName = "UserDefaultsClientTests"
+               BlueprintName = "UserDefaultsClientTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OnboardingFeatureTests"
+               BuildableName = "OnboardingFeatureTests"
+               BlueprintName = "OnboardingFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "MainFeatureTests"
+               BuildableName = "MainFeatureTests"
+               BlueprintName = "MainFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SignInFeatureTests"
+               BuildableName = "SignInFeatureTests"
+               BlueprintName = "SignInFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SignUpFeatureTests"
+               BuildableName = "SignUpFeatureTests"
+               BlueprintName = "SignUpFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UserLocalSettingsFeatureTests"
+               BuildableName = "UserLocalSettingsFeatureTests"
+               BlueprintName = "UserLocalSettingsFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TermsAndConditionsFeatureTests"
+               BuildableName = "TermsAndConditionsFeatureTests"
+               BlueprintName = "TermsAndConditionsFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -28,96 +154,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AppFeatureTests"
-               BuildableName = "AppFeatureTests"
-               BlueprintName = "AppFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplashFeatureTests"
-               BuildableName = "SplashFeatureTests"
-               BlueprintName = "SplashFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "UserDefaultsClientTests"
-               BuildableName = "UserDefaultsClientTests"
-               BlueprintName = "UserDefaultsClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OnboardingFeatureTests"
-               BuildableName = "OnboardingFeatureTests"
-               BlueprintName = "OnboardingFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MainFeatureTests"
-               BuildableName = "MainFeatureTests"
-               BlueprintName = "MainFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SignInFeatureTests"
-               BuildableName = "SignInFeatureTests"
-               BlueprintName = "SignInFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SignUpFeatureTests"
-               BuildableName = "SignUpFeatureTests"
-               BlueprintName = "SignUpFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "UserLocalSettingsFeatureTests"
-               BuildableName = "UserLocalSettingsFeatureTests"
-               BlueprintName = "UserLocalSettingsFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "TermsAndConditionsFeatureTests"
-               BuildableName = "TermsAndConditionsFeatureTests"
-               BlueprintName = "TermsAndConditionsFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

@@ -19,24 +19,24 @@ public extension Main {
             WithViewStore(self.store, observe: \.selectedTab) { viewStore in
                 VStack {
                     
-                TabView(selection: viewStore.binding(send: Main.Action.internal(.tabSelected))
-                                                ) {
-                                                    Home.View(
-                                                        store: self.store.scope(state: \.home!, action: Main.Action.home)
-                                                    )
-                                                    .tag(Main.State.Tab.home)
-                                                    .tabItem {
-                                                                Label("Home", systemImage: "house")
-                                                            }
-                    
-                                                    Products.View(
-                                                        store: self.store.scope(state: \.products!, action: Main.Action.products)
-                                                    )
-                                                    .tag(Main.State.Tab.products)
-                                                    .tabItem {
-                                                                Label("Products", systemImage: "puzzlepiece")
-                                                            }
-                                                }
+                    TabView(selection: viewStore.binding(send: Main.Action.internal(.tabSelected))
+                    ) {
+                        Home.View(
+                            store: self.store.scope(state: \.home!, action: Main.Action.home)
+                        )
+                        .tag(Main.State.Tab.home)
+                        .tabItem {
+                            Label("Home", systemImage: "house")
+                        }
+                        
+                        Products.View(
+                            store: self.store.scope(state: \.products!, action: Main.Action.products)
+                        )
+                        .tag(Main.State.Tab.products)
+                        .tabItem {
+                            Label("Products", systemImage: "puzzlepiece")
+                        }
+                    }
                 }
             }
         }

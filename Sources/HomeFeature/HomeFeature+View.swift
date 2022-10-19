@@ -46,7 +46,7 @@ public extension Home {
                             get: \.isProductDetailSheetPresented,
                             send: .internal(.toggleSheet))
                 ) {
-                    ProductDetailView(store: store, product: viewStore.state.productDetailView!)
+                    Product.DetailView<Home>(store: store, product: viewStore.state.productDetailView!)
                 }
             }
         }
@@ -102,64 +102,5 @@ public struct ProductView: SwiftUI.View {
     }
 }
 
-public struct ProductDetailView: SwiftUI.View {
-    public let store: StoreOf<Home>
-    public let product: Product
-    
-    public init(
-        store: StoreOf<Home>,
-        product: Product
-    ) {
-        self.store = store
-        self.product = product
-    }
-    
-    public var body: some SwiftUI.View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
-            ScrollView(.vertical) {
-                
-                VStack(spacing: 20) {
-                AsyncImage(url: URL(string: product.imageURL)) { maybeImage in
-                    if let image = maybeImage.image {
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 250, height: 250)
-                        
-                    } else if maybeImage.error != nil {
-                        Text("No image available")
-                        
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                }
-                .padding(.top)
-                    
-                    Text(product.title)
-                        .font(.largeTitle)
-                        .bold()
-                        .padding()
-                    
-                    HStack(spacing: 15) {
-                        Text(product.category)
-                            .font(.body)
-                        Text(product.subCategory)
-                            .font(.footnote)
-                        Text(product.sku)
-                            .font(.footnote)
-                    }
-                    Text(product.description)
-                        .font(.caption)
-                        .multilineTextAlignment(.center)
-                        .frame(width: 250)
-                    
-                    Text("\(product.price) kr")
-                        .font(.largeTitle)
-            }
-        }
-        }
-    }
-}
+
 

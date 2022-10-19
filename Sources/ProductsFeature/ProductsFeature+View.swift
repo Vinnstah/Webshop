@@ -8,71 +8,63 @@ public extension Products {
         
         public let store: StoreOf<Products>
         @ObservedObject var viewStore: ViewStore<ViewState, Products.Action>
-
-          struct ViewState: Equatable {
-            let productList: [Product]
-            let filteredProducts: [Product]?
-
+        
+        struct ViewState: Equatable {
+            var productList: [Product]
+            
             init(state: Products.State) {
-              self.productList = state.productList
-                self.filteredProducts = state.productList.filter { $0.title.contains(state.searchText)}
+                self.productList = state.productList
             }
-          }
-
-          public init(
+        }
+        
+        public init(
             store: StoreOf<Products>
-          ) {
+        ) {
             self.store = store
             self.viewStore = ViewStore(self.store.scope(state: ViewState.init(state:)))
-          }
+        }
+        
         public var body: some SwiftUI.View {
-            WithViewStore(self.viewStore, observe: { $0 } ) { viewStore in
+            WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 NavigationView {
                     VStack {
-//                        TextField("Search",
-//                                  text: viewStore.binding(
-//                                    get: { $0.searchText },
-//                                    send: { .internal(.searchTextReceivesInput($0)) }
-//                                  )
-//                        )
-                        //                        if viewStore.state.searchResults != nil {
-                        //                            ScrollView(.vertical) {
-                        //                                LazyVGrid(columns: .init(repeating: .init(), count: 2)) {
-                        //
-                        //                                    ForEach(viewStore.state.searchResults!, id: \.self) { prod in
-                        //                                        ProductView(store: store, product: prod)
-                        //                                            .padding(.horizontal)
-                        //
-                        //                                    }
-                        //
-                        //                                }
-                        //                            }
-                        //                        }
                         ScrollView(.vertical) {
                             LazyVGrid(columns: .init(repeating: .init(), count: 2)) {
                                 
-                                ForEach(viewStore, id: \.self) { prod in
+                                ForEach(
+                                    (viewStore.state.searchResults == []) ?
+                                        viewStore.state.productList :
+                                            viewStore.state.searchResults,
+                                        id: \.self
+                                ) { prod in
                                     ProductView(store: store, product: prod)
                                         .padding(.horizontal)
-                                    
+                                        .onTapGesture {
+                                            viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                        }
                                 }
-                                
                             }
                         }
-                        
-                        Text("Product Feature goes here")
-                            .searchable(text: viewStore.binding(
-                                get: { $0.searchText },
-                                send: { .internal(.searchTextReceivesInput($0)) }
-                            ) )
                     }
                 }
-                .onAppear {
-                    viewStore.send(.internal(.onAppear))
+                
+                .searchable(text:  viewStore.binding(
+                    get: { $0.searchText },
+                    send: { .internal(.searchTextReceivesInput($0)) })
+                )
+                .sheet(isPresented:
+                        viewStore.binding(
+                            get: \.isProductDetailSheetPresented,
+                            send: .internal(.toggleSheet))
+                ) {
+                    Product.DetailView<Products>(store: store, product: viewStore.state.productDetailView!)
                 }
-                .refreshable {
-                    viewStore.send(.internal(.onAppear))
-                }
+            }
+            .onAppear {
+                viewStore.send(.internal(.onAppear))
+            }
+            .refreshable {
+                viewStore.send(.internal(.onAppear))
             }
         }
     }
@@ -99,23 +91,7 @@ public struct ProductView: SwiftUI.View {
                     .foregroundColor(.indigo)
                     .cornerRadius(25)
                 VStack {
-                    AsyncImage(url: URL(string: product.imageURL)) { maybeImage in
-                        if let image = maybeImage.image {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 150, height: 150)
-                            
-                        } else if maybeImage.error != nil {
-                            Text("No image available")
-                            
-                        } else {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        }
-                    }
-                    .padding()
+                    product.getImage()
                     
                     Text(product.title)
                         .foregroundColor(Color.white)

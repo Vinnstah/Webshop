@@ -1,5 +1,7 @@
 import Foundation
 import PostgresNIO
+import SwiftUI
+import ComposableArchitecture
 
 extension URL: @unchecked Sendable {}
 
@@ -35,5 +37,87 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
         case sku
         case id
     }
+    
+    @ViewBuilder
+    public func getImage() -> some View {
+        AsyncImage(url: URL(string: self.imageURL)) { maybeImage in
+            if let image = maybeImage.image {
+                 image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 150, height: 150)
+                
+            } else if maybeImage.error != nil {
+                Text("No image available")
+                
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            }
+        }
+    }
 }
 
+public extension Product {
+    struct DetailView<T: ReducerProtocol> : SwiftUI.View where T.State: Equatable {
+        public let store: StoreOf<T>
+        public let product: Product
+        
+        public init(
+            store: StoreOf<T>,
+            product: Product
+        ) {
+            self.store = store
+            self.product = product
+        }
+        
+        public var body: some SwiftUI.View {
+            WithViewStore(self.store, observe: { $0 }) { viewStore in
+                ScrollView(.vertical) {
+                    
+                    VStack(spacing: 20) {
+                    AsyncImage(url: URL(string: product.imageURL)) { maybeImage in
+                        if let image = maybeImage.image {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 250, height: 250)
+                            
+                        } else if maybeImage.error != nil {
+                            Text("No image available")
+                            
+                        } else {
+                            Image(systemName: "photo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        }
+                    }
+                    .padding(.top)
+                        
+                        Text(product.title)
+                            .font(.largeTitle)
+                            .bold()
+                            .padding()
+                        
+                        HStack(spacing: 15) {
+                            Text(product.category)
+                                .font(.body)
+                            Text(product.subCategory)
+                                .font(.footnote)
+                            Text(product.sku)
+                                .font(.footnote)
+                        }
+                        Text(product.description)
+                            .font(.caption)
+                            .multilineTextAlignment(.center)
+                            .frame(width: 250)
+                        
+                        Text("\(product.price) kr")
+                            .font(.largeTitle)
+                }
+            }
+            }
+        }
+    }
+}

@@ -13,16 +13,22 @@ public extension Products {
     struct State: Equatable, Sendable {
         public var productList: [Product]
         public var searchText: String
-        public var searchResults: [Product]?
+        public var searchResults: [Product]
+        public var isProductDetailSheetPresented: Bool
+        public var productDetailView: Product?
         
         public init(
             productList: [Product] = [],
             searchText: String = "",
-            searchResults: [Product]? = nil
+            searchResults: [Product] = [],
+            isProductDetailSheetPresented: Bool = false,
+            productDetailView: Product? = nil
         ) {
             self.productList = productList
             self.searchText = searchText
             self.searchResults = searchResults
+            self.isProductDetailSheetPresented = isProductDetailSheetPresented
+            self.productDetailView = productDetailView
         }
     }
     
@@ -37,6 +43,8 @@ public extension Products {
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
             case searchTextReceivesInput(String)
+            case showProductDetailViewFor(Product)
+            case toggleSheet
         }
     }
     
@@ -65,7 +73,16 @@ public extension Products {
                 
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
-                state.productList.filter { $0.title.contains(text)  }
+                state.searchResults = state.productList.filter { $0.title.contains(text)  }
+                return .none
+                
+            case let .internal(.showProductDetailViewFor(product)):
+                state.productDetailView = product
+                state.isProductDetailSheetPresented.toggle()
+                return .none
+                
+            case .internal(.toggleSheet):
+                state.isProductDetailSheetPresented.toggle()
                 return .none
                 
             case .delegate(_):

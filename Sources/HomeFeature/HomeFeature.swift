@@ -80,12 +80,13 @@ public extension Home {
                 state.isProductDetailSheetPresented.toggle()
                 return .none
                 
-            case .delegate(_):
-                return .none
-                
             case .internal(.toggleSheet):
                 state.isProductDetailSheetPresented.toggle()
                 return .none
+                
+            case .delegate(_):
+                return .none
+                
             }
         }
     }

@@ -5,6 +5,7 @@ import ComposableArchitecture
 
 extension URL: @unchecked Sendable {}
 
+//TODO: Break out into it's own package
 public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
     
     public let title: String

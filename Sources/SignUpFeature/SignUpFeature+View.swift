@@ -2,6 +2,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
+import UserModel
 
 public extension SignUp {
      struct View: SwiftUI.View {
@@ -13,43 +14,45 @@ public extension SignUp {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
-                Text("WELCOME TO SIGNUP")
-                VStack {
-                    TextField("Email",
-                              text: viewStore.binding(
-                                get: { $0.email },
-                                send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
-                              )
-                    )
-                    .padding(.horizontal)
-                    SecureField("Password",
-                                text: viewStore.binding(
-                                    get: { $0.password },
-                                    send: { .internal(.passwordFieldReceivingInput(text: $0)) }
-                                )
-                    )
-                    .padding(.horizontal)
-                    if !viewStore.state.emailFulfillsRequirements {
-                        Text("Email does not meet requirements")
-                    }
-                    if !viewStore.state.passwordFulfillsRequirements {
-                        Text("Password does not meet requirements")
-                    }
-                    HStack {
-                        Button("Next step") {
-                            viewStore.send(.internal(.nextStep), animation: .default)
+                ForceFullScreen {
+                    Text("WELCOME TO SIGNUP")
+                    VStack {
+                        TextField("Email",
+                                  text: viewStore.binding(
+                                    get: { $0.email },
+                                    send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
+                                  )
+                        )
+                        .padding(.horizontal)
+                        SecureField("Password",
+                                    text: viewStore.binding(
+                                        get: { $0.password },
+                                        send: { .internal(.passwordFieldReceivingInput(text: $0)) }
+                                    )
+                        )
+                        .padding(.horizontal)
+                        if !viewStore.state.emailFulfillsRequirements {
+                            Text("Email does not meet requirements")
                         }
-                        .disabled(viewStore.state.disableButton)
-                        
-                        Button("Previous Step") { viewStore.send(.delegate(.goToThePreviousStep), animation: .default)}
+                        if !viewStore.state.passwordFulfillsRequirements {
+                            Text("Password does not meet requirements")
+                        }
+                        HStack {
+                            Button("Next step") {
+                                viewStore.send(.internal(.nextStep), animation: .default)
+                            }
+                            .disabled(viewStore.state.disableButton)
+                            
+                            Button("Previous Step") { viewStore.send(.delegate(.goToThePreviousStep), animation: .default)}
+                            
+                        }
                         
                     }
-                    
-                }
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            viewStore.send(.delegate(.goBackToLoginView), animation: .default)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                viewStore.send(.delegate(.goBackToLoginView), animation: .default)
+                            }
                         }
                     }
                 }

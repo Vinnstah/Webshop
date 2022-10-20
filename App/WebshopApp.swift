@@ -15,7 +15,7 @@ struct WebshopApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
             App.View(store:
-                        Store(initialState: .init(), reducer: App().debug())
+                        Store(initialState: .init(), reducer: App()._printChanges())
                              )
             
                 

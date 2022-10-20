@@ -137,7 +137,7 @@ public extension Onboarding {
                 
             case let .signIn(.delegate(.userLoggedIn(jwt: jwt))):
                 return .run { send in
-                    await send(.delegate(.userLoggedIn(jwt: jwt)), animation: .interactiveSpring())
+                    await send(.delegate(.userLoggedIn(jwt: jwt)))
                 }
                 
             case let .termsAndConditions(.delegate(.userFinishedOnboarding(jwt))):

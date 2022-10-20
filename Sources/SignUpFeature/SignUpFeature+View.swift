@@ -5,7 +5,7 @@ import ComposableArchitecture
 import UserModel
 
 public extension SignUp {
-     struct View: SwiftUI.View {
+    struct View: SwiftUI.View {
         public let store: StoreOf<SignUp>
         
         public init(store: StoreOf<SignUp>) {
@@ -15,39 +15,72 @@ public extension SignUp {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 ForceFullScreen {
-                    Text("WELCOME TO SIGNUP")
                     VStack {
-                        TextField("Email",
-                                  text: viewStore.binding(
-                                    get: { $0.email },
-                                    send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
-                                  )
-                        )
-                        .padding(.horizontal)
-                        SecureField("Password",
-                                    text: viewStore.binding(
-                                        get: { $0.password },
-                                        send: { .internal(.passwordFieldReceivingInput(text: $0)) }
-                                    )
-                        )
-                        .padding(.horizontal)
-                        if !viewStore.state.emailFulfillsRequirements {
-                            Text("Email does not meet requirements")
-                        }
-                        if !viewStore.state.passwordFulfillsRequirements {
-                            Text("Password does not meet requirements")
+                        Spacer()
+                        HStack {
+                            Text("Email")
+                                .font(.subheadline)
+                            
+                            Spacer()
                         }
                         HStack {
-                            Button("Next step") {
-                                viewStore.send(.internal(.nextStep), animation: .default)
-                            }
-                            .disabled(viewStore.state.disableButton)
+                            TextField("",
+                                      text: viewStore.binding(
+                                        get: { $0.email },
+                                        send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
+                                      )
+                            )
+                            .textFieldStyle(.roundedBorder)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .foregroundColor(Color("Secondary"))
+                            .padding(.bottom)
                             
-                            Button("Previous Step") { viewStore.send(.delegate(.goToThePreviousStep), animation: .default)}
+                            Image(systemName: viewStore.state.emailFulfillsRequirements ? "checkmark" : "xmark")
+                                .padding(.bottom)
+                                .foregroundColor(Color("Complementary"))
+                        }
+                        
+                        HStack {
+                            Text("Password")
+                                .font(.subheadline)
+                            
+                            Spacer()
+                        }
+                        
+                        HStack {
+                            SecureField("",
+                                        text: viewStore.binding(
+                                            get: { $0.password },
+                                            send: { .internal(.passwordFieldReceivingInput(text: $0)) }
+                                        )
+                            )
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .textFieldStyle(.roundedBorder)
+                            .foregroundColor(Color("Secondary"))
+                            .padding(.bottom)
+                            
+                            Image(systemName: viewStore.state.passwordFulfillsRequirements ? "checkmark" : "xmark")
+                                .padding(.bottom)
+                                .foregroundColor(Color("Complementary"))
                             
                         }
                         
+                        VStack {
+                            Button("Next step") {
+                                viewStore.send(.internal(.nextStep), animation: .default)
+                            }
+                            .buttonStyle(.primary(isDisabled: viewStore.disableButton, cornerRadius: 25))
+                            .disabled(viewStore.state.disableButton)
+                            
+                            Button("Go Back") { viewStore.send(.delegate(.goToThePreviousStep), animation: .default)}
+                                .foregroundColor(Color("Secondary"))
+                                .bold()
+                                .padding()
+                        }
                     }
+                    
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {

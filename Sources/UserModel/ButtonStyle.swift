@@ -1,17 +1,17 @@
 import SwiftUI
 
 public struct PrimaryButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) var isEnabled
+//    @Environment(\.isEnabled) var isEnabled
         
     public static let defaultCornerRadius: CGFloat = 8
     private let cornerRadius: CGFloat
-    private var isLoading: Bool
+    private var isDisabled: Bool
 
     public init(
-        isLoading: Bool = false,
+        isDisabled: Bool = false,
         cornerRadius: CGFloat = Self.defaultCornerRadius
     ) {
-        self.isLoading = isLoading
+        self.isDisabled = isDisabled
         self.cornerRadius = cornerRadius
     }
     
@@ -19,24 +19,27 @@ public struct PrimaryButtonStyle: ButtonStyle {
         Group {
                 configuration.label
                 .font(.body)
-                .foregroundColor(isEnabled ? Color.white : .gray)
+                .foregroundColor(isDisabled ? Color.white : .white)
 
             }
         .frame(maxWidth: .infinity, idealHeight: 50)
             .padding()
-            .background(isEnabled ? Color("ButtonColor") : .gray)
+            .background(isDisabled ? .gray : Color("ButtonColor"))
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
 
 public struct SecondaryButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) var isEnabled
+//    @Environment(\.isEnabled) var isEnabled
         
     private let cornerRadius: CGFloat
+    private var isDisabled: Bool
     
-    public init(cornerRadius: CGFloat = PrimaryButtonStyle.defaultCornerRadius) {
+    public init(cornerRadius: CGFloat = PrimaryButtonStyle.defaultCornerRadius,
+                isDisabled: Bool = false) {
         self.cornerRadius = cornerRadius
+        self.isDisabled = isDisabled
     }
     
     public func makeBody(configuration: Configuration) -> some View {
@@ -44,8 +47,8 @@ public struct SecondaryButtonStyle: ButtonStyle {
             .font(.body)
             .frame(maxWidth: .infinity, idealHeight: 50)
             .padding()
-            .background(isEnabled ? Color("ButtonColor") : .gray)
-            .foregroundColor(isEnabled ? Color.white : .gray)
+            .background(isDisabled ? Color("ButtonColor") : .gray)
+            .foregroundColor(isDisabled ? Color.white : .gray)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
@@ -67,10 +70,10 @@ public extension ButtonStyle where Self == PrimaryButtonStyle {
     /// To apply this style to a button, or to a view that contains buttons, use
     /// the ``View.buttonStyle(_:)`` modifier.
     static func primary(
-        isLoading: Bool = false,
+        isDisabled: Bool = false,
         cornerRadius: CGFloat = PrimaryButtonStyle.defaultCornerRadius
     ) -> PrimaryButtonStyle {
-        .init(isLoading: isLoading, cornerRadius: cornerRadius)
+        .init(isDisabled: isDisabled, cornerRadius: cornerRadius)
     }
 }
 

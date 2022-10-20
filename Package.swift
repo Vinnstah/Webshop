@@ -40,6 +40,9 @@ let package = Package(
             name: "ProductsFeature",
             targets: ["ProductsFeature"]),
         .library(
+            name: "ProductModel",
+            targets: ["ProductModel"]),
+        .library(
             name: "SignInFeature",
             targets: ["SignInFeature"]),
         .library(
@@ -54,6 +57,9 @@ let package = Package(
         .library(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
+        .library(
+            name: "StyleGuide",
+            targets: ["StyleGuide"]),
         .library(
             name: "TermsAndConditionsFeature",
             targets: ["TermsAndConditionsFeature"]),
@@ -101,11 +107,13 @@ let package = Package(
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
+        
         .target(
             name: "HomeFeature",
             dependencies: [
                 "ApiClient",
                 "SiteRouter",
+                "StyleGuide",
                 "UserDefaultsClient",
                 "UserModel",
                 tca,
@@ -148,12 +156,21 @@ let package = Package(
                 name: "ProductsFeature",
                 dependencies: [
                     "ApiClient",
+                    "ProductModel",
+                    "StyleGuide",
                     "SiteRouter",
                     "UserModel",
                     tca,
                 ],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "ProductModel",
+            dependencies: [
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
             .target(
                 name: "Server",
                 dependencies: [
@@ -170,6 +187,7 @@ let package = Package(
             .target(
                 name: "SignInFeature",
                 dependencies: [
+                    "StyleGuide",
                     "SiteRouter",
                     "ApiClient",
                     "UserDefaultsClient",
@@ -186,6 +204,7 @@ let package = Package(
         .target(
             name: "SignUpFeature",
             dependencies: [
+                "StyleGuide",
                 "UserModel",
                 tca,
             ],
@@ -219,9 +238,16 @@ let package = Package(
             dependencies: ["SplashFeature"]),
         
             .target(
+                name: "StyleGuide",
+                dependencies: [
+                ],
+                swiftSettings: swiftSettings
+            ),
+            .target(
                 name: "TermsAndConditionsFeature",
                 dependencies: [
                     "SiteRouter",
+                    "StyleGuide",
                     "ApiClient",
                     "UserDefaultsClient",
                     "UserModel",
@@ -254,6 +280,7 @@ let package = Package(
         .target(
             name: "UserLocalSettingsFeature",
             dependencies: [
+                "StyleGuide",
                 "UserModel",
                 tca,
             ],

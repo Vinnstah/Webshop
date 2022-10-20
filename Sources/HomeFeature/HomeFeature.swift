@@ -1,7 +1,7 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-import UserModel
+import ProductModel
 import UserDefaultsClient
 import ApiClient
 import SiteRouter

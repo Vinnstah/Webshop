@@ -2,7 +2,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
-import UserModel
+import StyleGuide
 
 public extension SignUp {
     struct View: SwiftUI.View {

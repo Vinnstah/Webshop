@@ -1,6 +1,6 @@
 import Foundation
 import ComposableArchitecture
-import UserModel
+import ProductModel
 import ApiClient
 import SiteRouter
 

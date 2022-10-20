@@ -1,7 +1,7 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-import UserModel
+import StyleGuide
 
 public extension TermsAndConditions {
     struct View: SwiftUI.View {

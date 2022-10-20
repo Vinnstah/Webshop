@@ -1,7 +1,27 @@
 import Foundation
-import PostgresNIO
+//import PostgresNIO
 import SwiftUI
 import ComposableArchitecture
+
+public enum Category: Equatable {
+    case games(SubCategory)
+    
+    public enum SubCategory: Equatable {
+        case boardgames
+        
+        public var rawValue: String {
+            switch self {
+            case .boardgames: return "Board Games"
+            }
+        }
+    }
+    
+    public var rawValue: String {
+        switch self {
+        case .games: return "Games"
+        }
+    }
+}
 
 extension URL: @unchecked Sendable {}
 
@@ -43,7 +63,7 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
     public func getImage() -> some View {
         AsyncImage(url: URL(string: self.imageURL)) { maybeImage in
             if let image = maybeImage.image {
-                 image
+                image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 150, height: 150)
@@ -78,23 +98,8 @@ public extension Product {
                 ScrollView(.vertical) {
                     
                     VStack(spacing: 20) {
-                    AsyncImage(url: URL(string: product.imageURL)) { maybeImage in
-                        if let image = maybeImage.image {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 250, height: 250)
-                            
-                        } else if maybeImage.error != nil {
-                            Text("No image available")
-                            
-                        } else {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        }
-                    }
-                    .padding(.top)
+                        product.getImage()
+                            .padding(.top)
                         
                         Text(product.title)
                             .font(.largeTitle)
@@ -116,9 +121,44 @@ public extension Product {
                         
                         Text("\(product.price) kr")
                             .font(.largeTitle)
+                    }
                 }
-            }
             }
         }
     }
+}
+
+extension Product {
+    public struct ProductView<T: ReducerProtocol> : SwiftUI.View where T.State: Equatable {
+        public let store: StoreOf<T>
+        public let product: Product
+        
+        public init(
+            store: StoreOf<T>,
+            product: Product
+        ) {
+            self.store = store
+            self.product = product
+        }
+        
+        public var body: some SwiftUI.View {
+            WithViewStore(self.store, observe: { $0 }) { viewStore in
+                ZStack {
+                    VStack {
+                        product.getImage()
+                        
+                        Text(product.title)
+                            .foregroundColor(Color("Secondary"))
+                            .font(.title.bold())
+                            .scaledToFill()
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
+                            .padding()
+                    }
+                }
+                .frame(width: 200, height: 250)
+            }
+        }
+    }
+    
 }

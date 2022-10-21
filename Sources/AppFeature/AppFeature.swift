@@ -101,6 +101,8 @@ public extension App {
                 return .none
             case .main(.products(_)):
                 return .none
+            case .main(.checkout(_)):
+                return .none
             }
         }
         ///Changing View depending on which state is initialized.

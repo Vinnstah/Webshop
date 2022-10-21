@@ -106,6 +106,40 @@ public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -
     return products
 }
 
+public func returnCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws -> Set<ProductModel.Category> {
+    var categories: Set<ProductModel.Category> = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let category = Category(
+            title: try randomRow["category"].decode(String.self, context: .default),
+                                subCategory: Category.SubCategory(
+                                    title: try randomRow["sub_category"].decode(String.self, context: .default)
+                                ))
+        if categories.contains(where: { $0.title == category.title}) {
+        } else {
+            categories.insert(category)
+        }
+    }
+    return categories
+}
+
+public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws -> Set<ProductModel.Category.SubCategory> {
+    var categories: Set<ProductModel.Category.SubCategory> = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let category = Category.SubCategory(
+            title: try randomRow["sub_category"].decode(String.self, context: .default)
+        )
+        if categories.contains(where: { $0.title == category.title}) {
+        } else {
+            categories.insert(category)
+        }
+        categories.insert(category)
+       
+    }
+    return categories
+}
+
 public func getAllProducts(
     _ db: PostgresConnection
 ) async throws -> [Product] {
@@ -117,4 +151,30 @@ public func getAllProducts(
     )
     let products = try await returnProductRowsAsArray(rows)
     return products
+}
+
+public func getAllCategories(
+    _ db: PostgresConnection
+) async throws -> Set<ProductModel.Category> {
+    let rows = try await db.query(
+                    """
+                    SELECT category,sub_category FROM products;
+                    """,
+                    logger: logger
+    )
+    let categories = try await returnCategoryRowsAsArray(rows)
+    return categories
+}
+
+public func getAllSubCategories(
+    _ db: PostgresConnection
+) async throws -> Set<ProductModel.Category.SubCategory> {
+    let rows = try await db.query(
+                    """
+                    SELECT sub_category FROM products;
+                    """,
+                    logger: logger
+    )
+    let categories = try await returnSubCategoryRowsAsArray(rows)
+    return categories
 }

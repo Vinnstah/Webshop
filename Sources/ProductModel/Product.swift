@@ -5,87 +5,6 @@ import NIOCore
 import SwiftUI
 import ComposableArchitecture
 
-public enum Category: Equatable, Codable, Sendable, Hashable, Identifiable {
-//    public init<JSONDecoder>(from byteBuffer: inout NIOCore.ByteBuffer, type: PostgresNIO.PostgresDataType, format: PostgresNIO.PostgresFormat, context: PostgresNIO.PostgresDecodingContext<JSONDecoder>) throws where JSONDecoder : PostgresNIO.PostgresJSONDecoder {
-//        self.rawValue = String(bitPat)
-//            }
-//        switch (format, type) {
-//                case (_, .varchar),
-//                     (_, .text),
-//                     (_, .name):
-//                    // we can force unwrap here, since this method only fails if there are not enough
-//                    // bytes available.
-//            self = Category(from: JbyteBuffer.readString(length: byteBuffer.readableBytes)!)
-//                case (_, .uuid):
-//                    guard let uuid = try? UUID(from: &byteBuffer, type: .uuid, format: format, context: context) else {
-//                        throw PostgresDecodingError.Code.failure
-//                    }
-//                    self = uuid.uuidString
-//                default:
-//                    throw PostgresDecodingError.Code.typeMismatch
-//                }
-//    }
-    
-    case games(SubCategory)
-    
-    
-    public enum CodingKeys: String, CodingKey {
-        case games = "Games"
-    }
-    
-    public var rawValue: String {
-        switch self {
-        case .games: return "Games"
-        }
-    }
-    
-    public var image: Image {
-        switch self {
-        case .games: return Image(systemName: "gamecontroller")
-        }
-    }
-    public var id: String {
-        switch self {
-        case .games: return UUID().uuidString
-        }
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
-    public enum SubCategory: Equatable, Codable, Sendable, Hashable, Identifiable {
-        case boardgames
-        
-        public enum CodingKeys: String, CodingKey {
-            case boardgames = "Board Games"
-        }
-        
-        public var rawValue: String {
-            switch self {
-            case .boardgames: return "Board Games"
-            }
-        }
-        
-        public var image: Image {
-            switch self {
-            case .boardgames: return Image(systemName: "circle.grid.cross")
-            }
-        }
-        
-        public var id: String {
-            switch self {
-            case .boardgames: return UUID().uuidString
-            }
-        }
-        
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-        }
-    }
-    
-}
-
 extension URL: @unchecked Sendable {}
 
 //TODO: Break out into it's own package
@@ -163,6 +82,7 @@ public extension Product {
             self.store = store
             self.product = product
         }
+        
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in

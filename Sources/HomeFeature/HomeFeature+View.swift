@@ -26,8 +26,8 @@ public extension Home {
                         ScrollView(.horizontal) {
                             HStack(spacing: 20) {
                                 
-                                ForEach(viewStore.state.catergories.sorted(by: <), id: \.self) { cat in
-                                    Text(cat)
+                                ForEach(viewStore.state.catergories, id: \.self) { cat in
+                                    Text(cat.title)
                                         .foregroundColor(Color("Secondary"))
                                         .padding()
                                 }
@@ -51,7 +51,7 @@ public extension Home {
                 Button("Log out user") {
                     viewStore.send(.internal(.logOutUser))
                 }
-                .buttonStyle(.secondary)
+                .buttonStyle(.primary)
                 .padding()
             }
             .onAppear {

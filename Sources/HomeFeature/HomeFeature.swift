@@ -17,13 +17,13 @@ public extension Home {
         public var productList: [Product]
         public var isProductDetailSheetPresented: Bool
         public var productDetailView: Product?
-        public var catergories: Set<String>
+        public var catergories: [ProductModel.Category]
         
         public init(
             productList: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
             productDetailView: Product? = nil,
-            catergories: Set<String> = []
+            catergories: [ProductModel.Category] = []
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
@@ -38,6 +38,7 @@ public extension Home {
         
         public enum DelegateAction: Equatable, Sendable {
             case userIsLoggedOut
+            case addProductToCart(quantity: Int, product: Product)
         }
         
         public enum InternalAction: Equatable, Sendable {
@@ -46,6 +47,7 @@ public extension Home {
             case getProductResponse(TaskResult<[Product]>)
             case toggleSheet
             case showProductDetailViewFor(Product)
+            case getCategoryResponse(TaskResult<[ProductModel.Category]>)
         }
     }
     
@@ -61,11 +63,19 @@ public extension Home {
                 
             case .internal(.onAppear):
                 return .run { [apiClient] send in
-                    return await send(.internal(.getProductResponse(
+                    await send(.internal(.getProductResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(
                                 for: .getProducts,
                                 as: ResultPayload<[Product]>.self).value.status.get()
+                        }
+                    )))
+                    
+                    await send(.internal(.getCategoryResponse(
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .getCategories,
+                                as: ResultPayload<[ProductModel.Category]>.self).value.status.get()
                         }
                     )))
                 }
@@ -73,16 +83,24 @@ public extension Home {
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
                 
-                state.productList.forEach { prod in
-                    if state.catergories.contains(prod.category)  {
-                        return
-                    }
-                    state.catergories.insert(prod.category)
-                }
+//                state.productList.forEach { prod in
+//                    if state.catergories.contains(prod.category)  {
+//                        return
+//                    }
+//                    state.catergories.insert(prod.category)
+//                }
 //                state.catergories = state.catergories.append
                 return .none
                 
             case let .internal(.getProductResponse(.failure(error))):
+                print(error)
+                return .none
+                
+            case let .internal(.getCategoryResponse(.success(categories))):
+                state.catergories = categories
+                return .none
+                
+            case let .internal(.getCategoryResponse(.failure(error))):
                 print(error)
                 return .none
                 

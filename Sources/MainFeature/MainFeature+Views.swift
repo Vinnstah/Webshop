@@ -5,6 +5,7 @@ import ComposableArchitecture
 import UserModel
 import HomeFeature
 import ProductsFeature
+import CheckoutFeature
 
 public extension Main {
     struct View: SwiftUI.View {
@@ -35,6 +36,13 @@ public extension Main {
                         .tag(Main.State.Tab.products)
                         .tabItem {
                             Label("Products", systemImage: "puzzlepiece")
+                        }
+                        Checkout.View(
+                            store: self.store.scope(state: \.checkout!, action: Main.Action.checkout)
+                        )
+                        .tag(Main.State.Tab.checkout)
+                        .tabItem {
+                            Label("Checkout", systemImage: "cart")
                         }
                     }
                 }

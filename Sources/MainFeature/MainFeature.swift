@@ -3,6 +3,7 @@ import ComposableArchitecture
 import SwiftUI
 import HomeFeature
 import ProductsFeature
+import CheckoutFeature
 
 public struct Main: ReducerProtocol {
     public init() {}
@@ -14,16 +15,20 @@ public extension Main {
         public var selectedTab: Tab
         public var home: Home.State?
         public var products: Products.State?
+        public var checkout: Checkout.State?
+        
         
         public init(
             selectedTab: Tab = .home,
             home: Home.State? = .init(),
-            products: Products.State? = .init()
+            products: Products.State? = .init(),
+            checkout: Checkout.State? = .init()
         ) {
             
             self.selectedTab = selectedTab
             self.home = home
             self.products = products
+            self.checkout = checkout
         }
         
         public enum Tab: Equatable, Sendable {
@@ -39,6 +44,7 @@ public extension Main {
         case delegate(DelegateAction)
         case home(Home.Action)
         case products(Products.Action)
+        case checkout(Checkout.Action)
         
         public enum DelegateAction: Equatable, Sendable {
             case userIsLoggedOut
@@ -82,6 +88,8 @@ public extension Main {
                 return .none
             case .products(_):
                 return .none
+            case .checkout(_):
+                return .none
             }
         }
         .ifLet(
@@ -96,11 +104,12 @@ public extension Main {
         ) {
             Products()
         }
-//        .ifCaseLet(
-//            /State.products,
-//             action: /Action.products
-//        ) {
-//            Products()
+        .ifLet(
+            \State.checkout,
+             action: /Action.checkout
+        ) {
+            Checkout()
+        }
     }
     
 }

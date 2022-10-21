@@ -7,6 +7,8 @@ public enum SiteRoute: Equatable {
     case create(User)
     case login(User)
     case getProducts
+    case getCategories
+    case getSubCategories
 }
 
 
@@ -23,6 +25,12 @@ public let router = OneOf {
     }
     Route(.case(SiteRoute.getProducts)) {
         Path { "getProducts" }
+    }
+    Route(.case(SiteRoute.getCategories)) {
+        Path { "getCategories" }
+    }
+    Route(.case(SiteRoute.getSubCategories)) {
+        Path { "getSubCategories" }
     }
 }
 

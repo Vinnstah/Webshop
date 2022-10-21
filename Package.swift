@@ -28,6 +28,12 @@ let package = Package(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
+            name: "CheckoutFeature",
+            targets: ["CheckoutFeature"]),
+        .library(
+            name: "CheckoutModel",
+            targets: ["CheckoutModel"]),
+        .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
         .library(
@@ -108,6 +114,22 @@ let package = Package(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
         
+            .target(
+                name: "CheckoutModel",
+                dependencies: [
+                    "ProductModel",
+                ],
+                swiftSettings: swiftSettings
+            ),
+        .target(
+            name: "CheckoutFeature",
+            dependencies: [
+                tca,
+                "CheckoutModel",
+                "ProductModel",
+            ],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "HomeFeature",
             dependencies: [
@@ -123,6 +145,7 @@ let package = Package(
             .target(
                 name: "MainFeature",
                 dependencies: [
+                    "CheckoutFeature",
                     "HomeFeature",
                     "ProductsFeature",
                     tca,

@@ -46,6 +46,16 @@ func siteHandler(
         let products = try await getAllProducts(db)
         try await db.close()
         return ResultPayload(forAction: "getProducts", payload: products)
+    case .getCategories:
+        let db = try await connectDatabase()
+        let categories = try await getAllCategories(db)
+        try await db.close()
+        return ResultPayload(forAction: "getCategories", payload: categories)
+    case .getSubCategories:
+        let db = try await connectDatabase()
+        let categories = try await getAllSubCategories(db)
+        try await db.close()
+        return ResultPayload(forAction: "getSubCategories", payload: categories)
     }
     
 }

@@ -17,13 +17,13 @@ public extension Home {
         public var productList: [Product]
         public var isProductDetailSheetPresented: Bool
         public var productDetailView: Product?
-        public var catergories: [ProductModel.Category]
+        public var catergories: Set<String>
         
         public init(
             productList: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
             productDetailView: Product? = nil,
-            catergories: [ProductModel.Category] = []
+            catergories: Set<String> = []
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
@@ -74,10 +74,10 @@ public extension Home {
                 state.productList = products
                 
                 state.productList.forEach { prod in
-                    if state.catergories.contains(prod.category) {
+                    if state.catergories.contains(prod.category)  {
                         return
                     }
-                    state.catergories.append(prod.category)
+                    state.catergories.insert(prod.category)
                 }
 //                state.catergories = state.catergories.append
                 return .none

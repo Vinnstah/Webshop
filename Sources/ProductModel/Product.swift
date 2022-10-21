@@ -1,10 +1,14 @@
 import Foundation
+import Network
 import PostgresNIO
+import NIOCore
 import SwiftUI
 import ComposableArchitecture
 
 public enum Category: Equatable, Codable, Sendable, Hashable, Identifiable {
 //    public init<JSONDecoder>(from byteBuffer: inout NIOCore.ByteBuffer, type: PostgresNIO.PostgresDataType, format: PostgresNIO.PostgresFormat, context: PostgresNIO.PostgresDecodingContext<JSONDecoder>) throws where JSONDecoder : PostgresNIO.PostgresJSONDecoder {
+//        self.rawValue = String(bitPat)
+//            }
 //        switch (format, type) {
 //                case (_, .varchar),
 //                     (_, .text),
@@ -91,8 +95,8 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
     public let description: String
     public let imageURL: String
     public let price: Int
-    public let category: Category
-    public let subCategory: Category.SubCategory
+    public let category: String
+    public let subCategory: String
     public let sku: String
     public let id: String
     
@@ -100,8 +104,8 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
                 description: String,
                 imageURL: String,
                 price: Int,
-                category: Category,
-                subCategory: Category.SubCategory,
+                category: String,
+                subCategory: String,
                 sku: String,
                 id: String = UUID().uuidString
     ) {
@@ -174,9 +178,9 @@ public extension Product {
                             .padding()
                         
                         HStack(spacing: 15) {
-                            Text(product.category.rawValue)
+                            Text(product.category)
                                 .font(.body)
-                            Text(product.subCategory.rawValue)
+                            Text(product.subCategory)
                                 .font(.footnote)
                             Text(product.sku)
                                 .font(.footnote)

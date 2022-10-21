@@ -26,55 +26,49 @@ public extension Home {
                         ScrollView(.horizontal) {
                             HStack(spacing: 20) {
                                 
-                                ForEach(viewStore.state.catergories, id: \.self) { cat in
-                                    VStack {
-                                    cat.image
-                                        Text(cat.rawValue)
-                                    }
-//                                    cat
-//                                    Product.ProductView<Home>(store: store, product: prod)
-//                                        .onTapGesture {
-//                                            viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                        }
-//                                }
-                            }
+                                ForEach(viewStore.state.catergories.sorted(by: <), id: \.self) { cat in
+                                    Text(cat)
+                                        .foregroundColor(Color("Secondary"))
+                                        .padding()
+                                }
                         }
                     }
-                    
-                    Text("Show popular items")
-                    
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 20) {
-                            ForEach(viewStore.state.productList, id: \.self) { prod in
-                                Product.ProductView<Home>(store: store, product: prod)
-                                    .onTapGesture {
-                                        viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                    }
-                            }
+                }
+                
+                Text("Show popular items")
+                
+                ScrollView(.horizontal) {
+                    HStack(spacing: 20) {
+                        ForEach(viewStore.state.productList, id: \.self) { prod in
+                            Product.ProductView<Home>(store: store, product: prod)
+                                .onTapGesture {
+                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                }
                         }
                     }
-                    
-                    Button("Log out user") {
-                        viewStore.send(.internal(.logOutUser))
-                    }
-                    .buttonStyle(.secondary)
-                    .padding()
                 }
-                .onAppear {
-                    viewStore.send(.internal(.onAppear))
+                
+                Button("Log out user") {
+                    viewStore.send(.internal(.logOutUser))
                 }
-                .refreshable {
-                    viewStore.send(.internal(.onAppear))
-                }
-                .sheet(isPresented:
-                        viewStore.binding(
-                            get: \.isProductDetailSheetPresented,
-                            send: .internal(.toggleSheet))
-                ) {
-                    Product.DetailView<Home>(store: store, product: viewStore.state.productDetailView!)
-                }
+                .buttonStyle(.secondary)
+                .padding()
+            }
+            .onAppear {
+                viewStore.send(.internal(.onAppear))
+            }
+            .refreshable {
+                viewStore.send(.internal(.onAppear))
+            }
+            .sheet(isPresented:
+                    viewStore.binding(
+                        get: \.isProductDetailSheetPresented,
+                        send: .internal(.toggleSheet))
+            ) {
+                Product.DetailView<Home>(store: store, product: viewStore.state.productDetailView!)
             }
         }
     }
+}
 }
 

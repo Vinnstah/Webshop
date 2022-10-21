@@ -37,6 +37,7 @@ public extension Products {
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable, Sendable {
+            case addProductToCart(quantity: Int, product: Product)
         }
         
         public enum InternalAction: Equatable, Sendable {

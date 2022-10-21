@@ -82,14 +82,6 @@ public extension Home {
                 
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
-                
-//                state.productList.forEach { prod in
-//                    if state.catergories.contains(prod.category)  {
-//                        return
-//                    }
-//                    state.catergories.insert(prod.category)
-//                }
-//                state.catergories = state.catergories.append
                 return .none
                 
             case let .internal(.getProductResponse(.failure(error))):

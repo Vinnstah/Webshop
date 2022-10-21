@@ -4,6 +4,7 @@ import PostgresNIO
 import NIOCore
 import SwiftUI
 import ComposableArchitecture
+import StyleGuide
 
 extension URL: @unchecked Sendable {}
 
@@ -74,15 +75,17 @@ public extension Product {
     struct DetailView<T: ReducerProtocol> : SwiftUI.View where T.State: Equatable {
         public let store: StoreOf<T>
         public let product: Product
+        public let action: T.Action
         
         public init(
             store: StoreOf<T>,
-            product: Product
+            product: Product,
+            action: T.Action
         ) {
             self.store = store
             self.product = product
+            self.action = action
         }
-        
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
@@ -114,6 +117,11 @@ public extension Product {
                             .font(.largeTitle)
                     }
                 }
+                
+                Button("Add to cart") {
+                    viewStore.send(action)
+                }
+                .buttonStyle(.primary)
             }
         }
     }

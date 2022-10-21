@@ -65,7 +65,12 @@ public extension Products {
                                 get: \.isProductDetailSheetPresented,
                                 send: .internal(.toggleSheet))
                     ) {
-                        Product.DetailView<Products>(store: store, product: viewStore.state.productDetailView!)
+                        Product.DetailView<Products>(
+                            store: store,
+                            product: viewStore.state.productDetailView!,
+                            action: .delegate(.addProductToCart(quantity: 1, product: viewStore.state.productDetailView!)
+                                             )
+                        )
                     }
                 }
             }

@@ -115,7 +115,6 @@ let package = Package(
                 "SiteRouter",
                 "StyleGuide",
                 "UserDefaultsClient",
-                "UserModel",
                 tca,
             ],
             swiftSettings: swiftSettings
@@ -167,6 +166,7 @@ let package = Package(
         .target(
             name: "ProductModel",
             dependencies: [
+                postgres,
                 tca,
             ],
             swiftSettings: swiftSettings
@@ -174,6 +174,7 @@ let package = Package(
             .target(
                 name: "Server",
                 dependencies: [
+                    "ProductModel",
                     "SiteRouter",
                     "UserModel",
                     postgres,

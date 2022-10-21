@@ -6,6 +6,7 @@ import NIOPosix
 import SiteRouter
 import UserModel
 import Vapor
+import ProductModel
 
 public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 public let logger = Logger(label: "postgres-logger")
@@ -96,7 +97,7 @@ public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -
             description: try randomRow["description"].decode(String.self, context: .default),
             imageURL: try randomRow["image_url"].decode(String.self, context: .default),
             price: try randomRow["price"].decode(Int.self, context: .default),
-            category: try randomRow["category"].decode(String.self, context: .default),
+            category: try randomRow["category"].decode(ProductModel.Category.self, context: .default),
             subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
             sku: try randomRow["sku"].decode(String.self, context: .default))
         products.append(product)

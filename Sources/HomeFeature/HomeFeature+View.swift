@@ -16,8 +16,30 @@ public extension Home {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 VStack {
-                    Text("Welcome back USER")
-                        .padding(.horizontal, 14)
+                    
+                    VStack {
+                        Text("Categories")
+                            .foregroundColor(Color("Secondary"))
+                            .bold()
+                            .padding()
+                        
+                        ScrollView(.horizontal) {
+                            HStack(spacing: 20) {
+                                
+                                ForEach(viewStore.state.catergories, id: \.self) { cat in
+                                    VStack {
+                                    cat.image
+                                        Text(cat.rawValue)
+                                    }
+//                                    cat
+//                                    Product.ProductView<Home>(store: store, product: prod)
+//                                        .onTapGesture {
+//                                            viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                        }
+//                                }
+                            }
+                        }
+                    }
                     
                     Text("Show popular items")
                     

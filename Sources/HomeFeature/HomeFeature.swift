@@ -17,15 +17,18 @@ public extension Home {
         public var productList: [Product]
         public var isProductDetailSheetPresented: Bool
         public var productDetailView: Product?
+        public var catergories: [ProductModel.Category]
         
         public init(
             productList: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
-            productDetailView: Product? = nil
+            productDetailView: Product? = nil,
+            catergories: [ProductModel.Category] = []
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
             self.productDetailView = productDetailView
+            self.catergories = catergories
         }
     }
     
@@ -69,6 +72,14 @@ public extension Home {
                 
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
+                
+                state.productList.forEach { prod in
+                    if state.catergories.contains(prod.category) {
+                        return
+                    }
+                    state.catergories.append(prod.category)
+                }
+//                state.catergories = state.catergories.append
                 return .none
                 
             case let .internal(.getProductResponse(.failure(error))):

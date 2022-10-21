@@ -1,19 +1,32 @@
 import Foundation
-//import PostgresNIO
+import PostgresNIO
 import SwiftUI
 import ComposableArchitecture
 
-public enum Category: Equatable {
+public enum Category: Equatable, Codable, Sendable, Hashable, Identifiable {
+//    public init<JSONDecoder>(from byteBuffer: inout NIOCore.ByteBuffer, type: PostgresNIO.PostgresDataType, format: PostgresNIO.PostgresFormat, context: PostgresNIO.PostgresDecodingContext<JSONDecoder>) throws where JSONDecoder : PostgresNIO.PostgresJSONDecoder {
+//        switch (format, type) {
+//                case (_, .varchar),
+//                     (_, .text),
+//                     (_, .name):
+//                    // we can force unwrap here, since this method only fails if there are not enough
+//                    // bytes available.
+//            self = Category(from: JbyteBuffer.readString(length: byteBuffer.readableBytes)!)
+//                case (_, .uuid):
+//                    guard let uuid = try? UUID(from: &byteBuffer, type: .uuid, format: format, context: context) else {
+//                        throw PostgresDecodingError.Code.failure
+//                    }
+//                    self = uuid.uuidString
+//                default:
+//                    throw PostgresDecodingError.Code.typeMismatch
+//                }
+//    }
+    
     case games(SubCategory)
     
-    public enum SubCategory: Equatable {
-        case boardgames
-        
-        public var rawValue: String {
-            switch self {
-            case .boardgames: return "Board Games"
-            }
-        }
+    
+    public enum CodingKeys: String, CodingKey {
+        case games = "Games"
     }
     
     public var rawValue: String {
@@ -21,6 +34,52 @@ public enum Category: Equatable {
         case .games: return "Games"
         }
     }
+    
+    public var image: Image {
+        switch self {
+        case .games: return Image(systemName: "gamecontroller")
+        }
+    }
+    public var id: String {
+        switch self {
+        case .games: return UUID().uuidString
+        }
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    public enum SubCategory: Equatable, Codable, Sendable, Hashable, Identifiable {
+        case boardgames
+        
+        public enum CodingKeys: String, CodingKey {
+            case boardgames = "Board Games"
+        }
+        
+        public var rawValue: String {
+            switch self {
+            case .boardgames: return "Board Games"
+            }
+        }
+        
+        public var image: Image {
+            switch self {
+            case .boardgames: return Image(systemName: "circle.grid.cross")
+            }
+        }
+        
+        public var id: String {
+            switch self {
+            case .boardgames: return UUID().uuidString
+            }
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
+    }
+    
 }
 
 extension URL: @unchecked Sendable {}
@@ -32,12 +91,20 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
     public let description: String
     public let imageURL: String
     public let price: Int
-    public let category: String
-    public let subCategory: String
+    public let category: Category
+    public let subCategory: Category.SubCategory
     public let sku: String
     public let id: String
     
-    public init(title: String, description: String, imageURL: String, price: Int, category: String, subCategory: String, sku: String, id: String = UUID().uuidString) {
+    public init(title: String,
+                description: String,
+                imageURL: String,
+                price: Int,
+                category: Category,
+                subCategory: Category.SubCategory,
+                sku: String,
+                id: String = UUID().uuidString
+    ) {
         self.title = title
         self.description = description
         self.imageURL = imageURL
@@ -107,9 +174,9 @@ public extension Product {
                             .padding()
                         
                         HStack(spacing: 15) {
-                            Text(product.category)
+                            Text(product.category.rawValue)
                                 .font(.body)
-                            Text(product.subCategory)
+                            Text(product.subCategory.rawValue)
                                 .font(.footnote)
                             Text(product.sku)
                                 .font(.footnote)

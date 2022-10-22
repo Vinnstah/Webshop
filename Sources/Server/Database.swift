@@ -7,6 +7,7 @@ import SiteRouter
 import UserModel
 import Vapor
 import ProductModel
+import CartModel
 
 public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 public let logger = Logger(label: "postgres-logger")
@@ -136,6 +137,24 @@ public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async thro
         }
         categories.insert(category)
        
+    }
+    return categories
+}
+
+//TODO: WIP
+public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart] {
+    var cart: [Cart] = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let category = Category(
+            title: try randomRow["category"].decode(String.self, context: .default),
+                                subCategory: Category.SubCategory(
+                                    title: try randomRow["sub_category"].decode(String.self, context: .default)
+                                ))
+        if categories.contains(where: { $0.title == category.title}) {
+        } else {
+            categories.insert(category)
+        }
     }
     return categories
 }

@@ -31,8 +31,8 @@ let package = Package(
             name: "CheckoutFeature",
             targets: ["CheckoutFeature"]),
         .library(
-            name: "CheckoutModel",
-            targets: ["CheckoutModel"]),
+            name: "CartModel",
+            targets: ["CartModel"]),
         .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
@@ -115,7 +115,7 @@ let package = Package(
             dependencies: ["AppFeature"]),
         
             .target(
-                name: "CheckoutModel",
+                name: "CartModel",
                 dependencies: [
                     "ProductModel",
                 ],
@@ -125,7 +125,7 @@ let package = Package(
             name: "CheckoutFeature",
             dependencies: [
                 tca,
-                "CheckoutModel",
+                "CartModel",
                 "ProductModel",
             ],
             swiftSettings: swiftSettings
@@ -134,6 +134,7 @@ let package = Package(
             name: "HomeFeature",
             dependencies: [
                 "ApiClient",
+                "CartModel",
                 "SiteRouter",
                 "StyleGuide",
                 "UserDefaultsClient",
@@ -145,6 +146,7 @@ let package = Package(
             .target(
                 name: "MainFeature",
                 dependencies: [
+                    "CartModel",
                     "CheckoutFeature",
                     "HomeFeature",
                     "ProductsFeature",
@@ -178,6 +180,7 @@ let package = Package(
                 name: "ProductsFeature",
                 dependencies: [
                     "ApiClient",
+                    "CartModel",
                     "ProductModel",
                     "StyleGuide",
                     "SiteRouter",
@@ -189,6 +192,7 @@ let package = Package(
         .target(
             name: "ProductModel",
             dependencies: [
+                "StyleGuide",
                 postgres,
                 tca,
             ],
@@ -197,6 +201,7 @@ let package = Package(
             .target(
                 name: "Server",
                 dependencies: [
+                    "CartModel",
                     "ProductModel",
                     "SiteRouter",
                     "UserModel",

@@ -15,22 +15,21 @@ public extension Checkout {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 VStack {
                     Text("Checkout")
-//                    List {
-//                        Section {
-//                            ForEach(viewStore.state.checkout?.products ?? [], id:\.self) { product in
-//                                HStack {
-//                                    Text(product.title)
-//                                    Text(String(product.quantity ?? 0))
-//                                    Text(String(product.price))
-//                                }
-//                            }
-//                        }
-//                        Section {
-//                            Text(String(viewStore.state.checkout?.price ?? 0))
-//                        }
-//                    }
+                    List {
+                        ForEach(viewStore.state.cart?.products.sorted(by: >) ?? [], id:\.key.title) { key, value in
+                            Section {
+                                HStack {
+                                    Text(String(value))
+                                    Text(key.title)
+                                    Text(String(key.price))
+                                }
+                            }
+                        }
+                        Text(String(viewStore.state.cart?.price ?? 0))
+                    }
                 }
             }
         }
     }
 }
+

@@ -68,7 +68,7 @@ public extension Home {
                 Product.DetailView<Home>(
                     store: store,
                     product: viewStore.state.productDetailView!,
-                    action: .delegate(.addProductToCart(quantity: 1, product: viewStore.state.productDetailView!)))
+                    action: .internal(.addItemToCart(viewStore.state.productDetailView!, quantity: 1)))
             }
         }
     }

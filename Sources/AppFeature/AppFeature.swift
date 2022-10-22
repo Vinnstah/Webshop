@@ -31,7 +31,7 @@ public extension App {
         
         
         public enum InternalAction: Equatable, Sendable {
-            case userIsLoggedIn
+            case logInUser
         }
     }
     
@@ -41,7 +41,6 @@ public extension App {
         Reduce { state, action in
             switch action {
                 
-                /// If user is logged in we receive action from splash delegate and then send action to userDefaults to get the logged in user's JWT.
             case let .splash(.delegate(.loadIsLoggedInResult(jwt))):
                 guard let jwt else {
                     state = .onboarding(.init(signIn: .init()))
@@ -50,13 +49,12 @@ public extension App {
                 
                 return .run { send in
                     await send(
-                        .internal(.userIsLoggedIn
-                                 )
+                        .internal(.logInUser)
                     )
                 }
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
-            case .internal(.userIsLoggedIn):
+            case .internal(.logInUser):
                 state = .main(.init())
                 return .none
                 

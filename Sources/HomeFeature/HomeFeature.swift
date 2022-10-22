@@ -5,6 +5,7 @@ import ProductModel
 import UserDefaultsClient
 import ApiClient
 import SiteRouter
+import CartModel
 
 public struct Home: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -18,17 +19,21 @@ public extension Home {
         public var isProductDetailSheetPresented: Bool
         public var productDetailView: Product?
         public var catergories: [ProductModel.Category]
+        public var cart: Cart?
+        
         
         public init(
             productList: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
             productDetailView: Product? = nil,
-            catergories: [ProductModel.Category] = []
+            catergories: [ProductModel.Category] = [],
+            cart: Cart? = nil
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
             self.productDetailView = productDetailView
             self.catergories = catergories
+            self.cart = cart
         }
     }
     
@@ -48,6 +53,7 @@ public extension Home {
             case toggleSheet
             case showProductDetailViewFor(Product)
             case getCategoryResponse(TaskResult<[ProductModel.Category]>)
+            case addItemToCart(Product, quantity: Int)
         }
     }
     
@@ -108,6 +114,10 @@ public extension Home {
             case .delegate(_):
                 return .none
                 
+            case let .internal(.addItemToCart(product, quantity: quantity)):
+                return .run { send in
+                    await send(.delegate(.addProductToCart(quantity: quantity, product: product)))
+                }
             }
         }
     }

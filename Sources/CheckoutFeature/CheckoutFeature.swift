@@ -1,5 +1,5 @@
 import Foundation
-import CheckoutModel
+import CartModel
 import ComposableArchitecture
 
 public struct Checkout: ReducerProtocol {
@@ -8,12 +8,12 @@ public struct Checkout: ReducerProtocol {
 
 public extension Checkout {
     struct State: Equatable, Sendable {
-        public var checkout: CheckoutModel?
+        public var cart: Cart?
         
         public init(
-            checkout: CheckoutModel? = nil
+            cart: Cart? = nil
         ) {
-            self.checkout = checkout
+            self.cart = cart
         }
     }
     

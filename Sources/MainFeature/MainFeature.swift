@@ -4,6 +4,7 @@ import SwiftUI
 import HomeFeature
 import ProductsFeature
 import CheckoutFeature
+import CartModel
 
 public struct Main: ReducerProtocol {
     public init() {}
@@ -16,19 +17,22 @@ public extension Main {
         public var home: Home.State?
         public var products: Products.State?
         public var checkout: Checkout.State?
+        public var cart: Cart?
         
         
         public init(
             selectedTab: Tab = .home,
             home: Home.State? = .init(),
             products: Products.State? = .init(),
-            checkout: Checkout.State? = .init()
+            checkout: Checkout.State? = .init(),
+            cart: Cart? = nil
         ) {
             
             self.selectedTab = selectedTab
             self.home = home
             self.products = products
             self.checkout = checkout
+            self.cart = cart
         }
         
         public enum Tab: Equatable, Sendable {
@@ -56,13 +60,6 @@ public extension Main {
     }
     
     var body: some ReducerProtocol<State, Action> {
-//        Scope(state: \State.home, action: /Action.home) {
-//            Home()
-//        }
-//        Scope(state: \State.products, action: /Action.products) {
-//            Products()
-//        }
-//    }
         Reduce { state, action in
             switch action {
             case .home(.delegate(.userIsLoggedOut)):
@@ -75,11 +72,16 @@ public extension Main {
                 case .products: state.products = .init()
                 case .settings:
                     return .none
-                case .checkout:
-                    return .none
+                case .checkout: state.checkout = .init(cart: state.cart)
                 }
                 return .none
-            
+                
+            case let .home(.delegate(.addProductToCart(quantity: quantity, product: product))):
+                
+//                state.cart = state.cart?.addItemToCart(product: Product, quantity: <#T##Int#>)
+                state.checkout = .init(cart: state.cart)
+                return .none
+                
             case .delegate(_):
                 return .none
             case .home(_):
@@ -90,7 +92,9 @@ public extension Main {
                 return .none
             case .checkout(_):
                 return .none
+                
             }
+                
         }
         .ifLet(
             \State.home,
@@ -110,6 +114,7 @@ public extension Main {
         ) {
             Checkout()
         }
+        
     }
     
 }

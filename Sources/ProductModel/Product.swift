@@ -8,8 +8,22 @@ import StyleGuide
 
 extension URL: @unchecked Sendable {}
 
-//TODO: Break out into it's own package
-public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable {
+public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Comparable {
+    public static func < (lhs: Product, rhs: Product) -> Bool {
+        lhs.title < rhs.title
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(description)
+        hasher.combine(imageURL)
+        hasher.combine(price)
+        hasher.combine(category)
+        hasher.combine(subCategory)
+        hasher.combine(sku)
+    }
+    
     
     public let title: String
     public let description: String

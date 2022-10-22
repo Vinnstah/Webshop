@@ -12,7 +12,11 @@
 
  Create a bootstrap init to add tables if they dont exist
 
-
+CREATE TABLE cart (
+id VARCHAR,
+quantity integer,
+price integer
+) ;
 
 MVP of productTable
 CREATE TABLE products (

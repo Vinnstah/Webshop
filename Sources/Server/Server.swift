@@ -57,6 +57,18 @@ func siteHandler(
         let categories = try await getAllSubCategories(db)
         try await db.close()
         return ResultPayload(forAction: "getSubCategories", payload: categories)
+    
+    case let .addCartSession(cart):
+        let db = try await connectDatabase()
+        try await addShoppingCartSession(db, logger: logger, jwt: cart.userJWT ?? "", sessionID: cart.id)
+        try await db.close()
+        return ResultPayload(forAction: "addShoppingCartSession", payload: cart.id)
+    
+    case let .addShoppingCartItems(cart):
+        let db = try await connectDatabase()
+        try await addShoppingCartProducts(db, logger: logger, cart: cart)
+        try await db.close()
+        return ResultPayload(forAction: "addShoppingCartProducts", payload: cart.id)
     }
     
 }

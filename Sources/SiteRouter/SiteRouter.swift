@@ -1,14 +1,18 @@
 import URLRouting
 import ComposableArchitecture
 import UserModel
+import CartModel
 
 
+//TODO: Rename annd remove `get`, `add`
 public enum SiteRoute: Equatable {
     case create(User)
     case login(User)
     case getProducts
     case getCategories
     case getSubCategories
+    case addCartSession(Cart)
+    case addShoppingCartItems(Cart)
 }
 
 
@@ -31,6 +35,16 @@ public let router = OneOf {
     }
     Route(.case(SiteRoute.getSubCategories)) {
         Path { "getSubCategories" }
+    }
+    Route(.case(SiteRoute.addCartSession)) {
+        Path { "addCartSession" }
+        Method.post
+        Body(.json(Cart.self))
+    }
+    Route(.case(SiteRoute.addShoppingCartItems)) {
+        Path { "addShoppingCartItems" }
+        Method.post
+        Body(.json(Cart.self))
     }
 }
 

@@ -246,6 +246,7 @@ let package = Package(
         .target(
             name: "SiteRouter",
             dependencies: [
+                "CartModel",
                 "UserModel",
                 tca,
                 urlRouting,

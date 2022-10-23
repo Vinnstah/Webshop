@@ -12,10 +12,22 @@
 
  Create a bootstrap init to add tables if they dont exist
 
-CREATE TABLE cart (
-id VARCHAR,
+CREATE TABLE shopping_cart_items (
+id VARCHAR PRIMARY KEY,
 quantity integer,
-price integer
+price integer,
+sku VARCHAR,
+CONSTRAINT fk_cart
+   FOREIGN KEY(id)
+    REFERENCES shopping_session(session_id)
+    );
+
+CREATE TABLE shopping_session (
+session_id VARCHAR PRIMARY KEY,
+jwt VARCHAR,
+CONSTRAINT fk_session
+   FOREIGN KEY(jwt) 
+      REFERENCES users(jwt)
 ) ;
 
 MVP of productTable

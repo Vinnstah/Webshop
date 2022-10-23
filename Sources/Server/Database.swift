@@ -141,23 +141,48 @@ public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async thro
     return categories
 }
 
-//TODO: WIP
-public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart] {
-    var cart: [Cart] = []
-    for try await row in rows {
-        let randomRow = row.makeRandomAccess()
-        let category = Category(
-            title: try randomRow["category"].decode(String.self, context: .default),
-                                subCategory: Category.SubCategory(
-                                    title: try randomRow["sub_category"].decode(String.self, context: .default)
-                                ))
-        if categories.contains(where: { $0.title == category.title}) {
-        } else {
-            categories.insert(category)
-        }
-    }
-    return categories
+public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt: String, sessionID: String) async throws {
+    try await db.query("""
+                        INSERT INTO shopping_session
+                        VALUES('\(jwt)','\(sessionID)')
+                        ON CONFLICT (session_id)
+                        DO NOTHING;
+                        """,
+                       logger: logger
+    )
 }
+
+public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
+    for product in cart.products {
+        try await db.query("""
+                        INSERT INTO shopping_cart_items
+                        VALUES('\(product.key.id)','\(product.value)','\(product.key.price)','\(product.key.sku)')
+                        ON CONFLICT (session_id)
+                        DO NOTHING;
+                        """,
+                           logger: logger
+        )
+    }
+}
+
+
+////TODO: WIP
+//public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart] {
+//    var cart: [Cart] = []
+//    for try await row in rows {
+//        let randomRow = row.makeRandomAccess()
+//        let category = Category(
+//            title: try randomRow["category"].decode(String.self, context: .default),
+//                                subCategory: Category.SubCategory(
+//                                    title: try randomRow["sub_category"].decode(String.self, context: .default)
+//                                ))
+//        if categories.contains(where: { $0.title == category.title}) {
+//        } else {
+//            categories.insert(category)
+//        }
+//    }
+//    return categories
+//}
 
 public func getAllProducts(
     _ db: PostgresConnection

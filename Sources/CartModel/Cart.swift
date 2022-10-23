@@ -1,10 +1,11 @@
 import Foundation
 import ProductModel
 
-public struct Cart: Equatable, Identifiable, Sendable, Hashable {
+public struct Cart: Equatable, Identifiable, Sendable, Hashable, Codable {
     
     public var id: String
     public var products: [Product : Int]
+    public var userJWT: String?
     
     public var numberOfItemsInCart: Int {
         products.values.reduce(0, +)
@@ -16,10 +17,12 @@ public struct Cart: Equatable, Identifiable, Sendable, Hashable {
     
     public init(
         id: String = UUID().uuidString,
-        products: [Product : Int]
+        products: [Product : Int],
+        userJWT: String?
     ) {
         self.id = id
         self.products = products
+        self.userJWT = userJWT
     }
     
     public func hash(into hasher: inout Hasher) {

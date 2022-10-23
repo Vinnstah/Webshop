@@ -31,7 +31,7 @@ public extension App {
         
         
         public enum InternalAction: Equatable, Sendable {
-            case logInUser
+            case logInUser(String)
         }
     }
     
@@ -49,13 +49,13 @@ public extension App {
                 
                 return .run { send in
                     await send(
-                        .internal(.logInUser)
+                        .internal(.logInUser(jwt))
                     )
                 }
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
-            case .internal(.logInUser):
-                state = .main(.init())
+            case let .internal(.logInUser(jwt)):
+                state = .main(.init(cart: .init(userJWT: jwt)))
                 return .none
                 
                 ///When a user logs out from `main` we initialize onboarding again.
@@ -65,7 +65,7 @@ public extension App {
                 
                 ///After a user have finished onboarding and received the jwt we will send them through to `main`
             case let .onboarding(.delegate(.userFinishedOnboarding(jwt))):
-                state = .main(.init())
+                state = .main(.init(cart: .init(userJWT: jwt)))
                 return .none
                
                 ///When a user logs in through onboarding we change state to `main` and send their jwt through.

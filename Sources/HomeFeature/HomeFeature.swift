@@ -17,7 +17,7 @@ public extension Home {
     struct State: Equatable, Sendable {
         public var productList: [Product]
         public var isProductDetailSheetPresented: Bool
-        public var productDetailView: Product?
+        public var productShownInDetailView: Product?
         public var catergories: [ProductModel.Category]
         public var cart: Cart?
         
@@ -25,13 +25,13 @@ public extension Home {
         public init(
             productList: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
-            productDetailView: Product? = nil,
+            productShownInDetailView: Product? = nil,
             catergories: [ProductModel.Category] = [],
             cart: Cart? = nil
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
-            self.productDetailView = productDetailView
+            self.productShownInDetailView = productShownInDetailView
             self.catergories = catergories
             self.cart = cart
         }
@@ -54,6 +54,7 @@ public extension Home {
             case showProductDetailViewFor(Product)
             case getCategoryResponse(TaskResult<[ProductModel.Category]>)
             case addItemToCart(Product, quantity: Int)
+            case upsertCartSession(TaskResult<String>)
         }
     }
     
@@ -103,7 +104,7 @@ public extension Home {
                 return .none
                 
             case let .internal(.showProductDetailViewFor(product)):
-                state.productDetailView = product
+                state.productShownInDetailView = product
                 state.isProductDetailSheetPresented.toggle()
                 return .none
                 
@@ -115,12 +116,29 @@ public extension Home {
                 return .none
                 
             case let .internal(.addItemToCart(product, quantity: quantity)):
-                return .run { send in
+                state.cart = .init()
+                state.cart?.addItemToCart(product: product, quantity: quantity)
+                return .run { [apiClient, userDefaultsClient, cart = state.cart] send in
+                    await send(.internal(.upsertCartSession(
+                        TaskResult {
+                            try await apiClient.decodedResponse(for: .addCartSession(cart!), as: ResultPayload<String>.self).value.status.get()
+                        }
+                    )
+                    )
+                    )
                     await send(.delegate(.addProductToCart(quantity: quantity, product: product)))
                 }
+                
+            case let .internal(.upsertCartSession(.success(id))):
+                print("SUCCSS")
+                return .none
+                    
+            case .internal(.upsertCartSession(.failure)):
+                print("FAIL")
+                return .none
+            }
             }
         }
     }
-}
 
 

@@ -144,7 +144,7 @@ public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async thro
 public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt: String, sessionID: String) async throws {
     try await db.query("""
                         INSERT INTO shopping_session
-                        VALUES('\(jwt)','\(sessionID)')
+                        VALUES('\(sessionID)','\(jwt)')
                         ON CONFLICT (session_id)
                         DO NOTHING;
                         """,

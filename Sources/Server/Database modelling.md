@@ -10,6 +10,11 @@
  categories - title / products
 
 
+INSERT INTO shopping_session
+VALUES('Test123','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk')
+ON CONFLICT (session_id)
+DO NOTHING;
+
  Create a bootstrap init to add tables if they dont exist
 
 CREATE TABLE shopping_cart_items (

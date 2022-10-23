@@ -175,3 +175,50 @@ extension Product {
     }
     
 }
+
+public struct DetailView: SwiftUI.View {
+    public let product: Product
+    public let action: () -> Void
+    
+    public init(product: Product, action: @escaping () -> Void) {
+        self.product = product
+        self.action = action
+    }
+    public var body: some SwiftUI.View {
+        ScrollView(.vertical) {
+            
+            VStack(spacing: 20) {
+                product.getImage()
+                    .padding(.top)
+                
+                Text(product.title)
+                    .font(.largeTitle)
+                    .bold()
+                    .padding()
+                
+                HStack(spacing: 15) {
+                    Text(product.category)
+                        .font(.body)
+                    Text(product.subCategory)
+                        .font(.footnote)
+                    Text(product.sku)
+                        .font(.footnote)
+                }
+                Text(product.description)
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+                    .frame(width: 250)
+                
+                Text("\(product.price) kr")
+                    .font(.largeTitle)
+            }
+        }
+        
+        Button("Add to cart") {
+            action()
+        }
+        .buttonStyle(.primary)
+    }
+}
+
+

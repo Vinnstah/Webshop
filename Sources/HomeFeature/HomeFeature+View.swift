@@ -65,10 +65,14 @@ public extension Home {
                         get: \.isProductDetailSheetPresented,
                         send: .internal(.toggleSheet))
             ) {
-                Product.DetailView<Home>(
-                    store: store,
-                    product: viewStore.state.productDetailView!,
-                    action: .internal(.addItemToCart(viewStore.state.productDetailView!, quantity: 1)))
+//                Product.DetailView<Home>(
+//                    store: store,
+//                    product: viewStore.state.productDetailView!,
+//                    action: .internal(.addItemToCart(viewStore.state.productDetailView!, quantity: 1)))
+                DetailView(
+                    product: viewStore.state.productShownInDetailView!, action: {
+                    viewStore.send(.internal(.addItemToCart(viewStore.state.productShownInDetailView!, quantity: 1)))
+                })
             }
         }
     }

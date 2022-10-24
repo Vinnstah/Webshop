@@ -116,10 +116,28 @@ public extension Home {
                 return .none
                 
             case let .internal(.addItemToCart(product, quantity: quantity)):
-                state.cart = .init()
-//                state.cart?.addItemToCart(product: product, quantity: quantity)
+                guard state.cart != nil else {
+                    state.cart = .init()
+                    state.cart?.userJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk"
+                    state.cart?.addItemToCart(product: product, quantity: quantity)
+                    return .run { [apiClient, userDefaultsClient, cart = state.cart] send in
+    //                    cart?.userJWT = try await userDefaultsClient.getLoggedInUserJWT()
+                        await send(.internal(.upsertCartSession(
+                            TaskResult {
+                                try await apiClient.decodedResponse(
+                                    for: .addCartSession(cart!),
+                                    as: ResultPayload<String>.self
+                                ).value.status.get()
+                            }
+                        )
+                        )
+                        )
+                    }
+                }
+                state.cart?.userJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk"
+                state.cart?.addItemToCart(product: product, quantity: quantity)
                 return .run { [apiClient, userDefaultsClient, cart = state.cart] send in
-                    print("UPSERT TESTING")
+//                    cart?.userJWT = try await userDefaultsClient.getLoggedInUserJWT()
                     await send(.internal(.upsertCartSession(
                         TaskResult {
                             try await apiClient.decodedResponse(
@@ -130,8 +148,8 @@ public extension Home {
                     )
                     )
                     )
-//                    await send(.delegate(.addProductToCart(quantity: quantity, product: product)))
                 }
+                //                    await send(.delegate(.addProductToCart(quantity: quantity, product: product)))
                 
             case let .internal(.upsertCartSession(.success(id))):
                 return .run { send in

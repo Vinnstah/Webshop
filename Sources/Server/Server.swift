@@ -63,6 +63,8 @@ func siteHandler(
     case let .addCartSession(cart):
         let db = try await connectDatabase()
         print("SUCCESSFULLY OPENED DP CONENCTIOn")
+        print("\(String(describing: cart.userJWT))")
+        print("\(cart.id)")
         try await addShoppingCartSession(db, logger: logger, jwt: cart.userJWT ?? "", sessionID: cart.id, cart: cart)
       try await db.close()
         return ResultPayload(forAction: "addShoppingCartSession", payload: "TESTER")

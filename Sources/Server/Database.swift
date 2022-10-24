@@ -142,21 +142,21 @@ public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async thro
 }
 
 public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt: String, sessionID: String, cart: Cart) async throws {
-    print("SESSION INSERT")
     try await db.query("""
                         INSERT INTO shopping_session
-                        VALUES('\(sessionID)','\(jwt)')
-                        ON CONFLICT (session_id)
+                        VALUES(\(sessionID), \(jwt))
+                        ON CONFLICT (jwt)
                         DO NOTHING;
                         """,
                        logger: logger
     )
+    
         for product in cart.products {
         try await db.query("""
                         INSERT INTO shopping_cart_items
-                        VALUES('\(product.key.id)','\(product.value)','\(product.key.price)','\(product.key.sku)')
-                        ON CONFLICT (session_id)
-                        DO NOTHING;
+                        VALUES(\(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
+                                                ON CONFLICT (id)
+                                                DO NOTHING;
                         """,
                            logger: logger
         )

@@ -28,8 +28,8 @@ CONSTRAINT fk_cart
     );
 
 CREATE TABLE shopping_session (
-session_id VARCHAR PRIMARY KEY,
-jwt VARCHAR,
+session_id VARCHAR,
+jwt VARCHAR PRIMARY KEY,
 CONSTRAINT fk_session
    FOREIGN KEY(jwt) 
       REFERENCES users(jwt)

@@ -3,6 +3,7 @@ import SwiftUI
 import ComposableArchitecture
 import ProductModel
 import StyleGuide
+import ProductViews
 
 public extension Home {
     struct View: SwiftUI.View {
@@ -31,51 +32,58 @@ public extension Home {
                                         .foregroundColor(Color("Secondary"))
                                         .padding()
                                 }
+                            }
                         }
                     }
-                }
-                
-                Text("Show popular items")
-                
-                ScrollView(.horizontal) {
-                    HStack(spacing: 20) {
-                        ForEach(viewStore.state.productList, id: \.self) { prod in
-                            Product.ProductView<Home>(store: store, product: prod)
-                                .onTapGesture {
-                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                }
+                    
+                    Text("Show popular items")
+                    
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 20) {
+                            ForEach(viewStore.state.productList, id: \.self) { prod in
+                                ProductCardView<Home>(store: store, product: prod)
+                                    .onTapGesture {
+                                        viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                    }
+                            }
                         }
                     }
+                    
+                    Button("Log out user") {
+                        viewStore.send(.internal(.logOutUser))
+                    }
+                    .buttonStyle(.primary)
+                    .padding()
                 }
-                
-                Button("Log out user") {
-                    viewStore.send(.internal(.logOutUser))
+                .onAppear {
+                    viewStore.send(.internal(.onAppear))
                 }
-                .buttonStyle(.primary)
-                .padding()
-            }
-            .onAppear {
-                viewStore.send(.internal(.onAppear))
-            }
-            .refreshable {
-                viewStore.send(.internal(.onAppear))
-            }
-            .sheet(isPresented:
-                    viewStore.binding(
-                        get: \.isProductDetailSheetPresented,
-                        send: .internal(.toggleSheet))
-            ) {
-//                Product.DetailView<Home>(
-//                    store: store,
-//                    product: viewStore.state.productDetailView!,
-//                    action: .internal(.addItemToCart(viewStore.state.productDetailView!, quantity: 1)))
-                DetailView(
-                    product: viewStore.state.productShownInDetailView!, action: {
-                    viewStore.send(.internal(.addItemToCart(viewStore.state.productShownInDetailView!, quantity: 1)))
-                })
+                .refreshable {
+                    viewStore.send(.internal(.onAppear))
+                }
+                .sheet(isPresented:
+                        viewStore.binding(
+                            get: \.isProductDetailSheetPresented,
+                            send: .internal(.toggleSheet))
+                ) {
+                    //                Product.DetailView<Home>(
+                    //                    store: store,
+                    //                    product: viewStore.state.productDetailView!,
+                    //                    action: .internal(.addItemToCart(viewStore.state.productDetailView!, quantity: 1)))
+                    //                DetailView(
+                    //                    product: viewStore.state.productShownInDetailView!, action: {)
+                    
+                    DetailView(
+                        product: viewStore.state.productShownInDetailView!,
+                        buttonAction: {
+                            viewStore.send(.internal(.addItemToCart(viewStore.state.productShownInDetailView!, quantity: viewStore.state.quantity)))
+                        },
+                        increaseQuantityAction: { viewStore.send(.internal(.increaseQuantityButtonPressed)) },
+                        decreaseQuantityAction: { viewStore.send(.internal(.decreaseQuantityButtonPressed)) },
+                        quantity: viewStore.state.quantity)
+                }
             }
         }
     }
-}
 }
 

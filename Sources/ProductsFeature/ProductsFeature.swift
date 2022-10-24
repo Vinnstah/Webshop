@@ -4,6 +4,7 @@ import ProductModel
 import ApiClient
 import SiteRouter
 
+//TODO: Remove entire feature and replace with favorites
 public struct Products: ReducerProtocol {
     @Dependency(\.apiClient) var apiClient
     public init() {}
@@ -16,19 +17,22 @@ public extension Products {
         public var searchResults: [Product]
         public var isProductDetailSheetPresented: Bool
         public var productDetailView: Product?
+        public var quantity: Int
         
         public init(
             productList: [Product] = [],
             searchText: String = "",
             searchResults: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
-            productDetailView: Product? = nil
+            productDetailView: Product? = nil,
+            quantity: Int = 1
         ) {
             self.productList = productList
             self.searchText = searchText
             self.searchResults = searchResults
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
             self.productDetailView = productDetailView
+            self.quantity = quantity
         }
     }
     

@@ -51,12 +51,12 @@ public struct Category: Equatable, Codable, Sendable, Hashable, Identifiable {
         }
         
         //TODO: Fix this to be a hardcoded image, Async image or an image stored in the DB
-        public func getImage() -> Image? {
-            guard let image else {
-                return nil
-            }
-            return Image(systemName: image)
-        }
+//        public func getImage() -> Image? {
+//            guard let image else {
+//                return nil
+//            }
+//            return Image(systemName: image)
+//        }
         
         public enum CodingKeys: String, CodingKey {
             case title

@@ -49,6 +49,9 @@ let package = Package(
             name: "ProductModel",
             targets: ["ProductModel"]),
         .library(
+            name: "ProductViews",
+            targets: ["ProductViews"]),
+        .library(
             name: "SignInFeature",
             targets: ["SignInFeature"]),
         .library(
@@ -135,6 +138,7 @@ let package = Package(
             dependencies: [
                 "ApiClient",
                 "CartModel",
+                "ProductViews",
                 "SiteRouter",
                 "StyleGuide",
                 "UserDefaultsClient",
@@ -182,6 +186,7 @@ let package = Package(
                     "ApiClient",
                     "CartModel",
                     "ProductModel",
+                    "ProductViews",
                     "StyleGuide",
                     "SiteRouter",
                     "UserModel",
@@ -194,6 +199,15 @@ let package = Package(
             dependencies: [
                 "StyleGuide",
                 postgres,
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "ProductViews",
+            dependencies: [
+                "ProductModel",
+                "StyleGuide",
                 tca,
             ],
             swiftSettings: swiftSettings

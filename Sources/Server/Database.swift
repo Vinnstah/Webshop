@@ -155,8 +155,10 @@ public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt
         try await db.query("""
                         INSERT INTO shopping_cart_items
                         VALUES(\(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
-                                                ON CONFLICT (id)
-                                                DO NOTHING;
+                        ON CONFLICT (id)
+                        DO
+                        UPDATE SET quantity = \(product.value)
+                        ;
                         """,
                            logger: logger
         )
@@ -186,8 +188,8 @@ public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, ca
     //    }
 }
 
-
-////TODO: WIP
+//TODO: Implement DELETE for products
+////TODO: WIP Get cart for open session
 //public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart] {
 //    var cart: [Cart] = []
 //    for try await row in rows {

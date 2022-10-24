@@ -3,6 +3,7 @@ import SwiftUI
 import ComposableArchitecture
 import ProductModel
 import StyleGuide
+import ProductViews
 
 public extension Products {
     struct View: SwiftUI.View {
@@ -39,7 +40,7 @@ public extension Products {
                                             viewStore.state.searchResults,
                                         id: \.self
                                     ) { prod in
-                                        Product.ProductView<Products>(store: store, product: prod)
+                                        ProductCardView<Products>(store: store, product: prod)
                                             .padding(.horizontal)
                                             .onTapGesture {
                                                 viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
@@ -60,18 +61,17 @@ public extension Products {
                     .refreshable {
                         viewStore.send(.internal(.onAppear))
                     }
-                    .sheet(isPresented:
-                            viewStore.binding(
-                                get: \.isProductDetailSheetPresented,
-                                send: .internal(.toggleSheet))
-                    ) {
-                        Product.DetailView<Products>(
-                            store: store,
-                            product: viewStore.state.productDetailView!,
-                            action: .delegate(.addProductToCart(quantity: 1, product: viewStore.state.productDetailView!)
-                                             )
-                        )
-                    }
+//                    .sheet(isPresented:
+//                            viewStore.binding(
+//                                get: \.isProductDetailSheetPresented,
+//                                send: .internal(.toggleSheet))
+//                    ) {
+//                        DetailView(
+//                            product: viewStore.state.productDetailView!,
+//                            action: { viewStore.send(.delegate(.addProductToCart(quantity: 1, product: viewStore.state.productDetailView!))
+//                            ) }
+//                        )
+//                    }
                 }
             }
         }

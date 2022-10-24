@@ -16,6 +16,27 @@ public struct Main: ReducerProtocol {
 public extension Main {
     struct State: Equatable, Sendable {
         
+//        public var selectedTab: Tab
+//        public var home: Home.State?
+//        public var products: Products.State?
+//        public var checkout: Checkout.State?
+//        public var cart: Cart?
+//
+//
+//        public init(
+//            selectedTab: Tab = .home,
+//            home: Home.State? = .init(),
+//            products: Products.State? = .init(),
+//            checkout: Checkout.State? = .init(),
+//            cart: Cart? = nil
+//        ) {
+//
+//            self.selectedTab = selectedTab
+//            self.home = home
+//            self.products = products
+//            self.checkout = checkout
+//            self.cart = cart
+//        }
         public var selectedTab: Tab
         public var home: Home.State?
         public var products: Products.State?
@@ -25,16 +46,13 @@ public extension Main {
         
         public init(
             selectedTab: Tab = .home,
-            home: Home.State? = .init(),
-            products: Products.State? = .init(),
-            checkout: Checkout.State? = .init(),
             cart: Cart? = nil
         ) {
             
             self.selectedTab = selectedTab
-            self.home = home
-            self.products = products
-            self.checkout = checkout
+            self.home = .init()
+            self.products = .init()
+            self.checkout = .init(cart: cart)
             self.cart = cart
         }
         
@@ -70,13 +88,13 @@ public extension Main {
                 return .run { send in
                     await send(.delegate(.userIsLoggedOut))
                 }
-            case.internal(.tabSelected):
+            case .internal(.tabSelected):
                 switch state.selectedTab {
                 case .home: state.home = .init()
                 case .products: state.products = .init()
                 case .settings:
                     return .none
-                case .checkout: state.checkout = .init(cart: state.cart)
+                case .checkout: state.checkout?.cart = state.cart
                 }
                 return .none
                 

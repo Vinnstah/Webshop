@@ -117,21 +117,27 @@ public extension Home {
                 
             case let .internal(.addItemToCart(product, quantity: quantity)):
                 state.cart = .init()
-                state.cart?.addItemToCart(product: product, quantity: quantity)
+//                state.cart?.addItemToCart(product: product, quantity: quantity)
                 return .run { [apiClient, userDefaultsClient, cart = state.cart] send in
+                    print("UPSERT TESTING")
                     await send(.internal(.upsertCartSession(
                         TaskResult {
-                            try await apiClient.decodedResponse(for: .addCartSession(cart!), as: ResultPayload<String>.self).value.status.get()
+                            try await apiClient.decodedResponse(
+                                for: .addCartSession(cart!),
+                                as: ResultPayload<String>.self
+                            ).value.status.get()
                         }
                     )
                     )
                     )
-                    await send(.delegate(.addProductToCart(quantity: quantity, product: product)))
+//                    await send(.delegate(.addProductToCart(quantity: quantity, product: product)))
                 }
                 
             case let .internal(.upsertCartSession(.success(id))):
-                print("SUCCSS")
-                return .none
+                return .run { send in
+                    print("SUCCSS")
+                    
+                }
                     
             case .internal(.upsertCartSession(.failure)):
                 print("FAIL")

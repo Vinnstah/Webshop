@@ -9,7 +9,7 @@ import Vapor
 import ProductModel
 import CartModel
 
-public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)
 public let logger = Logger(label: "postgres-logger")
 
 public func connectDatabase() async throws -> PostgresConnection  {
@@ -102,7 +102,7 @@ public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -
             subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
             sku: try randomRow["sku"].decode(String.self, context: .default))
         products.append(product)
-       
+        
     }
     return products
 }
@@ -113,9 +113,9 @@ public func returnCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws 
         let randomRow = row.makeRandomAccess()
         let category = Category(
             title: try randomRow["category"].decode(String.self, context: .default),
-                                subCategory: Category.SubCategory(
-                                    title: try randomRow["sub_category"].decode(String.self, context: .default)
-                                ))
+            subCategory: Category.SubCategory(
+                title: try randomRow["sub_category"].decode(String.self, context: .default)
+            ))
         if categories.contains(where: { $0.title == category.title}) {
         } else {
             categories.insert(category)
@@ -136,12 +136,13 @@ public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async thro
             categories.insert(category)
         }
         categories.insert(category)
-       
+        
     }
     return categories
 }
 
-public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt: String, sessionID: String) async throws {
+public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt: String, sessionID: String, cart: Cart) async throws {
+    print("SESSION INSERT")
     try await db.query("""
                         INSERT INTO shopping_session
                         VALUES('\(sessionID)','\(jwt)')
@@ -150,10 +151,7 @@ public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt
                         """,
                        logger: logger
     )
-}
-
-public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
-    for product in cart.products {
+        for product in cart.products {
         try await db.query("""
                         INSERT INTO shopping_cart_items
                         VALUES('\(product.key.id)','\(product.value)','\(product.key.price)','\(product.key.sku)')
@@ -162,7 +160,30 @@ public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, ca
                         """,
                            logger: logger
         )
-    }
+        }
+}
+
+public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
+    let productKey = cart.products.map { $0.key}
+    let productValue = cart.products.map { $0.value}
+    try await db.query("""
+                        INSERT INTO shopping_cart_items
+                        VALUES('\(productKey.first?.id)','\(productValue.first)','\(productKey.first?.price)','\(productKey.first?.sku)')
+                        ON CONFLICT (session_id)
+                        DO NOTHING;
+                        """,
+                       logger: logger
+    )
+    //    for product in cart.products {
+    //    try await db.query("""
+    //                    INSERT INTO shopping_cart_items
+    //                    VALUES('\(product.key.id)','\(product.value)','\(product.key.price)','\(product.key.sku)')
+    //                    ON CONFLICT (session_id)
+    //                    DO NOTHING;
+    //                    """,
+    //                       logger: logger
+    //    )
+    //    }
 }
 
 

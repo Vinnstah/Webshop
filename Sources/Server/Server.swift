@@ -47,11 +47,13 @@ func siteHandler(
         let products = try await getAllProducts(db)
         try await db.close()
         return ResultPayload(forAction: "getProducts", payload: products)
+        
     case .getCategories:
         let db = try await connectDatabase()
         let categories = try await getAllCategories(db)
         try await db.close()
         return ResultPayload(forAction: "getCategories", payload: categories)
+        
     case .getSubCategories:
         let db = try await connectDatabase()
         let categories = try await getAllSubCategories(db)
@@ -60,9 +62,10 @@ func siteHandler(
     
     case let .addCartSession(cart):
         let db = try await connectDatabase()
-        try await addShoppingCartSession(db, logger: logger, jwt: cart.userJWT ?? "", sessionID: cart.id)
-        try await db.close()
-        return ResultPayload(forAction: "addShoppingCartSession", payload: cart.id)
+        print("SUCCESSFULLY OPENED DP CONENCTIOn")
+        try await addShoppingCartSession(db, logger: logger, jwt: cart.userJWT ?? "", sessionID: cart.id, cart: cart)
+      try await db.close()
+        return ResultPayload(forAction: "addShoppingCartSession", payload: "TESTER")
     
     case let .addShoppingCartItems(cart):
         let db = try await connectDatabase()

@@ -150,9 +150,11 @@ let package = Package(
             .target(
                 name: "MainFeature",
                 dependencies: [
+                    "ApiClient",
                     "CartModel",
                     "CheckoutFeature",
                     "HomeFeature",
+                    "SiteRouter",
                     "ProductsFeature",
                     tca,
                 ],

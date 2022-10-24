@@ -23,6 +23,7 @@ public struct DetailView: SwiftUI.View {
         self.decreaseQuantityAction = decreaseQuantityAction
         self.quantity = quantity
     }
+    
     public var body: some SwiftUI.View {
         ScrollView(.vertical) {
             
@@ -58,12 +59,14 @@ public struct DetailView: SwiftUI.View {
         }
         .buttonStyle(.primary)
         
-        Button("-") {
-            decreaseQuantityAction()
-        }
-        Text(String("\(quantity)"))
-        Button("+") {
-            increaseQuantityAction()
+        HStack {
+            Button("-") {
+                decreaseQuantityAction()
+            }
+            Text(String("\(quantity)"))
+            Button("+") {
+                increaseQuantityAction()
+            }
         }
     }
 }

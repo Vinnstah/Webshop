@@ -17,7 +17,7 @@ public extension Home {
     struct State: Equatable, Sendable {
         public var productList: [Product]
         public var isProductDetailSheetPresented: Bool
-        public var productShownInDetailView: Product?
+        public var product: Product?
         public var catergories: [ProductModel.Category]
         public var cart: Cart?
         public var quantity: Int
@@ -26,14 +26,14 @@ public extension Home {
         public init(
             productList: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
-            productShownInDetailView: Product? = nil,
+            product: Product? = nil,
             catergories: [ProductModel.Category] = [],
             cart: Cart? = nil,
             quantity: Int = 0
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
-            self.productShownInDetailView = productShownInDetailView
+            self.product = product
             self.catergories = catergories
             self.cart = cart
             self.quantity = quantity
@@ -109,7 +109,7 @@ public extension Home {
                 return .none
                 
             case let .internal(.showProductDetailViewFor(product)):
-                state.productShownInDetailView = product
+                state.product = product
                 state.isProductDetailSheetPresented.toggle()
                 return .none
                 
@@ -149,7 +149,6 @@ public extension Home {
                     )
                     )
                 }
-                //                    await send(.delegate(.addProductToCart(quantity: quantity, product: product)))
                 
             case let .internal(.upsertCartSession(.success(id))):
                 return .run { send in

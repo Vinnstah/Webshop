@@ -10,6 +10,7 @@ import SiteRouter
 
 public struct Main: ReducerProtocol {
     @Dependency(\.apiClient) var apiClient
+    @Dependency(\.mainQueue) var mainQueue
     public init() {}
 }
 
@@ -78,6 +79,7 @@ public extension Main {
         public enum InternalAction: Equatable, Sendable {
             case tabSelected
             case upsertCartSession(TaskResult<String>)
+            case getDatabaseID(TaskResult<[Cart.Session]>)
         }
     }
     
@@ -131,14 +133,34 @@ public extension Main {
 //                state.checkout = .init(cart: state.cart)
 //                return .none
             case let .internal(.upsertCartSession(.success(id))):
+                state.cart?.databaseID = id
+                state.checkout?.cart = state.cart
                 print(state.cart)
-                return .run { send in
-                    print("SUCCSS")
-                    
+                return .run { [apiClient, cart = state.cart, mainQueue] send in
+                    try await mainQueue.sleep(for: .seconds(2))
+                    await send(.internal(.getDatabaseID(
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .shoppingSessionDatabaseID,
+                                as: ResultPayload<[Cart.Session]>.self
+                            ).value.status.get()
+                        }
+                    )
+                    )
+                    )
                 }
                     
             case .internal(.upsertCartSession(.failure)):
                 print("FAIL")
+                return .none
+                
+            case let .internal(.getDatabaseID(.success(id))):
+                print("DATABASE ID")
+                print(id)
+                return .none
+                
+            case .internal(.getDatabaseID(.failure)):
+                print("FAFA ID")
                 return .none
                 
             case .delegate(_):

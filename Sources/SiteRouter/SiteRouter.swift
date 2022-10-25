@@ -13,6 +13,7 @@ public enum SiteRoute: Equatable {
     case getSubCategories
     case addCartSession(Cart)
     case addShoppingCartItems(Cart)
+    case shoppingSessionDatabaseID
 }
 
 
@@ -45,6 +46,9 @@ public let router = OneOf {
         Path { "addShoppingCartItems" }
         Method.post
         Body(.json(Cart.self))
+    }
+    Route(.case(SiteRoute.shoppingSessionDatabaseID)) {
+        Path { "shoppingSessionDatabaseID" }
     }
 }
 

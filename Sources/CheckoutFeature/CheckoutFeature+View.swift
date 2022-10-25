@@ -28,6 +28,9 @@ public extension Checkout {
                         Text(String(viewStore.state.cart?.price ?? 0))
                     }
                 }
+                .onAppear {
+                    print(viewStore.state.cart)
+                }
             }
         }
     }

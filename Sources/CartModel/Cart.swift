@@ -35,4 +35,16 @@ public struct Cart: Equatable, Identifiable, Sendable, Hashable, Codable {
     public mutating func addItemToCart(product: Product, quantity: Int){
         self.products[product] = quantity
     }
+    
+    public struct Session: Equatable, Identifiable, Sendable, Hashable, Codable {
+        public var id: String
+        public var dbID: String
+        public var jwt: String
+        
+        public init(id: String, dbID: String, jwt: String) {
+            self.id = id
+            self.dbID = dbID
+            self.jwt = jwt
+        }
+    }
 }

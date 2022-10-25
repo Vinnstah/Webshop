@@ -141,28 +141,37 @@ public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async thro
     return categories
 }
 
-public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, jwt: String, sessionID: String, cart: Cart) async throws {
+public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
     try await db.query("""
                         INSERT INTO shopping_session
-                        VALUES(\(sessionID), \(jwt))
+                        VALUES(\(cart.id), \(cart.userJWT))
                         ON CONFLICT (jwt)
                         DO NOTHING;
                         """,
                        logger: logger
     )
     
-        for product in cart.products {
-        try await db.query("""
-                        INSERT INTO shopping_cart_items
-                        VALUES(\(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
-                        ON CONFLICT (id)
-                        DO
-                        UPDATE SET quantity = \(product.value)
-                        ;
-                        """,
-                           logger: logger
-        )
-        }
+    //        for product in cart.products {
+    //        try await db.query("""
+    //                        INSERT INTO shopping_cart_items
+    //                        VALUES(\(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
+    //                        ON CONFLICT (id)
+    //                        DO
+    //                        UPDATE SET quantity = \(product.value)
+    //                        ;
+    //                        """,
+    //                           logger: logger
+    //        )
+    //        }
+}
+
+public func getCartSessions(_ db: PostgresConnection, logger: Logger) async throws -> [Cart.Session]  {
+    let rows = try await db.query("""
+                                SELECT * FROM shopping_session;
+                                """, logger: logger)
+    
+        let sessions = try await returnCartRowsAsArray(rows)
+    return sessions
 }
 
 public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
@@ -190,22 +199,21 @@ public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, ca
 
 //TODO: Implement DELETE for products
 ////TODO: WIP Get cart for open session
-//public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart] {
-//    var cart: [Cart] = []
-//    for try await row in rows {
-//        let randomRow = row.makeRandomAccess()
-//        let category = Category(
-//            title: try randomRow["category"].decode(String.self, context: .default),
-//                                subCategory: Category.SubCategory(
-//                                    title: try randomRow["sub_category"].decode(String.self, context: .default)
-//                                ))
-//        if categories.contains(where: { $0.title == category.title}) {
-//        } else {
-//            categories.insert(category)
-//        }
-//    }
-//    return categories
-//}
+///
+public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart.Session] {
+    var sessions: [Cart.Session] = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let session = Cart.Session(
+            id: try randomRow["session_id"].decode(String.self, context: .default),
+            dbID: try randomRow["db_id"].decode(String.self, context: .default),
+            jwt: try randomRow["jwt"].decode(String.self, context: .default))
+        sessions.append(session)
+    }
+    print("TEST")
+    print(sessions)
+    return sessions
+}
 
 public func getAllProducts(
     _ db: PostgresConnection

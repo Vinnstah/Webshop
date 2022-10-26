@@ -7,6 +7,7 @@ import CheckoutFeature
 import CartModel
 import ApiClient
 import SiteRouter
+import ProductModel
 
 public struct Main: ReducerProtocol {
     @Dependency(\.apiClient) var apiClient
@@ -16,38 +17,16 @@ public struct Main: ReducerProtocol {
 
 public extension Main {
     struct State: Equatable, Sendable {
-        
-//        public var selectedTab: Tab
-//        public var home: Home.State?
-//        public var products: Products.State?
-//        public var checkout: Checkout.State?
-//        public var cart: Cart?
-//
-//
-//        public init(
-//            selectedTab: Tab = .home,
-//            home: Home.State? = .init(),
-//            products: Products.State? = .init(),
-//            checkout: Checkout.State? = .init(),
-//            cart: Cart? = nil
-//        ) {
-//
-//            self.selectedTab = selectedTab
-//            self.home = home
-//            self.products = products
-//            self.checkout = checkout
-//            self.cart = cart
-//        }
         public var selectedTab: Tab
         public var home: Home.State?
         public var products: Products.State?
         public var checkout: Checkout.State?
-        public var cart: Cart?
+        public var cart: Cart
         
         
         public init(
             selectedTab: Tab = .home,
-            cart: Cart? = nil
+            cart: Cart
         ) {
             
             self.selectedTab = selectedTab
@@ -77,19 +56,24 @@ public extension Main {
         }
         
         public enum InternalAction: Equatable, Sendable {
+            case onAppear
             case tabSelected
-            case upsertCartSession(TaskResult<String>)
-            case getDatabaseID(TaskResult<[Cart.Session]>)
+            case addOrUpdateCartSession(TaskResult<String>)
+            case getDatabaseSessions(TaskResult<[Cart.Session]>)
+            case addProductsToCart(TaskResult<String>)
+            case getProductsFromCartSession(TaskResult<Cart>)
         }
     }
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
+                
             case .home(.delegate(.userIsLoggedOut)):
                 return .run { send in
                     await send(.delegate(.userIsLoggedOut))
                 }
+                
             case .internal(.tabSelected):
                 switch state.selectedTab {
                 case .home: state.home = .init()
@@ -101,67 +85,92 @@ public extension Main {
                 return .none
                 
             case let .home(.delegate(.addProductToCart(quantity: quantity, product: product))):
-                guard state.cart != nil else {
-                    state.cart = .init(userJWT: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk")
-                    state.cart?.addItemToCart(product: product, quantity: quantity)
-                    return .run { [apiClient, cart = state.cart] send in
-    //                    cart?.userJWT = try await userDefaultsClient.getLoggedInUserJWT()
-                        await send(.internal(.upsertCartSession(
-                            TaskResult {
-                                try await apiClient.decodedResponse(
-                                    for: .addCartSession(cart!),
-                                    as: ResultPayload<String>.self
-                                ).value.status.get()
-                            })))
-                    }
-                }
-                state.cart?.userJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk"
-                state.cart?.addItemToCart(product: product, quantity: quantity)
+                state.cart.addItemToCart(product: product, quantity: quantity)
                 return .run { [apiClient, cart = state.cart] send in
-                    await send(.internal(.upsertCartSession(
+                    await send(.internal(.addOrUpdateCartSession(
                         TaskResult {
                             try await apiClient.decodedResponse(
-                                for: .addCartSession(cart!),
+                                for: .addShoppingCartItems(cart),
                                 as: ResultPayload<String>.self
+                            ).value.status.get()
+                        }
+                    )))
+                }
+                
+                
+            case .internal(.addOrUpdateCartSession(.success)):
+                
+                state.checkout?.cart = state.cart
+                return .none
+                    
+            case .internal(.addOrUpdateCartSession(.failure)):
+                print("FAIL")
+                return .none
+                
+            case let .internal(.getDatabaseSessions(.success(sessions))):
+                for session in sessions {
+                    if state.cart.userJWT == session.jwt {
+                        state.cart.id = session.id
+                        state.cart.session = .init(id: session.id, jwt: session.jwt, dbID: session.dbID)
+                    }
+                }
+                
+                guard state.cart.session != nil else {
+                    return .run { [apiClient, cart = state.cart] send in
+                        await send(.internal(.addOrUpdateCartSession(
+                            TaskResult {
+                                try await apiClient.decodedResponse(
+                                    for: .addCartSession(cart),
+                                    as: ResultPayload<String>.self
+                                ).value.status.get()
+                            }
+                        )
+                        )
+                        )
+                    }
+                }
+                
+                
+                print("SESSION UPDATED")
+                return .run { [apiClient, id = state.cart.id] send in
+                    await send(.internal(.getProductsFromCartSession(
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .shoppingCartSessionProducts(id: id),
+                                as: ResultPayload<Cart>.self
                             ).value.status.get()
                         }
                     )
                     )
                     )
                 }
-//                state.cart = state.cart?.addItemToCart(product: Product, quantity: <#T##Int#>)
-//                state.checkout = .init(cart: state.cart)
-//                return .none
-            case let .internal(.upsertCartSession(.success(id))):
-                state.cart?.databaseID = id
+                
+            case let .internal(.getProductsFromCartSession(.success(cart))):
+                let session = state.cart.session
+                state.cart = cart
+                state.cart.session = session
                 state.checkout?.cart = state.cart
-                print(state.cart)
-                return .run { [apiClient, cart = state.cart, mainQueue] send in
-                    try await mainQueue.sleep(for: .seconds(2))
-                    await send(.internal(.getDatabaseID(
+                return .none
+                
+            case .internal(.getProductsFromCartSession(.failure)):
+                print("FAILED TO GET PRODUCTS FROM SESSION")
+                return .none
+                
+            case .internal(.getDatabaseSessions(.failure)):
+                print("FAILED TO GET DB SESSIONS")
+                return .none
+                
+            case .internal(.onAppear):
+                return .run { [apiClient] send in
+                    await send(.internal(.getDatabaseSessions(
                         TaskResult {
                             try await apiClient.decodedResponse(
                                 for: .shoppingSessionDatabaseID,
                                 as: ResultPayload<[Cart.Session]>.self
                             ).value.status.get()
                         }
-                    )
-                    )
-                    )
+                    )))
                 }
-                    
-            case .internal(.upsertCartSession(.failure)):
-                print("FAIL")
-                return .none
-                
-            case let .internal(.getDatabaseID(.success(id))):
-                print("DATABASE ID")
-                print(id)
-                return .none
-                
-            case .internal(.getDatabaseID(.failure)):
-                print("FAFA ID")
-                return .none
                 
             case .delegate(_):
                 return .none
@@ -175,8 +184,6 @@ public extension Main {
                 return .none
                 
             }
-            
-                
         }
         .ifLet(
             \State.home,

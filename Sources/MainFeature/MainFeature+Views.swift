@@ -46,6 +46,9 @@ public extension Main {
                         }
                     }
                 }
+                .onAppear {
+                    viewStore.send(.internal(.onAppear))
+                }
             }
         }
     }

@@ -89,23 +89,7 @@ public func loginUser(
     }
 }
 
-public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Product] {
-    var products: [Product] = []
-    for try await row in rows {
-        let randomRow = row.makeRandomAccess()
-        let product = Product(
-            title: try randomRow["title"].decode(String.self, context: .default),
-            description: try randomRow["description"].decode(String.self, context: .default),
-            imageURL: try randomRow["image_url"].decode(String.self, context: .default),
-            price: try randomRow["price"].decode(Int.self, context: .default),
-            category: try randomRow["category"].decode(String.self, context: .default),
-            subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
-            sku: try randomRow["sku"].decode(String.self, context: .default))
-        products.append(product)
-        
-    }
-    return products
-}
+
 
 public func returnCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws -> Set<ProductModel.Category> {
     var categories: Set<ProductModel.Category> = []
@@ -150,68 +134,19 @@ public func addShoppingCartSession(_ db: PostgresConnection, logger: Logger, car
                         """,
                        logger: logger
     )
-    
-    //        for product in cart.products {
-    //        try await db.query("""
-    //                        INSERT INTO shopping_cart_items
-    //                        VALUES(\(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
-    //                        ON CONFLICT (id)
-    //                        DO
-    //                        UPDATE SET quantity = \(product.value)
-    //                        ;
-    //                        """,
-    //                           logger: logger
-    //        )
-    //        }
 }
 
-public func getCartSessions(_ db: PostgresConnection, logger: Logger) async throws -> [Cart.Session]  {
-    let rows = try await db.query("""
+public func getCartSessions(
+    _ db: PostgresConnection
+) async throws -> [Cart.Session]  {
+    let rows = try await db.query(
+                                """
                                 SELECT * FROM shopping_session;
-                                """, logger: logger)
-    
-        let sessions = try await returnCartRowsAsArray(rows)
-    return sessions
-}
-
-public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
-    let productKey = cart.products.map { $0.key}
-    let productValue = cart.products.map { $0.value}
-    try await db.query("""
-                        INSERT INTO shopping_cart_items
-                        VALUES('\(productKey.first?.id)','\(productValue.first)','\(productKey.first?.price)','\(productKey.first?.sku)')
-                        ON CONFLICT (session_id)
-                        DO NOTHING;
-                        """,
-                       logger: logger
+                                """,
+                                logger: logger
     )
-    //    for product in cart.products {
-    //    try await db.query("""
-    //                    INSERT INTO shopping_cart_items
-    //                    VALUES('\(product.key.id)','\(product.value)','\(product.key.price)','\(product.key.sku)')
-    //                    ON CONFLICT (session_id)
-    //                    DO NOTHING;
-    //                    """,
-    //                       logger: logger
-    //    )
-    //    }
-}
-
-//TODO: Implement DELETE for products
-////TODO: WIP Get cart for open session
-///
-public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart.Session] {
-    var sessions: [Cart.Session] = []
-    for try await row in rows {
-        let randomRow = row.makeRandomAccess()
-        let session = Cart.Session(
-            id: try randomRow["session_id"].decode(String.self, context: .default),
-            dbID: try randomRow["db_id"].decode(String.self, context: .default),
-            jwt: try randomRow["jwt"].decode(String.self, context: .default))
-        sessions.append(session)
-    }
-    print("TEST")
-    print(sessions)
+    
+    let sessions = try await returnCartRowsAsArray(rows)
     return sessions
 }
 
@@ -227,6 +162,89 @@ public func getAllProducts(
     let products = try await returnProductRowsAsArray(rows)
     return products
 }
+
+
+public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
+    for product in cart.products {
+        try await db.query("""
+                            INSERT INTO shopping_cart_items
+                            VALUES(\(cart.id), \(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
+                            ON CONFLICT (session_id, prod_id)
+                            DO
+                            UPDATE SET quantity = \(product.value)
+                            ;
+                            """,
+                           logger: logger
+        )
+    }
+}
+
+public func getShoppingCartProducts(_ db: PostgresConnection, logger: Logger, sessionID: String) async throws -> Cart {
+    let rows = try await db.query("""
+                                    SELECT * FROM products, shopping_cart_items
+                                    WHERE products.sku = shopping_cart_items.sku
+                                    AND shopping_cart_items.session_id = \(sessionID);
+                                """, logger: logger)
+    
+    let cart = try await returnProductRowsAsCart(rows, id: sessionID)
+    
+    return cart
+}
+
+//TODO: Implement DELETE for products
+public func returnProductRowsAsCart(_ rows: PostgresRowSequence, id: String) async throws -> Cart {
+    var cart: Cart = .init(id: id, userJWT: "")
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let product = Product(
+            id: try randomRow["prod_id"].decode(Int.self, context: .default),
+            title: try randomRow["title"].decode(String.self, context: .default),
+            description: try randomRow["description"].decode(String.self, context: .default),
+            imageURL: try randomRow["image_url"].decode(String.self, context: .default),
+            price: try randomRow["price"].decode(Int.self, context: .default),
+            category: try randomRow["category"].decode(String.self, context: .default),
+            subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
+            sku: try randomRow["sku"].decode(String.self, context: .default))
+        print(randomRow)
+        cart.addItemToCart(product: product, quantity: try randomRow["quantity"].decode(Int.self, context: .default))
+        
+    }
+    return cart
+}
+
+public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Product] {
+    var products: [Product] = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let product = Product(
+            id: try randomRow["prod_id"].decode(Int.self, context: .default),
+            title: try randomRow["title"].decode(String.self, context: .default),
+            description: try randomRow["description"].decode(String.self, context: .default),
+            imageURL: try randomRow["image_url"].decode(String.self, context: .default),
+            price: try randomRow["price"].decode(Int.self, context: .default),
+            category: try randomRow["category"].decode(String.self, context: .default),
+            subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
+            sku: try randomRow["sku"].decode(String.self, context: .default))
+        products.append(product)
+
+    }
+    return products
+}
+
+public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [Cart.Session] {
+    var sessions: [Cart.Session] = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let session = Cart.Session(
+            id: try randomRow["session_id"].decode(String.self, context: .default),
+            jwt: try randomRow["jwt"].decode(String.self, context: .default),
+            dbID: try randomRow["db_id"].decode(Int.self, context: .default)
+        )
+        sessions.append(session)
+    }
+    return sessions
+}
+
 
 public func getAllCategories(
     _ db: PostgresConnection

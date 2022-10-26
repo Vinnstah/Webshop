@@ -156,6 +156,7 @@ let package = Package(
                     "HomeFeature",
                     "SiteRouter",
                     "ProductsFeature",
+                    "ProductModel",
                     tca,
                 ],
                 swiftSettings: swiftSettings

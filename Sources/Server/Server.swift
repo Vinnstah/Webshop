@@ -64,20 +64,27 @@ func siteHandler(
         let db = try await connectDatabase()
         try await addShoppingCartSession(db, logger: logger, cart: cart)
         try await db.close()
-        return ResultPayload(forAction: "addShoppingCartSession", payload: "dbID")
+        return ResultPayload(forAction: "addCartSession", payload: "dbID")
         
     case let .addShoppingCartItems(cart):
         let db = try await connectDatabase()
         try await addShoppingCartProducts(db, logger: logger, cart: cart)
         try await db.close()
-        return ResultPayload(forAction: "addShoppingCartProducts", payload: cart.id)
+        return ResultPayload(forAction: "addShoppingCartItems", payload: cart.id)
         
     case .shoppingSessionDatabaseID:
         let db = try await connectDatabase()
-        let sessions = try await getCartSessions(db, logger: logger)
+        let sessions = try await getCartSessions(db)
         try await db.close()
-        return ResultPayload(forAction: "addShoppingCartProducts", payload: "sessions")
+        return ResultPayload(forAction: "shoppingSessionDatabaseID", payload: sessions)
+    
+    case let .shoppingCartSessionProducts(id):
+        let db = try await connectDatabase()
+        let cart = try await getShoppingCartProducts(db, logger: logger, sessionID: id)
+        try await db.close()
+        return ResultPayload(forAction: "shoppingCartSessionProducts", payload: cart)
     }
+    
     
 }
 

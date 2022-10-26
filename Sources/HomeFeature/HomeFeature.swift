@@ -122,7 +122,7 @@ public extension Home {
                 
             case let .internal(.addItemToCart(product, quantity: quantity)):
                 guard state.cart != nil else {
-                    state.cart = .init(userJWT: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk")
+//                    state.cart = .init(userJWT: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk")
                     state.cart?.addItemToCart(product: product, quantity: quantity)
                     return .run { [apiClient, cart = state.cart] send in
     //                    cart?.userJWT = try await userDefaultsClient.getLoggedInUserJWT()

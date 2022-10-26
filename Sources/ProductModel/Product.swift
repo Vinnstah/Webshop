@@ -25,6 +25,7 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Com
     }
     
     
+    public let id: Int
     public let title: String
     public let description: String
     public let imageURL: String
@@ -32,17 +33,17 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Com
     public let category: String
     public let subCategory: String
     public let sku: String
-    public let id: String
     
-    public init(title: String,
+    public init(id: Int,
+                title: String,
                 description: String,
                 imageURL: String,
                 price: Int,
                 category: String,
                 subCategory: String,
-                sku: String,
-                id: String = UUID().uuidString
+                sku: String
     ) {
+        self.id = id
         self.title = title
         self.description = description
         self.imageURL = imageURL
@@ -50,7 +51,6 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Com
         self.category = category
         self.subCategory = subCategory
         self.sku = sku
-        self.id = id
     }
     
     public enum CodingKeys: String, CodingKey {

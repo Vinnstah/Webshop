@@ -29,7 +29,8 @@ UPDATE SET quantity = 2
  Create a bootstrap init to add tables if they dont exist
 
 CREATE TABLE shopping_cart_items (
-session_id VARCHAR PRIMARY KEY,
+session_prod_id VARCHAR PRIMARY KEY,
+session_id VARCHAR, 
 prod_id VARCHAR,
 quantity integer,
 price integer,

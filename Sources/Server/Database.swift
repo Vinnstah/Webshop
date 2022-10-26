@@ -165,11 +165,14 @@ public func getAllProducts(
 
 
 public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
+    var sessionProdId: String = ""
+    print(cart.products)
     for product in cart.products {
+        sessionProdId = "\(cart.id)"  + "_" + "\(product.key.id)"
         try await db.query("""
                             INSERT INTO shopping_cart_items
-                            VALUES(\(cart.id), \(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
-                            ON CONFLICT (session_id, prod_id)
+                            VALUES(\(sessionProdId) ,\(cart.id), \(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
+                            ON CONFLICT (session_prod_id)
                             DO
                             UPDATE SET quantity = \(product.value)
                             ;
@@ -180,11 +183,21 @@ public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, ca
 }
 
 public func getShoppingCartProducts(_ db: PostgresConnection, logger: Logger, sessionID: String) async throws -> Cart {
+//    let rows = try await db.query("""
+//                                    SELECT * FROM products, shopping_cart_items
+//                                    WHERE products.sku = shopping_cart_items.sku
+//                                    AND shopping_cart_items.session_id = \(sessionID);
+//                                """, logger: logger)
+    
     let rows = try await db.query("""
-                                    SELECT * FROM products, shopping_cart_items
-                                    WHERE products.sku = shopping_cart_items.sku
-                                    AND shopping_cart_items.session_id = \(sessionID);
+                                SELECT products.*, shopping_cart_items.session_id, shopping_cart_items.quantity
+                                FROM products
+                                LEFT JOIN shopping_cart_items
+                                ON products.sku = shopping_cart_items.sku
+                                WHERE shopping_cart_items.session_id = \(sessionID);
                                 """, logger: logger)
+    
+
     
     let cart = try await returnProductRowsAsCart(rows, id: sessionID)
     
@@ -206,8 +219,10 @@ public func returnProductRowsAsCart(_ rows: PostgresRowSequence, id: String) asy
             subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
             sku: try randomRow["sku"].decode(String.self, context: .default))
         print(randomRow)
+        print(product)
         cart.addItemToCart(product: product, quantity: try randomRow["quantity"].decode(Int.self, context: .default))
-        
+//
+        print(randomRow)
     }
     return cart
 }

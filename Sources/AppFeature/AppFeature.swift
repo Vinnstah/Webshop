@@ -97,7 +97,7 @@ public extension App {
                 return .none
             case .main(.home(.delegate(_))):
                 return .none
-            case .main(.products(_)):
+            case .main(.favorites(_)):
                 return .none
             case .main(.checkout(_)):
                 return .none

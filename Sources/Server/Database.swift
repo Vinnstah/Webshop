@@ -183,11 +183,6 @@ public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, ca
 }
 
 public func getShoppingCartProducts(_ db: PostgresConnection, logger: Logger, sessionID: String) async throws -> Cart {
-//    let rows = try await db.query("""
-//                                    SELECT * FROM products, shopping_cart_items
-//                                    WHERE products.sku = shopping_cart_items.sku
-//                                    AND shopping_cart_items.session_id = \(sessionID);
-//                                """, logger: logger)
     
     let rows = try await db.query("""
                                 SELECT products.*, shopping_cart_items.session_id, shopping_cart_items.quantity
@@ -196,8 +191,6 @@ public func getShoppingCartProducts(_ db: PostgresConnection, logger: Logger, se
                                 ON products.sku = shopping_cart_items.sku
                                 WHERE shopping_cart_items.session_id = \(sessionID);
                                 """, logger: logger)
-    
-
     
     let cart = try await returnProductRowsAsCart(rows, id: sessionID)
     

@@ -19,7 +19,7 @@ public extension Main {
     struct State: Equatable, Sendable {
         public var selectedTab: Tab
         public var home: Home.State?
-        public var products: Products.State?
+        public var favorites: Favorites.State?
         public var checkout: Checkout.State?
         public var cart: Cart
         
@@ -31,14 +31,14 @@ public extension Main {
             
             self.selectedTab = selectedTab
             self.home = .init()
-            self.products = .init()
+            self.favorites = .init()
             self.checkout = .init(cart: cart)
             self.cart = cart
         }
         
         public enum Tab: Equatable, Sendable {
             case home
-            case products
+            case favorites
             case settings
             case checkout
         }
@@ -48,7 +48,7 @@ public extension Main {
         case `internal`(InternalAction)
         case delegate(DelegateAction)
         case home(Home.Action)
-        case products(Products.Action)
+        case favorites(Favorites.Action)
         case checkout(Checkout.Action)
         
         public enum DelegateAction: Equatable, Sendable {
@@ -77,7 +77,7 @@ public extension Main {
             case .internal(.tabSelected):
                 switch state.selectedTab {
                 case .home: state.home = .init()
-                case .products: state.products = .init()
+                case .favorites: state.favorites = .init()
                 case .settings:
                     return .none
                 case .checkout: state.checkout?.cart = state.cart
@@ -140,9 +140,7 @@ public extension Main {
                                 as: ResultPayload<Cart>.self
                             ).value.status.get()
                         }
-                    )
-                    )
-                    )
+                    )))
                 }
                 
             case let .internal(.getProductsFromCartSession(.success(cart))):
@@ -178,7 +176,7 @@ public extension Main {
                 return .none
             case .internal(_):
                 return .none
-            case .products(_):
+            case .favorites(_):
                 return .none
             case .checkout(_):
                 return .none
@@ -191,12 +189,12 @@ public extension Main {
         ) {
             Home()
         }
-        .ifLet(
-            \State.products,
-             action: /Action.products
-        ) {
-            Products()
-        }
+//        .ifLet(
+//            \State.favorites,
+//             action: /Action.favorites
+//        ) {
+//            Favorites()
+//        }
         .ifLet(
             \State.checkout,
              action: /Action.checkout

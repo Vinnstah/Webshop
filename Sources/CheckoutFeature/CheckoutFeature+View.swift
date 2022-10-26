@@ -16,23 +16,27 @@ public extension Checkout {
                 VStack {
                     Text("Checkout")
                     List {
+                        Section(String("Quantity - Title - Price"), content: {
                         ForEach(viewStore.state.cart?.products.sorted(by: >) ?? [], id:\.key.title) { key, value in
-                            Section {
                                 HStack {
                                     Text(String(value))
                                     Text(key.title)
-                                    Text(String(key.price))
+                                        Text(String(key.price))
+                                        Text("kr")
                                 }
                             }
                         }
-                        Text(String(viewStore.state.cart?.price ?? 0))
+                        )
+                        Section(String("Total"), content: {
+                            HStack {
+                                Text(String(viewStore.state.cart?.price ?? 0))
+                                Text("kr")
+                            }
+                        })
+                        }
                     }
-                }
-                .onAppear {
-                    print(viewStore.state.cart)
                 }
             }
         }
     }
-}
 

@@ -21,6 +21,8 @@ public extension Home {
         public var catergories: [ProductModel.Category]
         public var cart: Cart?
         public var quantity: Int
+        public var searchText: String
+        public var searchResults: [Product]
         
         
         public init(
@@ -29,7 +31,9 @@ public extension Home {
             product: Product? = nil,
             catergories: [ProductModel.Category] = [],
             cart: Cart? = nil,
-            quantity: Int = 0
+            quantity: Int = 0,
+            searchText: String = "",
+            searchResults: [Product] = []
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
@@ -37,6 +41,8 @@ public extension Home {
             self.catergories = catergories
             self.cart = cart
             self.quantity = quantity
+            self.searchText = searchText
+            self.searchResults = searchResults
         }
     }
     
@@ -56,10 +62,9 @@ public extension Home {
             case toggleSheet
             case showProductDetailViewFor(Product)
             case getCategoryResponse(TaskResult<[ProductModel.Category]>)
-            case addItemToCart(Product, quantity: Int)
-            case upsertCartSession(TaskResult<String>)
             case increaseQuantityButtonPressed
             case decreaseQuantityButtonPressed
+            case searchTextReceivesInput(String)
         }
     }
     
@@ -92,6 +97,11 @@ public extension Home {
                     )))
                 }
                 
+            case let .internal(.searchTextReceivesInput(text)):
+                state.searchText = text
+                state.searchResults = state.productList.filter { $0.title.contains(text)  }
+                return .none
+                
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
                 return .none
@@ -118,46 +128,6 @@ public extension Home {
                 return .none
                 
             case .delegate(_):
-                return .none
-                
-            case let .internal(.addItemToCart(product, quantity: quantity)):
-                guard state.cart != nil else {
-//                    state.cart = .init(userJWT: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk")
-                    state.cart?.addItemToCart(product: product, quantity: quantity)
-                    return .run { [apiClient, cart = state.cart] send in
-    //                    cart?.userJWT = try await userDefaultsClient.getLoggedInUserJWT()
-                        await send(.internal(.upsertCartSession(
-                            TaskResult {
-                                try await apiClient.decodedResponse(
-                                    for: .addCartSession(cart!),
-                                    as: ResultPayload<String>.self
-                                ).value.status.get()
-                            })))
-                    }
-                }
-                state.cart?.userJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBQzM3MjFBMi03OTUwLTQ3MzUtQkMyNy1GQUVBMzdDMTgyQjkiLCJuYW1lIjoidGVzdGVyQHRlc3Rlci5zZSIsImlhdCI6MTY2NTA4NTczMi41MDkzMX0.qfgtrBqDOCp2FRF6eh9jDKn114BweI6BL9yGd0R3QOk"
-                state.cart?.addItemToCart(product: product, quantity: quantity)
-                return .run { [apiClient, cart = state.cart] send in
-                    await send(.internal(.upsertCartSession(
-                        TaskResult {
-                            try await apiClient.decodedResponse(
-                                for: .addCartSession(cart!),
-                                as: ResultPayload<String>.self
-                            ).value.status.get()
-                        }
-                    )
-                    )
-                    )
-                }
-                
-            case let .internal(.upsertCartSession(.success(id))):
-                return .run { send in
-                    print("SUCCSS")
-                    
-                }
-                    
-            case .internal(.upsertCartSession(.failure)):
-                print("FAIL")
                 return .none
             case .internal(.increaseQuantityButtonPressed):
                 state.quantity += 1

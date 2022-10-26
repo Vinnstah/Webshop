@@ -5,12 +5,12 @@ import ApiClient
 import SiteRouter
 
 //TODO: Remove entire feature and replace with favorites
-public struct Products: ReducerProtocol {
+public struct Favorites: ReducerProtocol {
     @Dependency(\.apiClient) var apiClient
     public init() {}
 }
 
-public extension Products {
+public extension Favorites {
     struct State: Equatable, Sendable {
         public var productList: [Product]
         public var searchText: String

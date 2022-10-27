@@ -47,7 +47,9 @@ public extension Home {
                                                 viewStore.state.searchResults,
                                             id: \.self
                                         )  { prod in
-                                            ProductCardView<Home>(store: store, product: prod)
+                                            ProductCardView<Home>(store: store, product: prod, action: ({
+                                                viewStore.send(.internal(.favoriteButtonClicked(prod)))
+                                            }))
                                                 .onTapGesture {
                                                     viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
                                                 }
@@ -64,10 +66,12 @@ public extension Home {
                                                 viewStore.state.searchResults,
                                             id: \.self
                                         )  { prod in
-                                            ProductCardView<Home>(store: store, product: prod)
-                                                .onTapGesture {
-                                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                                }
+                                                ProductCardView<Home>(store: store, product: prod, action: ({
+                                                    viewStore.send(.internal(.favoriteButtonClicked(prod)))
+                                                }))
+                                                    .onTapGesture {
+                                                        viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                                    }
                                         }
                                     }
                                     
@@ -114,3 +118,4 @@ public extension Home {
         }
     }
 }
+

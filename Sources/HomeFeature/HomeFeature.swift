@@ -65,6 +65,7 @@ public extension Home {
             case increaseQuantityButtonPressed
             case decreaseQuantityButtonPressed
             case searchTextReceivesInput(String)
+            case favoriteButtonClicked(Product)
         }
     }
     
@@ -135,6 +136,10 @@ public extension Home {
             case .internal(.decreaseQuantityButtonPressed):
                 state.quantity -= 1
                 return .none
+            case let .internal(.favoriteButtonClicked(product)):
+                return .run { [userDefaultsClient] send in
+                    await userDefaultsClient.setFavoriteProduct(product.sku)
+                }
             }
             }
         }

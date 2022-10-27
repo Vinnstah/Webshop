@@ -40,7 +40,9 @@ public extension Favorites {
                                             viewStore.state.searchResults,
                                         id: \.self
                                     ) { prod in
-                                        ProductCardView<Favorites>(store: store, product: prod)
+                                        ProductCardView<Favorites>(store: store, product: prod, action: {
+                                            viewStore.send(.internal(.onAppear))
+                                        })
                                             .padding(.horizontal)
                                             .onTapGesture {
                                                 viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)

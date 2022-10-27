@@ -18,6 +18,7 @@ public extension Favorites {
         public var isProductDetailSheetPresented: Bool
         public var productDetailView: Product?
         public var quantity: Int
+        public var favoriteProducts: [String]
         
         public init(
             productList: [Product] = [],
@@ -25,7 +26,8 @@ public extension Favorites {
             searchResults: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
             productDetailView: Product? = nil,
-            quantity: Int = 1
+            quantity: Int = 1,
+            favoriteProducts: [String] = []
         ) {
             self.productList = productList
             self.searchText = searchText
@@ -33,6 +35,7 @@ public extension Favorites {
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
             self.productDetailView = productDetailView
             self.quantity = quantity
+            self.favoriteProducts = favoriteProducts
         }
     }
     
@@ -66,6 +69,8 @@ public extension Favorites {
                                 as: ResultPayload<[Product]>.self).value.status.get()
                         }
                     )))
+                    
+//                    await
                 }
                 
             case let .internal(.getProductResponse(.success(products))):

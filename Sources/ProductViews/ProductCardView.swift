@@ -13,13 +13,16 @@ import ProductModel
 public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: Equatable {
     public let store: StoreOf<T>
     public let product: Product
+    public let action: () -> Void
     
     public init(
         store: StoreOf<T>,
-        product: Product
+        product: Product,
+        action: @escaping () -> Void
     ) {
         self.store = store
         self.product = product
+        self.action = action
     }
     
     public var body: some SwiftUI.View {
@@ -35,6 +38,7 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                         .padding()
+                    favoriteButton(action: action)
                 }
             }
             .frame(width: 200, height: 250)
@@ -63,3 +67,14 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
         }
     }
     
+@ViewBuilder
+func favoriteButton(action: @escaping () -> Void) -> some View {
+    Button(action: {
+        action()
+    }, label: {
+        Image(systemName: "heart")
+            .clipShape(Circle())
+            .frame(width: 50, height: 50)
+    })
+}
+

@@ -55,8 +55,20 @@ public extension UserDefaultsClient {
         await setArray(skus, favoriteKey)
     }
     
-    func getFavoriteProducts() async -> [String] {
+    func getFavoriteProducts() async -> [String?] {
         await stringForArrayKey(favoriteKey)
+    }
+    
+    func removeFavoriteProduct(_ sku: String, favoriteProducts: [String?]) async {
+        await remove(favoriteKey)
+        
+        let modifiedArrayOfFavorites = favoriteProducts.filter( { $0 != sku } )
+        print(modifiedArrayOfFavorites)
+        for prod in modifiedArrayOfFavorites {
+            print(prod)
+            await setFavoriteProduct(prod!)
+        }
+           
     }
  
     

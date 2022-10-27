@@ -4,7 +4,7 @@ import SwiftUI
 import ComposableArchitecture
 import UserModel
 import HomeFeature
-import ProductsFeature
+import FavoriteFeature
 import CheckoutFeature
 
 public extension Main {

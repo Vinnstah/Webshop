@@ -14,15 +14,18 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
     public let store: StoreOf<T>
     public let product: Product
     public let action: () -> Void
+    public let isFavorite: () -> Bool
     
     public init(
         store: StoreOf<T>,
         product: Product,
-        action: @escaping () -> Void
+        action: @escaping () -> Void,
+        isFavorite: @escaping () -> Bool
     ) {
         self.store = store
         self.product = product
         self.action = action
+        self.isFavorite = isFavorite
     }
     
     public var body: some SwiftUI.View {
@@ -38,7 +41,7 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                         .padding()
-                    favoriteButton(action: action)
+                    favoriteButton(action: action, isFavorite: isFavorite)
                 }
             }
             .frame(width: 200, height: 250)
@@ -68,11 +71,11 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
     }
     
 @ViewBuilder
-func favoriteButton(action: @escaping () -> Void) -> some View {
+func favoriteButton(action: @escaping () -> Void, isFavorite: @escaping () -> Bool) -> some View {
     Button(action: {
         action()
     }, label: {
-        Image(systemName: "heart")
+        Image(systemName: isFavorite() ? "heart.fill" : "heart")
             .clipShape(Circle())
             .frame(width: 50, height: 50)
     })

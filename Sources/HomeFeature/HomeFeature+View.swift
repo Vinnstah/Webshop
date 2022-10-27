@@ -47,12 +47,15 @@ public extension Home {
                                                 viewStore.state.searchResults,
                                             id: \.self
                                         )  { prod in
-                                            ProductCardView<Home>(store: store, product: prod, action: ({
+                                            ProductCardView<Home>(store: store, product: prod, action: {
                                                 viewStore.send(.internal(.favoriteButtonClicked(prod)))
-                                            }))
-                                                .onTapGesture {
-                                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                                }
+                                            }, isFavorite: {
+                                                //                                                return true
+                                                viewStore.isProductDetailSheetPresented
+                                            })
+                                            .onTapGesture {
+                                                viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                            }
                                         }
                                     }
                                 }
@@ -66,12 +69,15 @@ public extension Home {
                                                 viewStore.state.searchResults,
                                             id: \.self
                                         )  { prod in
-                                                ProductCardView<Home>(store: store, product: prod, action: ({
-                                                    viewStore.send(.internal(.favoriteButtonClicked(prod)))
-                                                }))
-                                                    .onTapGesture {
-                                                        viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                                    }
+                                            ProductCardView<Home>(store: store, product: prod, action: {
+                                                viewStore.send(.internal(.favoriteButtonClicked(prod)))
+                                            },  isFavorite: {
+                                                //                                                return true
+                                                viewStore.isProductDetailSheetPresented
+                                            })
+                                            .onTapGesture {
+                                                viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                            }
                                         }
                                     }
                                     

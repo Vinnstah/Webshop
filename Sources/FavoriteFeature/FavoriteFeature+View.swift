@@ -41,7 +41,9 @@ public extension Favorites {
                                         id: \.self
                                     ) { prod in
                                         ProductCardView<Favorites>(store: store, product: prod, action: {
-                                            viewStore.send(.internal(.onAppear))
+                                            viewStore.send(.internal(.favoriteButtonClicked(prod)))
+                                        }, isFavorite: {
+                                            viewStore.favoriteProducts.sku.contains(prod.sku)
                                         })
                                             .padding(.horizontal)
                                             .onTapGesture {

@@ -2,7 +2,7 @@ import Foundation
 import ComposableArchitecture
 import SwiftUI
 import HomeFeature
-import ProductsFeature
+import FavoriteFeature
 import CheckoutFeature
 import CartModel
 import ApiClient
@@ -116,7 +116,8 @@ public extension Main {
                 }
                 
                 guard state.cart.session != nil else {
-                    return .run { [apiClient, cart = state.cart] send in
+                    return .run {
+                        [apiClient, cart = state.cart] send in
                         await send(.internal(.addOrUpdateCartSession(
                             TaskResult {
                                 try await apiClient.decodedResponse(
@@ -124,14 +125,10 @@ public extension Main {
                                     as: ResultPayload<String>.self
                                 ).value.status.get()
                             }
-                        )
-                        )
-                        )
+                        )))
                     }
                 }
                 
-                
-                print("SESSION UPDATED")
                 return .run { [apiClient, id = state.cart.id] send in
                     await send(.internal(.getProductsFromCartSession(
                         TaskResult {
@@ -189,12 +186,12 @@ public extension Main {
         ) {
             Home()
         }
-//        .ifLet(
-//            \State.favorites,
-//             action: /Action.favorites
-//        ) {
-//            Favorites()
-//        }
+        .ifLet(
+            \State.favorites,
+             action: /Action.favorites
+        ) {
+            Favorites()
+        }
         .ifLet(
             \State.checkout,
              action: /Action.checkout

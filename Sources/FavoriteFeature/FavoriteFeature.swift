@@ -3,10 +3,12 @@ import ComposableArchitecture
 import ProductModel
 import ApiClient
 import SiteRouter
+import UserDefaultsClient
 
 //TODO: Remove entire feature and replace with favorites
-public struct Favorites: ReducerProtocol {
+public struct Favorites: ReducerProtocol, Sendable {
     @Dependency(\.apiClient) var apiClient
+    @Dependency(\.userDefaultsClient) var userDefaultsClient
     public init() {}
 }
 
@@ -18,7 +20,7 @@ public extension Favorites {
         public var isProductDetailSheetPresented: Bool
         public var productDetailView: Product?
         public var quantity: Int
-        public var favoriteProducts: [String]
+        public var favoriteProducts: FavoriteProducts
         
         public init(
             productList: [Product] = [],
@@ -27,7 +29,7 @@ public extension Favorites {
             isProductDetailSheetPresented: Bool = false,
             productDetailView: Product? = nil,
             quantity: Int = 1,
-            favoriteProducts: [String] = []
+            favoriteProducts: FavoriteProducts = .init()
         ) {
             self.productList = productList
             self.searchText = searchText
@@ -53,6 +55,8 @@ public extension Favorites {
             case searchTextReceivesInput(String)
             case showProductDetailViewFor(Product)
             case toggleSheet
+            case loadFavoriteProducts([String?])
+            case favoriteButtonClicked(Product)
         }
     }
     
@@ -70,11 +74,22 @@ public extension Favorites {
                         }
                     )))
                     
-//                    await
                 }
                 
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
+                return .run { send in
+                    await send(.internal(.loadFavoriteProducts(await userDefaultsClient.getFavoriteProducts())))
+                    
+                }
+                
+            case let .internal(.loadFavoriteProducts(products)):
+                guard !products.isEmpty else {
+                        return .none
+                    }
+                    
+                state.favoriteProducts.sku = products
+                state.productList = state.productList.filter { state.favoriteProducts.sku.contains($0.sku) }
                 return .none
                 
             case let .internal(.getProductResponse(.failure(error))):
@@ -94,6 +109,22 @@ public extension Favorites {
             case .internal(.toggleSheet):
                 state.isProductDetailSheetPresented.toggle()
                 return .none
+                
+            case let .internal(.favoriteButtonClicked(product)):
+                
+                if state.favoriteProducts.sku.contains(product.sku) {
+                    print("REMOVE PRODUCT")
+                    return .run { [userDefaultsClient, favoriteProducts = state.favoriteProducts.sku] send in
+                        await userDefaultsClient.removeFavoriteProduct(product.sku, favoriteProducts: favoriteProducts)
+                        await send(.internal(.onAppear))
+                    }
+                }
+                
+                return .none
+//                print("DONT REMOVE PRODUCT")
+//                return .run { [userDefaultsClient] send in
+//                    await userDefaultsClient.setFavoriteProduct(product.sku)
+//                }
                 
             case .delegate(_):
                 return .none

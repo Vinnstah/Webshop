@@ -128,18 +128,22 @@ public extension Home {
                 state.isProductDetailSheetPresented.toggle()
                 return .none
                 
-            case .delegate(_):
-                return .none
             case .internal(.increaseQuantityButtonPressed):
                 state.quantity += 1
                 return .none
+                
             case .internal(.decreaseQuantityButtonPressed):
                 state.quantity -= 1
                 return .none
+                
             case let .internal(.favoriteButtonClicked(product)):
                 return .run { [userDefaultsClient] send in
                     await userDefaultsClient.setFavoriteProduct(product.sku)
                 }
+                
+            case .delegate(_):
+                return .none
+                
             }
             }
         }

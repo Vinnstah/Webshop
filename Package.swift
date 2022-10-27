@@ -43,8 +43,8 @@ let package = Package(
             name: "OnboardingFeature",
             targets: ["OnboardingFeature"]),
         .library(
-            name: "ProductsFeature",
-            targets: ["ProductsFeature"]),
+            name: "FavoriteFeature",
+            targets: ["FavoriteFeature"]),
         .library(
             name: "ProductModel",
             targets: ["ProductModel"]),
@@ -134,6 +134,21 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "FavoriteFeature",
+            dependencies: [
+                "ApiClient",
+                "CartModel",
+                "ProductModel",
+                "ProductViews",
+                "StyleGuide",
+                "SiteRouter",
+                "UserDefaultsClient",
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "HomeFeature",
             dependencies: [
                 "ApiClient",
@@ -155,7 +170,7 @@ let package = Package(
                     "CheckoutFeature",
                     "HomeFeature",
                     "SiteRouter",
-                    "ProductsFeature",
+                    "FavoriteFeature",
                     "ProductModel",
                     tca,
                 ],
@@ -183,20 +198,6 @@ let package = Package(
         
             .executableTarget(name: "runner", dependencies: [.target(name: "Server")]),
         
-            .target(
-                name: "ProductsFeature",
-                dependencies: [
-                    "ApiClient",
-                    "CartModel",
-                    "ProductModel",
-                    "ProductViews",
-                    "StyleGuide",
-                    "SiteRouter",
-                    "UserModel",
-                    tca,
-                ],
-                swiftSettings: swiftSettings
-            ),
         .target(
             name: "ProductModel",
             dependencies: [

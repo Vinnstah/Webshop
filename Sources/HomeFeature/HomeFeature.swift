@@ -93,7 +93,8 @@ public extension Home {
                         TaskResult {
                             try await apiClient.decodedResponse(
                                 for: .getCategories,
-                                as: ResultPayload<[ProductModel.Category]>.self).value.status.get()
+                                as: ResultPayload<[ProductModel.Category]>.self
+                            ).value.status.get()
                         }
                     )))
                 }

@@ -5,7 +5,6 @@ import ApiClient
 import SiteRouter
 import UserDefaultsClient
 
-//TODO: Remove entire feature and replace with favorites
 public struct Favorites: ReducerProtocol, Sendable {
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -121,10 +120,6 @@ public extension Favorites {
                 }
                 
                 return .none
-//                print("DONT REMOVE PRODUCT")
-//                return .run { [userDefaultsClient] send in
-//                    await userDefaultsClient.setFavoriteProduct(product.sku)
-//                }
                 
             case .delegate(_):
                 return .none

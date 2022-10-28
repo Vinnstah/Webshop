@@ -1,8 +1,9 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-27.
-//
+import XCTest
+@testable import HomeFeature
 
-import Foundation
+@MainActor
+final class HomeFeatureTests: XCTestCase {
+    func testTrivial() throws {
+        XCTAssert(true)
+    }
+}

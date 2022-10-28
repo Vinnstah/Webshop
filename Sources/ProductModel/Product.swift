@@ -5,6 +5,7 @@ import NIOCore
 import SwiftUI
 import ComposableArchitecture
 import StyleGuide
+import Tagged
 
 extension URL: @unchecked Sendable {}
 
@@ -32,7 +33,7 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Com
     public let price: Int
     public let category: String
     public let subCategory: String
-    public let sku: String
+    public let sku: Product.SKU
     
     public init(id: Int,
                 title: String,
@@ -41,7 +42,7 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Com
                 price: Int,
                 category: String,
                 subCategory: String,
-                sku: String
+                sku: Product.SKU
     ) {
         self.id = id
         self.title = title
@@ -63,10 +64,12 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Com
         case sku
         case id
     }
-    
-   
 }
 
+public extension Product {
+    struct SKUtag: Sendable, Codable {}
+    typealias SKU = Tagged<SKUtag, String>
+}
 
 
 

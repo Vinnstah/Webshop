@@ -1,14 +1,10 @@
 import Foundation
 
-public struct FavoriteProducts: Equatable, Sendable {
+public struct FavoriteProducts: Equatable, Sendable, Codable {
     
-    public var sku: [String?]
+    public var sku: [Product.SKU]
     
-    public init(sku: [String?] = [nil]) {
+    public init(sku: [Product.SKU] = []) {
         self.sku = sku
-    }
-    
-    public mutating func addFavoriteProducts(products: [String]) {
-        self.sku = products
     }
 }

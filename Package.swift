@@ -9,6 +9,8 @@ let vapor: Target.Dependency = .product(name: "Vapor", package: "vapor")
 let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "vapor-routing")
 let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift-url-routing")
 
+let tagged: Target.Dependency = .product(name: "Tagged", package: "swift-tagged")
+
 var swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
         "-Xfrontend", "-warn-concurrency",
@@ -33,6 +35,9 @@ let package = Package(
         .library(
             name: "CartModel",
             targets: ["CartModel"]),
+        .library(
+            name: "FavoritesClient",
+            targets: ["FavoritesClient"]),
         .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
@@ -87,6 +92,7 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.66.1"),
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
+        .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.3.1"),
     ],
     targets: [
@@ -134,6 +140,15 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "FavoritesClient",
+            dependencies: [
+                tca,
+                "ProductModel",
+                "UserDefaultsClient",
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "FavoriteFeature",
             dependencies: [
                 "ApiClient",
@@ -161,6 +176,9 @@ let package = Package(
             ],
             swiftSettings: swiftSettings
         ),
+        .testTarget(
+            name: "HomeFeatureTests",
+            dependencies: ["HomeFeature"]),
         
             .target(
                 name: "MainFeature",
@@ -203,6 +221,7 @@ let package = Package(
             dependencies: [
                 "StyleGuide",
                 postgres,
+                tagged,
                 tca,
             ],
             swiftSettings: swiftSettings
@@ -309,6 +328,7 @@ let package = Package(
             .target(
                 name: "UserDefaultsClient",
                 dependencies: [
+                    "ProductModel",
                     "UserModel",
                     tca,
                 ],

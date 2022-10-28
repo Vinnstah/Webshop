@@ -15,7 +15,7 @@ extension UserDefaultsClient {
             integerForKey: { userDefaults().integer(forKey: $0) },
             stringForKey: { userDefaults().string(forKey: $0) ?? "" },
             jwtForKey: { userDefaults().string(forKey: $0) ?? "" },
-            stringForArrayKey: { userDefaults().stringArray(forKey: $0) ?? [""]},
+            stringForArrayKey: { userDefaults().stringArray(forKey: $0) },
             remove: { userDefaults().removeObject(forKey: $0) },
             setBool: { userDefaults().set($0, forKey: $1) },
             setData: { userDefaults().set($0, forKey: $1) },

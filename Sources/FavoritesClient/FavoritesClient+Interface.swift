@@ -3,7 +3,16 @@ import UserDefaultsClient
 import ProductModel
 
 public struct FavoritesClient: Sendable {
-    public typealias AddFavorite = @Sendable (Product.SKU) -> Product.SKU?
+    
+    public struct Favourites: Codable {
+        var favourites: [Product.SKU]
+        
+        public init(favourites: [Product.SKU]) {
+            self.favourites = favourites
+        }
+    }
+    
+    public typealias AddFavorite = @Sendable (Product.SKU) throws -> Product.SKU?
     
     public var addFavorite: AddFavorite
     
@@ -12,6 +21,8 @@ public struct FavoritesClient: Sendable {
     ) {
         self.addFavorite = addFavorite
     }
+    
+    
     
 }
 

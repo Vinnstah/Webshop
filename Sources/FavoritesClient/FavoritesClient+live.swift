@@ -4,55 +4,34 @@ import UserDefaultsClient
 import ComposableArchitecture
 import ProductModel
 
-fileprivate let jsonDecoder = JSONDecoder()
-fileprivate let jsonEncoder = JSONEncoder()
 
 public extension FavoritesClient {
     
     static let live: Self = {
+        let userDefaults = UserDefaults()
         
-        @Dependency(\.userDefaultsClient) var userDefaultsClient
+        let favouritesKey = "favouritesKey"
         
-        struct ConverterHelper: Codable {
-            public var data: Data?
-            public var sku: [Product.SKU]
-            public var decodedData: [Product.SKU]
-            public var skuKey: String
-            
-            public init(
-                data: Data? = nil,
-                sku: [Product.SKU] = [],
-                decodedData: [Product.SKU] = [],
-                skuKey: String = "skuKey"
-            ) {
-                self.data = data
-                self.sku = sku
-                self.decodedData = decodedData
-                self.skuKey = skuKey
-            }
-            
-            mutating func decodeData() {
-                self.decodedData = try! jsonDecoder.decode([Product.SKU].self, from: self.data!)
-            }
-            
-            mutating func encodeData() {
-                self.data = try! jsonEncoder.encode(self.sku)
-            }
+        func mutatingFavourites(_ mutate: (inout [Product.SKU]) throws -> Product.SKU?) throws -> Product.SKU? {
+            var favorites: [Product.SKU] = []
+            let mutatedArray = try mutate(&favorites)
+            let encoded = try JSONEncoder().encode(mutatedArray)
+            userDefaults.set(encoded, forKey: favouritesKey)
+            return favorites.first
         }
         
-        return Self.init(addFavorite: { sku in
-            let userDefaults = UserDefaults()
-            var helper = ConverterHelper()
-            
-            helper.data = userDefaults.object(forKey: helper.skuKey) as? Data
-            helper.decodeData()
-            
-            helper.decodedData.append(sku)
-            
-            helper.encodeData()
-            userDefaults.set(helper.data, forKey: helper.skuKey)
-            
+        let addFavourite: (Product.SKU?) throws -> Product.SKU? = { sku in
+            return try mutatingFavourites { favourites in
+                var existingData: Data? = userDefaults.data(forKey: favouritesKey)
+                var favourites = try existingData.map { try JSONDecoder().decode(Favourites.self, from: $0) } ?? Favourites.init(favourites: [])
+                guard !(favourites.favourites.contains(where: { $0 ==  sku }) ) else { return Product.SKU.init(rawValue: "") }
+                favourites.favourites.append(sku ?? .init(rawValue: "TEST"))
+                return sku
+            }
             return sku
-        })
+        }
+        
+        return Self.init(addFavorite: addFavourite)
+        
     }()
 }

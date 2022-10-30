@@ -13,18 +13,21 @@ public struct FavoritesClient: Sendable {
     }
     
     public typealias AddFavorite = @Sendable (Product.SKU) throws -> Product.SKU?
+    public typealias RemoveFavorite = @Sendable (Product.SKU) throws -> Product.SKU?
     
     public var addFavorite: AddFavorite
+    public var removeFavorite: RemoveFavorite
     
     public init(
-        addFavorite: @escaping AddFavorite
+        addFavorite: @escaping AddFavorite,
+        removeFavorite: @escaping RemoveFavorite
     ) {
         self.addFavorite = addFavorite
+        self.removeFavorite = removeFavorite
     }
     
     
     
 }
 
-private let keyForData: String = "dataKey"
 

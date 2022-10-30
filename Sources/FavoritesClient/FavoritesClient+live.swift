@@ -12,26 +12,48 @@ public extension FavoritesClient {
         
         let favouritesKey = "favouritesKey"
         
-        func mutatingFavourites(_ mutate: (inout [Product.SKU]) throws -> Product.SKU?) throws -> Product.SKU? {
-            var favorites: [Product.SKU] = []
-            let mutatedArray = try mutate(&favorites)
-            let encoded = try JSONEncoder().encode(mutatedArray)
-            userDefaults.set(encoded, forKey: favouritesKey)
-            return favorites.first
-        }
-        
-        let addFavourite: (Product.SKU?) throws -> Product.SKU? = { sku in
-            return try mutatingFavourites { favourites in
-                var existingData: Data? = userDefaults.data(forKey: favouritesKey)
-                var favourites = try existingData.map { try JSONDecoder().decode(Favourites.self, from: $0) } ?? Favourites.init(favourites: [])
-                guard !(favourites.favourites.contains(where: { $0 ==  sku }) ) else { return Product.SKU.init(rawValue: "") }
-                favourites.favourites.append(sku ?? .init(rawValue: "TEST"))
-                return sku
+        @Sendable func mutatingFavourites(_ mutate: ( inout [Product.SKU]) throws -> Void) throws -> Product.SKU? {
+            var currentUserDefaultsData: Data? = userDefaults.data(forKey: favouritesKey)
+            
+            guard let currentUserDefaultsData else {
+                var favourites: Favourites = .init(favourites: [])
+                try mutate(&favourites.favourites)
+                
+                let encodedFavourites = try JSONEncoder().encode(favourites)
+                userDefaults.set(encodedFavourites, forKey: favouritesKey)
+                
+                return favourites.favourites.first
             }
-            return sku
+            
+            var decodedData = try JSONDecoder().decode(Favourites.self, from: currentUserDefaultsData)
+            var favourites = decodedData
+            try mutate(&favourites.favourites)
+            
+            guard !decodedData.favourites.contains(where: {
+                sku in
+                favourites.favourites.first(where: { $0 == sku }) == sku
+            } ) else {
+                return nil
+            }
+            let encodedFavourites = try JSONEncoder().encode(favourites)
+            userDefaults.set(encodedFavourites, forKey: favouritesKey)
+            
+            return favourites.favourites.filter { !decodedData.favourites.contains($0)}.first
+            
         }
         
-        return Self.init(addFavorite: addFavourite)
         
+        return Self.init(addFavorite: { sku in
+            try mutatingFavourites { favourites in
+                favourites.append(sku)
+            }
+        },
+                         removeFavorite: { sku in
+            try mutatingFavourites { favourites in
+                favourites.removeAll(where: { $0 == sku })
+            }
+            
+        }
+        )
     }()
 }

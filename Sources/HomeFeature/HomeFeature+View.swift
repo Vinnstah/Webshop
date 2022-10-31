@@ -72,7 +72,6 @@ public extension Home {
                                             ProductCardView<Home>(store: store, product: prod, action: {
                                                 viewStore.send(.internal(.favoriteButtonClicked(prod)))
                                             },  isFavorite: {
-                                                //                                                return true
                                                 viewStore.isProductDetailSheetPresented
                                             })
                                             .onTapGesture {
@@ -108,17 +107,17 @@ public extension Home {
                             get: \.isProductDetailSheetPresented,
                             send: .internal(.toggleSheet))
                 ) {
-                    
-                    DetailView(
-                        product: viewStore.state.product!,
-                        buttonAction: {
-                            viewStore.send(.delegate(.addProductToCart(quantity: viewStore.state.quantity, product: viewStore.state.product!)
-                                                    ))
-                        },
-                        increaseQuantityAction: { viewStore.send(.internal(.increaseQuantityButtonPressed)) },
-                        decreaseQuantityAction: { viewStore.send(.internal(.decreaseQuantityButtonPressed)) },
-                        quantity: viewStore.state.quantity
-                    )
+                    DetailView(store: store)
+//                    DetailView(
+//                        product: viewStore.state.product!,
+//                        buttonAction: {
+//                            viewStore.send(.delegate(.addProductToCart(quantity: viewStore.state.quantity, product: viewStore.state.product!)
+//                                                    ))
+//                        },
+//                        increaseQuantityAction: { viewStore.send(.internal(.increaseQuantityButtonPressed)) },
+//                        decreaseQuantityAction: { viewStore.send(.internal(.decreaseQuantityButtonPressed)) },
+//                        quantity: viewStore.state.quantity
+//                    )
                 }
             }
         }

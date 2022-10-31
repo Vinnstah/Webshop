@@ -25,6 +25,7 @@ public extension Home {
         public var quantity: Int
         public var searchText: String
         public var searchResults: [Product]
+        public var favoriteProducts: FavoriteProducts
         
         
         public init(
@@ -35,7 +36,8 @@ public extension Home {
             cart: Cart? = nil,
             quantity: Int = 0,
             searchText: String = "",
-            searchResults: [Product] = []
+            searchResults: [Product] = [],
+            favoriteProducts: FavoriteProducts = .init()
         ) {
             self.productList = productList
             self.isProductDetailSheetPresented = isProductDetailSheetPresented
@@ -45,6 +47,7 @@ public extension Home {
             self.quantity = quantity
             self.searchText = searchText
             self.searchResults = searchResults
+            self.favoriteProducts = favoriteProducts
         }
     }
     
@@ -68,6 +71,7 @@ public extension Home {
             case decreaseQuantityButtonPressed
             case searchTextReceivesInput(String)
             case favoriteButtonClicked(Product)
+            case loadFavoriteProducts([Product.SKU]?)
         }
     }
     
@@ -99,7 +103,17 @@ public extension Home {
                             ).value.status.get()
                         }
                     )))
+                    
+                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 }
+                
+            case let .internal(.loadFavoriteProducts(products)):
+                guard let products else {
+                        return .none
+                    }
+                    
+                state.favoriteProducts.sku = products
+                return .none
                 
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
@@ -136,10 +150,19 @@ public extension Home {
                 return .none
                 
             case .internal(.decreaseQuantityButtonPressed):
+                guard state.quantity != 0 else {
+                    return .none
+                }
                 state.quantity -= 1
                 return .none
                 
             case let .internal(.favoriteButtonClicked(product)):
+                
+                if state.favoriteProducts.sku.contains(product.sku) {
+                    return .run { send in
+                        try favouritesClient.removeFavorite(product.sku)
+                    }
+                }
                 return .run { send in
                     try favouritesClient.addFavorite(product.sku)
                 }

@@ -79,7 +79,6 @@ public extension Favorites {
                 state.productList = products
                 return .run { send in
                     await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
-                    
                 }
                 
             case let .internal(.loadFavoriteProducts(products)):
@@ -114,7 +113,6 @@ public extension Favorites {
                 if state.favoriteProducts.sku.contains(product.sku) {
                     return .run { send in
                         try favouritesClient.removeFavorite(product.sku)
-//                        await userDefaultsClient.removeFavoriteProduct(product.sku, favoriteProducts: favoriteProducts)
                     }
                 }
                 

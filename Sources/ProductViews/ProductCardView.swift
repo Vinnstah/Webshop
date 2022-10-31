@@ -51,13 +51,14 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
 
     
     @ViewBuilder
-     func getImage(imageURL: String) -> some View {
+     public func getImage(imageURL: String) -> some View {
         AsyncImage(url: URL(string: imageURL)) { maybeImage in
             if let image = maybeImage.image {
                 image
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 150, height: 150)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 400)
+                    .ignoresSafeArea()
                 
             } else if maybeImage.error != nil {
                 Text("No image available")
@@ -65,19 +66,23 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
             } else {
                 Image(systemName: "photo")
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 400)
             }
         }
     }
     
 @ViewBuilder
-func favoriteButton(action: @escaping () -> Void, isFavorite: @escaping () -> Bool) -> some View {
+public func favoriteButton(action: @escaping () -> Void, isFavorite: @escaping () -> Bool) -> some View {
     Button(action: {
         action()
     }, label: {
         Image(systemName: isFavorite() ? "heart.fill" : "heart")
-            .clipShape(Circle())
+            .foregroundColor(.red)
+            .background(Color(.white))
             .frame(width: 50, height: 50)
     })
+    .clipShape(Circle())
 }
 

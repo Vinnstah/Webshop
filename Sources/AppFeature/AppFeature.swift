@@ -31,7 +31,7 @@ public extension App {
         
         
         public enum InternalAction: Equatable, Sendable {
-            case userIsLoggedIn(JWT)
+            case logInUser(String)
         }
     }
     
@@ -41,7 +41,6 @@ public extension App {
         Reduce { state, action in
             switch action {
                 
-                /// If user is logged in we receive action from splash delegate and then send action to userDefaults to get the logged in user's JWT.
             case let .splash(.delegate(.loadIsLoggedInResult(jwt))):
                 guard let jwt else {
                     state = .onboarding(.init(signIn: .init()))
@@ -50,16 +49,15 @@ public extension App {
                 
                 return .run { send in
                     await send(
-                        .internal(.userIsLoggedIn(jwt)
-                                 )
+                        .internal(.logInUser(jwt))
                     )
                 }
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
-            case let .internal(.userIsLoggedIn(jwt)):
-                state = .main(.init())
+            case let .internal(.logInUser(jwt)):
+                state = .main(.init(cart: .init(id: UUID().uuidString, userJWT: jwt)))
                 return .none
-                
+                 
                 ///When a user logs out from `main` we initialize onboarding again.
             case .main((.delegate(.userIsLoggedOut))):
                 state = .onboarding(.init(signIn: .init()))
@@ -67,12 +65,12 @@ public extension App {
                 
                 ///After a user have finished onboarding and received the jwt we will send them through to `main`
             case let .onboarding(.delegate(.userFinishedOnboarding(jwt))):
-                state = .main(.init())
+                state = .main(.init(cart: .init(id: UUID().uuidString, userJWT: jwt)))
                 return .none
                
                 ///When a user logs in through onboarding we change state to `main` and send their jwt through.
             case let .onboarding(.delegate(.userLoggedIn(jwt))):
-                state = .main(.init())
+                state = .main(.init(cart: .init(id: UUID().uuidString, userJWT: jwt)))
                 return .none
                 
             case .splash(.internal(_)):
@@ -98,6 +96,10 @@ public extension App {
             case .main(.home(.internal(_))):
                 return .none
             case .main(.home(.delegate(_))):
+                return .none
+            case .main(.favorites(_)):
+                return .none
+            case .main(.checkout(_)):
                 return .none
             }
         }

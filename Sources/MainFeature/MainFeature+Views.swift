@@ -4,6 +4,8 @@ import SwiftUI
 import ComposableArchitecture
 import UserModel
 import HomeFeature
+import FavoriteFeature
+import CheckoutFeature
 
 public extension Main {
     struct View: SwiftUI.View {
@@ -16,14 +18,46 @@ public extension Main {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: \.selectedTab) { viewStore in
-                TabView(selection: viewStore.binding(send: Main.Action.internal(.tabSelected))
-                                                ) {
-                                                    Home.View(
-                                                        store: self.store.scope(state: \.home, action: Main.Action.home)
-                                                    )
-                                                    .tag(Main.State.Tab.home)
-                                                }
+                VStack {
+                    
+                    TabView(selection: viewStore.binding(send: Main.Action.internal(.tabSelected))
+                    ) {
+                        Home.View(
+                            store: self.store.scope(state: \.home!, action: Main.Action.home)
+                        )
+                        .tag(Main.State.Tab.home)
+                        .tabItem {
+                            Label("Home", systemImage: "house")
+                        }
+                        
+                        Favorites.View(
+                            store: self.store.scope(state: \.favorites!, action: Main.Action.favorites)
+                        )
+                        .tag(Main.State.Tab.favorites)
+                        .tabItem {
+                            Label("Favorites", systemImage: "heart")
+                        }
+                        Checkout.View(
+                            store: self.store.scope(state: \.checkout!, action: Main.Action.checkout)
+                        )
+                        .tag(Main.State.Tab.checkout)
+                        .tabItem {
+                            Label("Checkout", systemImage: "cart")
+                        }
+                    }
+                }
+                .onAppear {
+                    viewStore.send(.internal(.onAppear))
+                }
             }
         }
     }
 }
+
+//public extension Main {
+//    
+//    @ViewBuilder
+//    func topBar(numberOfProductsInCart: Int ) -> some View {
+//        Image(systemName: "cart")
+//    }
+//}

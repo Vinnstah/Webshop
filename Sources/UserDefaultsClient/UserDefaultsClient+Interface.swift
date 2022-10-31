@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import UserModel
+import ProductModel
 
 public struct UserDefaultsClient: Sendable {
     public var boolForKey: @Sendable (String) async -> Bool
@@ -9,6 +10,7 @@ public struct UserDefaultsClient: Sendable {
     public var integerForKey: @Sendable (String) async -> Int
     public var stringForKey: @Sendable (String) async -> String
     public var jwtForKey: @Sendable (String) async -> String
+    public var stringForArrayKey: @Sendable (String) async -> [String]
     public var remove: @Sendable (String) async -> Void
     public var setBool: @Sendable (Bool, String) async -> Void
     public var setData: @Sendable (Data?, String) async -> Void
@@ -16,10 +18,12 @@ public struct UserDefaultsClient: Sendable {
     public var setInteger: @Sendable (Int, String) async -> Void
     public var setString: @Sendable (String, String) async -> Void
     public var setJWT: @Sendable (String, String) async -> Void
+    public var setArray: @Sendable ([String], String) async -> Void
 }
 
 private let currencyKey: String = "currencyKey"
 private let jwtKey: String = "jwtKey"
+private let favoriteKey: String = "favoriteKey"
 
 public extension UserDefaultsClient {
     
@@ -45,8 +49,24 @@ public extension UserDefaultsClient {
     func removeLoggedInUserJWT() async -> Void {
         await remove(jwtKey)
     }
- 
     
+    func setFavoriteProduct(_ sku: String) async {
+        var skus = await stringForArrayKey(favoriteKey)
+        skus.append(sku)
+        await setArray(skus, favoriteKey)
+    }
+    
+    func getFavoriteProducts() async -> [String] {
+        await stringForArrayKey(favoriteKey)
+    }
+    
+    func removeFavoriteProduct(_ sku: String, favoriteProducts: [String]) async {
+        await remove(favoriteKey)
+        
+        for prod in favoriteProducts where prod != sku {
+            await setFavoriteProduct(prod)
+        }
+    }
 }
 
 

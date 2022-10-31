@@ -1,13 +1,6 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-29.
-//
-
 import Foundation
 import ComposableArchitecture
-import VaporRouting
+import URLRouting
 import SiteRouter
 
 private enum ApiClientKey: DependencyKey {

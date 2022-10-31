@@ -1,7 +1,7 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-import UserModel
+import StyleGuide
 
 public extension UserLocalSettings {
     struct View: SwiftUI.View {
@@ -13,34 +13,44 @@ public extension UserLocalSettings {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
-                VStack {
-                    Text("View to fill in all information")
-                    
-                    Picker("Default Currency", selection: viewStore.binding(
-                        get: { $0.userSettings.defaultCurrency },
-                        send: { .internal(.defaultCurrencyChosen($0)) }
-                    )
-                    ) {
-                        ForEach(Currency.allCases, id: \.self) {
-                            Text($0.rawValue)
+                ForceFullScreen {
+                    VStack {
+                        Text("User Settings")
+                        Text("Currency disabled")
+//                        Picker("Default Currency", selection: viewStore.binding(
+//                            get: { $0.userSettings.defaultCurrency },
+//                            send: { .internal(.defaultCurrencyChosen($0)) }
+//                        )
+//                        ) {
+//                            ForEach(Currency.allCases, id: \.self) {
+//                                Text($0.rawValue)
+//                            }
+//                        }
+//                        .pickerStyle(.inline)
+//                        .padding()
+                        
+                        VStack {
+                            Button("Next step") {
+                                viewStore.send(.internal(.nextStep), animation: .default)
+                            }
+                            .buttonStyle(.primary(cornerRadius: 25))
+                            
+                            Button("Go Back") { viewStore.send(.internal(.previousStep), animation: .default)}
+                                .foregroundColor(Color("Secondary"))
+                                .bold()
+                                .padding()
                         }
-                    }
-                    .padding()
-                    
-                    Button("Next step") {
-                        viewStore.send(.internal(.nextStep))
-                    }
-                        Button("Previous Step") { viewStore.send(.internal(.previousStep))}
-                }
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            viewStore.send(.internal(.cancelButtonPressed))
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel") {
+                                    viewStore.send(.internal(.cancelButtonPressed))
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
+    
 }
-

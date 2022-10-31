@@ -15,13 +15,15 @@ extension UserDefaultsClient {
             integerForKey: { userDefaults().integer(forKey: $0) },
             stringForKey: { userDefaults().string(forKey: $0) ?? "" },
             jwtForKey: { userDefaults().string(forKey: $0) ?? "" },
+            stringForArrayKey: { userDefaults().stringArray(forKey: $0) ?? [] },
             remove: { userDefaults().removeObject(forKey: $0) },
             setBool: { userDefaults().set($0, forKey: $1) },
             setData: { userDefaults().set($0, forKey: $1) },
             setDouble: { userDefaults().set($0, forKey: $1) },
             setInteger: { userDefaults().set($0, forKey: $1) },
             setString: { userDefaults().set($0, forKey: $1) },
-            setJWT: { userDefaults().set($0, forKey: $1) }
+            setJWT: { userDefaults().set($0, forKey: $1) },
+            setArray: { userDefaults().set($0, forKey: $1) }
         )
     }
 }

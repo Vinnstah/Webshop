@@ -2,11 +2,14 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+
 let postgres: Target.Dependency = .product(name: "PostgresNIO", package: "postgres-nio")
 let tca: Target.Dependency = .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
 let vapor: Target.Dependency = .product(name: "Vapor", package: "vapor")
 let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "vapor-routing")
-let urlRouting: Target.Dependency = .product(name: "_URLRouting", package: "swift-parsing")
+let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift-url-routing")
+
+let tagged: Target.Dependency = .product(name: "Tagged", package: "swift-tagged")
 
 var swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
@@ -27,6 +30,15 @@ let package = Package(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
+            name: "CheckoutFeature",
+            targets: ["CheckoutFeature"]),
+        .library(
+            name: "CartModel",
+            targets: ["CartModel"]),
+        .library(
+            name: "FavoritesClient",
+            targets: ["FavoritesClient"]),
+        .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
         .library(
@@ -35,6 +47,15 @@ let package = Package(
         .library(
             name: "OnboardingFeature",
             targets: ["OnboardingFeature"]),
+        .library(
+            name: "FavoriteFeature",
+            targets: ["FavoriteFeature"]),
+        .library(
+            name: "ProductModel",
+            targets: ["ProductModel"]),
+        .library(
+            name: "ProductViews",
+            targets: ["ProductViews"]),
         .library(
             name: "SignInFeature",
             targets: ["SignInFeature"]),
@@ -50,6 +71,9 @@ let package = Package(
         .library(
             name: "SplashFeature",
             targets: ["SplashFeature"]),
+        .library(
+            name: "StyleGuide",
+            targets: ["StyleGuide"]),
         .library(
             name: "TermsAndConditionsFeature",
             targets: ["TermsAndConditionsFeature"]),
@@ -68,9 +92,8 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.66.1"),
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
-        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.10.0"),
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
+        .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.3.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -80,7 +103,7 @@ let package = Package(
             dependencies: [
                 "SiteRouter",
                 tca,
-                vaporRouting,
+                urlRouting,
             ],
             swiftSettings: swiftSettings
         ),
@@ -99,22 +122,75 @@ let package = Package(
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
+        
+            .target(
+                name: "CartModel",
+                dependencies: [
+                    "ProductModel",
+                ],
+                swiftSettings: swiftSettings
+            ),
         .target(
-            name: "HomeFeature",
+            name: "CheckoutFeature",
+            dependencies: [
+                tca,
+                "CartModel",
+                "ProductModel",
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "FavoritesClient",
+            dependencies: [
+                tca,
+                "ProductModel",
+                "UserDefaultsClient",
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "FavoriteFeature",
             dependencies: [
                 "ApiClient",
+                "CartModel",
+                "FavoritesClient",
+                "ProductModel",
+                "ProductViews",
+                "StyleGuide",
                 "SiteRouter",
-                "UserDefaultsClient",
                 "UserModel",
                 tca,
             ],
             swiftSettings: swiftSettings
         ),
+        .target(
+            name: "HomeFeature",
+            dependencies: [
+                "ApiClient",
+                "CartModel",
+                "FavoritesClient",
+                "ProductViews",
+                "SiteRouter",
+                "StyleGuide",
+                "UserDefaultsClient",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "HomeFeatureTests",
+            dependencies: ["HomeFeature"]),
         
             .target(
                 name: "MainFeature",
                 dependencies: [
+                    "ApiClient",
+                    "CartModel",
+                    "CheckoutFeature",
                     "HomeFeature",
+                    "SiteRouter",
+                    "FavoriteFeature",
+                    "ProductModel",
                     tca,
                 ],
                 swiftSettings: swiftSettings
@@ -141,9 +217,30 @@ let package = Package(
         
             .executableTarget(name: "runner", dependencies: [.target(name: "Server")]),
         
+        .target(
+            name: "ProductModel",
+            dependencies: [
+                "StyleGuide",
+                postgres,
+                tagged,
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "ProductViews",
+            dependencies: [
+                "ProductModel",
+                "StyleGuide",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
             .target(
                 name: "Server",
                 dependencies: [
+                    "CartModel",
+                    "ProductModel",
                     "SiteRouter",
                     "UserModel",
                     postgres,
@@ -157,6 +254,7 @@ let package = Package(
             .target(
                 name: "SignInFeature",
                 dependencies: [
+                    "StyleGuide",
                     "SiteRouter",
                     "ApiClient",
                     "UserDefaultsClient",
@@ -173,6 +271,7 @@ let package = Package(
         .target(
             name: "SignUpFeature",
             dependencies: [
+                "StyleGuide",
                 "UserModel",
                 tca,
             ],
@@ -181,14 +280,14 @@ let package = Package(
         .testTarget(
             name: "SignUpFeatureTests",
             dependencies: ["SignUpFeature"]),
+        
         .target(
             name: "SiteRouter",
             dependencies: [
+                "CartModel",
                 "UserModel",
                 tca,
                 urlRouting,
-                vapor,
-                vaporRouting,
             ],
             swiftSettings: swiftSettings
         ),
@@ -207,9 +306,16 @@ let package = Package(
             dependencies: ["SplashFeature"]),
         
             .target(
+                name: "StyleGuide",
+                dependencies: [
+                ],
+                swiftSettings: swiftSettings
+            ),
+            .target(
                 name: "TermsAndConditionsFeature",
                 dependencies: [
                     "SiteRouter",
+                    "StyleGuide",
                     "ApiClient",
                     "UserDefaultsClient",
                     "UserModel",
@@ -223,6 +329,7 @@ let package = Package(
             .target(
                 name: "UserDefaultsClient",
                 dependencies: [
+                    "ProductModel",
                     "UserModel",
                     tca,
                 ],
@@ -234,12 +341,15 @@ let package = Package(
         
             .target(
                 name: "UserModel",
-                dependencies: [postgres, vapor],
+                dependencies: [
+                    postgres,
+                              ],
                 swiftSettings: swiftSettings
             ),
         .target(
             name: "UserLocalSettingsFeature",
             dependencies: [
+                "StyleGuide",
                 "UserModel",
                 tca,
             ],

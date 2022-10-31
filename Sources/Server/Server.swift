@@ -3,6 +3,7 @@ import VaporRouting
 import SiteRouter
 import UserModel
 
+
 // configures your application
 public func configure(_ app: Application) throws {
     
@@ -46,8 +47,47 @@ func siteHandler(
         let products = try await getAllProducts(db)
         try await db.close()
         return ResultPayload(forAction: "getProducts", payload: products)
+        
+    case .getCategories:
+        let db = try await connectDatabase()
+        let categories = try await getAllCategories(db)
+        try await db.close()
+        return ResultPayload(forAction: "getCategories", payload: categories)
+        
+    case .getSubCategories:
+        let db = try await connectDatabase()
+        let categories = try await getAllSubCategories(db)
+        try await db.close()
+        return ResultPayload(forAction: "getSubCategories", payload: categories)
+        
+    case let .addCartSession(cart):
+        let db = try await connectDatabase()
+        try await addShoppingCartSession(db, logger: logger, cart: cart)
+        try await db.close()
+        return ResultPayload(forAction: "addCartSession", payload: "dbID")
+        
+    case let .addShoppingCartItems(cart):
+        let db = try await connectDatabase()
+        try await addShoppingCartProducts(db, logger: logger, cart: cart)
+        try await db.close()
+        return ResultPayload(forAction: "addShoppingCartItems", payload: cart.id)
+        
+    case .shoppingSessionDatabaseID:
+        let db = try await connectDatabase()
+        let sessions = try await getCartSessions(db)
+        try await db.close()
+        return ResultPayload(forAction: "shoppingSessionDatabaseID", payload: sessions)
+    
+    case let .shoppingCartSessionProducts(id):
+        print("id" + id)
+        let db = try await connectDatabase()
+        let cart = try await getShoppingCartProducts(db, logger: logger, sessionID: id)
+        try await db.close()
+        return ResultPayload(forAction: "shoppingCartSessionProducts", payload: cart)
     }
+    
     
 }
 
 
+extension ResultPayload: Content {}

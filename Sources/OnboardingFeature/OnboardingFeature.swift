@@ -145,7 +145,7 @@ public extension Onboarding {
                     await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
                 }
                 
-            case .internal(_):
+            case .internal(_):  
                 return .none
             case .delegate(_):
                 return .none

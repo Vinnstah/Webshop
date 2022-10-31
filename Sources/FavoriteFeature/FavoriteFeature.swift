@@ -4,10 +4,12 @@ import ProductModel
 import ApiClient
 import SiteRouter
 import UserDefaultsClient
+import FavoritesClient
 
 public struct Favorites: ReducerProtocol, Sendable {
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.userDefaultsClient) var userDefaultsClient
+    @Dependency(\.favouritesClient) var favouritesClient
     public init() {}
 }
 
@@ -54,7 +56,7 @@ public extension Favorites {
             case searchTextReceivesInput(String)
             case showProductDetailViewFor(Product)
             case toggleSheet
-            case loadFavoriteProducts([String?])
+            case loadFavoriteProducts([Product.SKU]?)
             case favoriteButtonClicked(Product)
         }
     }
@@ -78,12 +80,12 @@ public extension Favorites {
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
                 return .run { send in
-                    await send(.internal(.loadFavoriteProducts(await userDefaultsClient.getFavoriteProducts())))
+                    await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                     
                 }
                 
             case let .internal(.loadFavoriteProducts(products)):
-                guard !products.isEmpty else {
+                guard let products else {
                         return .none
                     }
                     
@@ -114,7 +116,8 @@ public extension Favorites {
                 if state.favoriteProducts.sku.contains(product.sku) {
                     print("REMOVE PRODUCT")
                     return .run { [userDefaultsClient, favoriteProducts = state.favoriteProducts.sku] send in
-                        await userDefaultsClient.removeFavoriteProduct(product.sku, favoriteProducts: favoriteProducts)
+                        try favouritesClient.removeFavorite(product.sku)
+//                        await userDefaultsClient.removeFavoriteProduct(product.sku, favoriteProducts: favoriteProducts)
                         await send(.internal(.onAppear))
                     }
                 }

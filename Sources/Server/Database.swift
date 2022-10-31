@@ -171,7 +171,7 @@ public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, ca
         sessionProdId = "\(cart.id)"  + "_" + "\(product.key.id)"
         try await db.query("""
                             INSERT INTO shopping_cart_items
-                            VALUES(\(sessionProdId) ,\(cart.id), \(product.key.id), \(product.value), \(product.key.price), \(product.key.sku))
+                            VALUES(\(sessionProdId) ,\(cart.id), \(product.key.id), \(product.value), \(product.key.price), \(product.key.sku.rawValue))
                             ON CONFLICT (session_prod_id)
                             DO
                             UPDATE SET quantity = \(product.value)
@@ -210,7 +210,7 @@ public func returnProductRowsAsCart(_ rows: PostgresRowSequence, id: String) asy
             price: try randomRow["price"].decode(Int.self, context: .default),
             category: try randomRow["category"].decode(String.self, context: .default),
             subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
-            sku: try randomRow["sku"].decode(String.self, context: .default))
+            sku: Product.SKU(rawValue: try randomRow["sku"].decode(String.self, context: .default)))
         print(randomRow)
         print(product)
         cart.addItemToCart(product: product, quantity: try randomRow["quantity"].decode(Int.self, context: .default))
@@ -232,7 +232,7 @@ public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -
             price: try randomRow["price"].decode(Int.self, context: .default),
             category: try randomRow["category"].decode(String.self, context: .default),
             subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
-            sku: try randomRow["sku"].decode(String.self, context: .default))
+            sku: Product.SKU(rawValue: try randomRow["sku"].decode(String.self, context: .default)))
         products.append(product)
 
     }

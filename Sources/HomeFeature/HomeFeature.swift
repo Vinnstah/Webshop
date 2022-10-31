@@ -6,10 +6,12 @@ import UserDefaultsClient
 import ApiClient
 import SiteRouter
 import CartModel
+import FavoritesClient
 
 public struct Home: ReducerProtocol {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.apiClient) var apiClient
+    @Dependency(\.favouritesClient) var favouritesClient
     public init() {}
 }
 
@@ -139,7 +141,8 @@ public extension Home {
                 
             case let .internal(.favoriteButtonClicked(product)):
                 return .run { [userDefaultsClient] send in
-                    await userDefaultsClient.setFavoriteProduct(product.sku)
+//                    await userDefaultsClient.setFavoriteProduct(product.sku)
+                    try favouritesClient.addFavorite(product.sku)
                 }
                 
             case .delegate(_):

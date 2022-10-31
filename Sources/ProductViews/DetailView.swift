@@ -41,7 +41,7 @@ public struct DetailView: SwiftUI.View {
                         .font(.body)
                     Text(product.subCategory)
                         .font(.footnote)
-                    Text(product.sku)
+                    Text(product.sku.rawValue)
                         .font(.footnote)
                 }
                 Text(product.description)

@@ -153,6 +153,7 @@ let package = Package(
             dependencies: [
                 "ApiClient",
                 "CartModel",
+                "FavoritesClient",
                 "ProductModel",
                 "ProductViews",
                 "StyleGuide",
@@ -168,6 +169,7 @@ let package = Package(
             dependencies: [
                 "ApiClient",
                 "CartModel",
+                "FavoritesClient",
                 "ProductViews",
                 "SiteRouter",
                 "StyleGuide",

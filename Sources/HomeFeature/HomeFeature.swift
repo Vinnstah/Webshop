@@ -8,7 +8,7 @@ import SiteRouter
 import CartModel
 import FavoritesClient
 
-public struct Home: ReducerProtocol {
+public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.favouritesClient) var favouritesClient
@@ -140,8 +140,7 @@ public extension Home {
                 return .none
                 
             case let .internal(.favoriteButtonClicked(product)):
-                return .run { [userDefaultsClient] send in
-//                    await userDefaultsClient.setFavoriteProduct(product.sku)
+                return .run { send in
                     try favouritesClient.addFavorite(product.sku)
                 }
                 

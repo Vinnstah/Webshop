@@ -158,7 +158,6 @@ let package = Package(
                 "ProductViews",
                 "StyleGuide",
                 "SiteRouter",
-                "UserDefaultsClient",
                 "UserModel",
                 tca,
             ],

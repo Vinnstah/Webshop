@@ -3,12 +3,10 @@ import ComposableArchitecture
 import ProductModel
 import ApiClient
 import SiteRouter
-import UserDefaultsClient
 import FavoritesClient
 
 public struct Favorites: ReducerProtocol, Sendable {
     @Dependency(\.apiClient) var apiClient
-    @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.favouritesClient) var favouritesClient
     public init() {}
 }
@@ -114,11 +112,9 @@ public extension Favorites {
             case let .internal(.favoriteButtonClicked(product)):
                 
                 if state.favoriteProducts.sku.contains(product.sku) {
-                    print("REMOVE PRODUCT")
-                    return .run { [userDefaultsClient, favoriteProducts = state.favoriteProducts.sku] send in
+                    return .run { send in
                         try favouritesClient.removeFavorite(product.sku)
 //                        await userDefaultsClient.removeFavoriteProduct(product.sku, favoriteProducts: favoriteProducts)
-                        await send(.internal(.onAppear))
                     }
                 }
                 

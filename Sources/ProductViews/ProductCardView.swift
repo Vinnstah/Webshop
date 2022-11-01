@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-24.
-//
-
 import Foundation
 import SwiftUI
 import ComposableArchitecture
@@ -33,6 +26,8 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
             ZStack {
                 VStack {
                     getImage(imageURL: product.imageURL)
+                        .scaledToFill()
+                        .frame(width: 150, height: 150)
                     
                     Text(product.title)
                         .foregroundColor(Color("Secondary"))
@@ -41,10 +36,11 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                         .padding()
-                    favoriteButton(action: action, isFavorite: isFavorite)
+                    
                 }
+                favoriteButton(action: action, isFavorite: isFavorite)
+                    .offset(x: 60, y: -100)
             }
-            .frame(width: 200, height: 250)
         }
     }
 }
@@ -56,9 +52,6 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
             if let image = maybeImage.image {
                 image
                     .resizable()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 400)
-                    .ignoresSafeArea()
                 
             } else if maybeImage.error != nil {
                 Text("No image available")
@@ -80,9 +73,11 @@ public func favoriteButton(action: @escaping () -> Void, isFavorite: @escaping (
     }, label: {
         Image(systemName: isFavorite() ? "heart.fill" : "heart")
             .foregroundColor(.red)
-            .background(Color(.white))
-            .frame(width: 50, height: 50)
+            .frame(width: 25, height: 25)
+            .background {
+                Color("BackgroundColor")
+                    .clipShape(Circle())
+            }
     })
-    .clipShape(Circle())
 }
 

@@ -21,7 +21,10 @@ public extension Home {
                     isRoot: true,
                     isCartPopulated: { viewStore.state.cart?.session == nil },
                     isFavourite: nil,
-                    toggleSettings: { viewStore.send(.internal(.toggleSettingsSheet)) }
+                    toggleSettings: { viewStore.send(.internal(.toggleSettingsSheet)) },
+                    searchableBinding: viewStore.binding(
+                                            get: { $0.searchText },
+                                            send: { .internal(.searchTextReceivesInput($0)) })
                 ) {
                     VStack {
                         if viewStore.searchResults.isEmpty {
@@ -106,10 +109,6 @@ public extension Home {
                 .refreshable {
                     viewStore.send(.internal(.onAppear))
                 }
-                .searchable(text:  viewStore.binding(
-                    get: { $0.searchText },
-                    send: { .internal(.searchTextReceivesInput($0)) })
-                )
                 .navigationBarHidden(true)
                 .sheet(isPresented:
                         viewStore.binding(
@@ -121,6 +120,10 @@ public extension Home {
                     }
                     .presentationDetents([.fraction(0.1)])
                 }
+//                .searchable(text:  viewStore.binding(
+//                    get: { $0.searchText },
+//                    send: { .internal(.searchTextReceivesInput($0)) })
+//                )
             }
         }
     }

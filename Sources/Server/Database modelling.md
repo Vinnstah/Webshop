@@ -66,6 +66,14 @@ INSERT INTO products(title, description, image_url, price, category, sub_categor
 VALUES('Diamant', 'Diamant är ett snabbspelat och roligt bluffspel för hela familjen.  Spelare är äventyrare som tillsammans utforskar en grotta genom att vända upp ett kort åt gången som visar vad nästa sektion i grottgången har att erbjuda, skatter eller fällor eller ingenting. Men innan nästa kort vänds upp måste spelare var för sig bestämma om de vill stanna kvar och fortsätta utforska eller om de vill vända hemåt med de skatter de samlat in, om du går hemåt får du både de skatter du själv bär på samt de som ligger bakom dig i grottan, men kruxet är att du måste dela dem med alla som går hem samtidigt som du.', 'https://www.dragonslair.se/images/41410/product', 279, 'Games', 'Board Games', 'DMT101');
 
 
+INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
+VALUES('Railroad Ink', 'In the multiplayer puzzle game Railroad Ink, your goal is to connect as many exits on your board as possible. Each round, a set of dice are rolled in the middle of the table, determining which kind of road and railway routes are available to all players. You have to draw these routes on your erasable boards to create transport lines and connect your exits, trying to optimize the available symbols better than your opponents.
+
+The more exits you connect, the more points you score at the end of the game, but you lose points for each incomplete route, so plan carefully! Will you press your luck and try to stretch your transportation network to the next exit, or will you play it safe and start a new, simpler to manage route?
+
+Railroad Ink comes in two versions, each one including two expansions with additional dice sets that add special rules to your games. The Blazing Red Edition includes the Lava and Meteor expansions. Try to confine the lava coming from the erupting volcano before it destroys your routes, or deal with the havoc brought by the meteor strikes and mine the craters for precious ore. These special rules can spice up things and make each game play and feel different.
+
+Each box allows you to play from 1 to 6 players, and if you combine more boxes, you can play with up to 12 players (or more). The only limit to the number of players is the number of boards you have!', 'https://www.dragonslair.se/images/53107/original', 225, 'Games', 'Board Games', 'RRI101');
 
 
 

@@ -118,7 +118,12 @@ public extension Home {
                 
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
-                state.searchResults = state.productList.filter { $0.title.contains(text)  }
+                
+                state.searchResults = state.productList.filter { $0.title.contains(text) }
+                
+                if state.searchResults == [] {
+                    state.searchResults = state.productList.filter { $0.category.contains(text) }
+                }
                 return .none
                 
             case let .internal(.getProductResponse(.success(products))):

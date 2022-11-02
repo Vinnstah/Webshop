@@ -9,6 +9,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
     let isFavourite: Bool?
     let toggleFavourite: () -> Void
     let toggleSettings: () -> Void
+    let searchableBinding: Binding<String>
     let content: Content
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     
@@ -18,6 +19,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         isFavourite: Bool?,
         toggleFavourite: @escaping () -> Void = {},
         toggleSettings: @escaping () -> Void = {},
+        searchableBinding: Binding<String> = .constant(.init()),
         content: () -> Content
     ) {
         self.isRoot = isRoot
@@ -25,6 +27,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         self.isFavourite = isFavourite
         self.toggleFavourite = toggleFavourite
         self.toggleSettings = toggleSettings
+        self.searchableBinding = searchableBinding
         self.content = content()
     }
     
@@ -52,6 +55,9 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                                     .opacity(isRoot ? 0 : 1)
                             }
                             Spacer()
+                            if isRoot {
+                                searchBar(bindingText: searchableBinding)
+                            }
                             
                             favoriteButton(action: { toggleFavourite() }, isFavorite: isFavourite)
                             
@@ -85,6 +91,31 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                 Color("BackgroundColor")
                     .ignoresSafeArea()
             }
+        }
+    }
+}
+
+@ViewBuilder
+public func searchBar(bindingText: Binding<String>) -> some View {
+    
+    ZStack {
+        TextField("", text: bindingText)
+            .labelsHidden()
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .padding(.horizontal)
+            .foregroundColor(Color("Secondary"))
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .bold()
+                .foregroundColor(.gray)
+                .padding(.horizontal)
+                .opacity(bindingText.wrappedValue == "" ? 1 : 0)
+            Text("Search")
+                .font(.footnote)
+                .foregroundColor(.gray)
+                .opacity(bindingText.wrappedValue == "" ? 1 : 0)
+            Spacer()
         }
     }
 }

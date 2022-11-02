@@ -88,14 +88,27 @@ public extension Home {
                         
                         HStack {
                             HStack {
-                                Button(action: { viewStore.send(.internal(.decreaseQuantityButtonPressed)) }, label: { Image(systemName: "minus") })
-                                
-                                Text(String("\(viewStore.state.quantity)"))
-                                    .font(.title3)
-                                    .bold()
-                                    .foregroundColor(Color("Secondary"))
-                                
-                                Button(action: { viewStore.send(.internal(.increaseQuantityButtonPressed)) }, label: { Image(systemName: "plus") })
+                                Button(action: { viewStore.send(.internal(.decreaseQuantityButtonPressed)) },
+                                       label: {
+                                    Image(systemName: "minus")
+                                        .foregroundColor(Color("Secondary"))
+                                })
+                                if viewStore.state.quantity < 10 {
+                                    Text(String("0" + "\(viewStore.state.quantity)"))
+                                        .font(.title3)
+                                        .bold()
+                                        .foregroundColor(Color("Secondary"))
+                                } else {
+                                    Text(String("\(viewStore.state.quantity)"))
+                                        .font(.title3)
+                                        .bold()
+                                        .foregroundColor(Color("Secondary"))
+                                }
+                                Button(action: { viewStore.send(.internal(.increaseQuantityButtonPressed)) },
+                                       label: {
+                                    Image(systemName: "plus")
+                                        .foregroundColor(Color("Secondary"))
+                                })
                             }
                             .fixedSize()
                             .padding(.horizontal)

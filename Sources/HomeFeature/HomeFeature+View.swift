@@ -20,7 +20,8 @@ public extension Home {
                 NavigationBar(
                     isRoot: true,
                     isCartPopulated: { viewStore.state.cart?.session == nil },
-                    isFavourite: nil
+                    isFavourite: nil,
+                    toggleSettings: { viewStore.send(.internal(.toggleSettingsSheet)) }
                 ) {
                     VStack {
                         if viewStore.searchResults.isEmpty {
@@ -58,17 +59,17 @@ public extension Home {
                                                 isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku)},
                                                 toggleFavourite: { viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
                                         }, label: {
-                                            ProductCardView<Home>(store: store, product: prod, action:
-                                                                    { viewStore.send(.internal(.favoriteButtonClicked(prod))) }
-                                                                  , isFavorite: {
-                                                viewStore.state.favoriteProducts.sku.contains(prod.sku)
-                                            })
-                                            
+                                            ProductCardView<Home>(
+                                                store: store,
+                                                product: prod,
+                                                action: { viewStore.send(.internal(.favoriteButtonClicked(prod))) },
+                                                isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) })
                                         })
                                     }
                                 }
                             }
                         }
+                        
                         if !viewStore.searchResults.isEmpty {
                             ScrollView(.vertical) {
                                 LazyVGrid(columns: .init(repeating: .init(), count: 2)) {
@@ -85,23 +86,17 @@ public extension Home {
                                                 isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) },
                                                 toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
                                         }, label: {
-                                            ProductCardView<Home>(store: store, product: prod, action:
-                                                                    { viewStore.send(.internal(.favoriteButtonClicked(prod))) }
-                                                                  , isFavorite: {
-                                                viewStore.state.favoriteProducts.sku.contains(prod.sku)
-                                            })
-                                            
+                                            ProductCardView<Home>(
+                                                store: store,
+                                                product: prod,
+                                                action:{ viewStore.send(.internal(.favoriteButtonClicked(prod))) },
+                                                isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) })
                                         })
                                     }
                                 }
                                 
                             }
                         }
-                        Button("Log out user") {
-                            viewStore.send(.internal(.logOutUser))
-                        }
-                        .buttonStyle(.primary)
-                        .padding()
                     }
                     
                 }
@@ -116,8 +111,32 @@ public extension Home {
                     send: { .internal(.searchTextReceivesInput($0)) })
                 )
                 .navigationBarHidden(true)
+                .sheet(isPresented:
+                        viewStore.binding(
+                            get: \.isSettingsSheetPresented,
+                            send: .internal(.toggleSettingsSheet))
+                ) {
+                    Settings() {
+                        viewStore.send(.internal(.logOutUser))
+                    }
+                    .presentationDetents([.fraction(0.1)])
+                }
             }
         }
     }
 }
 
+//Temporary struct for logout button. Will create entire feature later on.
+struct Settings: View {
+    public let action: () -> Void
+    
+    public init(action: @escaping () -> Void) { self.action = action}
+    
+    public var body: some View {
+        Button("Log out user") {
+            action()
+        }
+        .buttonStyle(.primary)
+        .padding()
+    }
+}

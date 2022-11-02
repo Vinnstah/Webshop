@@ -7,7 +7,8 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
     let isRoot: Bool
     let isCartPopulated: () -> Bool
     let isFavourite: Bool?
-    let toggleFavourite: () -> Void 
+    let toggleFavourite: () -> Void
+    let toggleSettings: () -> Void
     let content: Content
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     
@@ -16,12 +17,14 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         isCartPopulated: @escaping () -> Bool,
         isFavourite: Bool?,
         toggleFavourite: @escaping () -> Void = {},
+        toggleSettings: @escaping () -> Void = {},
         content: () -> Content
     ) {
         self.isRoot = isRoot
         self.isCartPopulated = isCartPopulated
         self.isFavourite = isFavourite
         self.toggleFavourite = toggleFavourite
+        self.toggleSettings = toggleSettings
         self.content = content()
     }
     
@@ -31,15 +34,23 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                 VStack {
                     ZStack {
                         HStack {
-                            Image(systemName: "chevron.left")
-                                .bold()
-                                .padding()
-                                .foregroundColor(Color("Secondary"))
-                                .onTapGesture(count: 1, perform: {
-                                    self.mode.wrappedValue.dismiss()
+                            if isRoot {
+                                Button(action: { toggleSettings() }, label: {
+                                    Image(systemName: "gearshape")
+                                        .bold()
+                                        .padding()
+                                        .foregroundColor(Color("Secondary"))
                                 })
-                                .opacity(isRoot ? 0 : 1)
-                            
+                            } else {
+                                Image(systemName: "chevron.left")
+                                    .bold()
+                                    .padding()
+                                    .foregroundColor(Color("Secondary"))
+                                    .onTapGesture(count: 1, perform: {
+                                        self.mode.wrappedValue.dismiss()
+                                    })
+                                    .opacity(isRoot ? 0 : 1)
+                            }
                             Spacer()
                             
                             favoriteButton(action: { toggleFavourite() }, isFavorite: isFavourite)

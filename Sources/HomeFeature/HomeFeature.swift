@@ -18,7 +18,6 @@ public struct Home: ReducerProtocol, Sendable {
 public extension Home {
     struct State: Equatable, Sendable {
         public var productList: [Product]
-        public var isProductDetailSheetPresented: Bool
         public var product: Product?
         public var catergories: [ProductModel.Category]
         public var cart: Cart?
@@ -26,21 +25,21 @@ public extension Home {
         public var searchText: String
         public var searchResults: [Product]
         public var favoriteProducts: FavoriteProducts
+        public var isSettingsSheetPresented: Bool
         
         
         public init(
             productList: [Product] = [],
-            isProductDetailSheetPresented: Bool = false,
             product: Product? = nil,
             catergories: [ProductModel.Category] = [],
             cart: Cart? = nil,
             quantity: Int = 0,
             searchText: String = "",
             searchResults: [Product] = [],
-            favoriteProducts: FavoriteProducts = .init()
+            favoriteProducts: FavoriteProducts = .init(),
+            isSettingsSheetPresented: Bool = false
         ) {
             self.productList = productList
-            self.isProductDetailSheetPresented = isProductDetailSheetPresented
             self.product = product
             self.catergories = catergories
             self.cart = cart
@@ -48,6 +47,7 @@ public extension Home {
             self.searchText = searchText
             self.searchResults = searchResults
             self.favoriteProducts = favoriteProducts
+            self.isSettingsSheetPresented = isSettingsSheetPresented
         }
     }
     
@@ -64,8 +64,7 @@ public extension Home {
             case logOutUser
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
-            case toggleSheet
-            case showProductDetailViewFor(Product)
+            case toggleSettingsSheet
             case getCategoryResponse(TaskResult<[ProductModel.Category]>)
             case increaseQuantityButtonPressed
             case decreaseQuantityButtonPressed
@@ -138,13 +137,8 @@ public extension Home {
                 print(error)
                 return .none
                 
-            case let .internal(.showProductDetailViewFor(product)):
-                state.product = product
-                state.isProductDetailSheetPresented.toggle()
-                return .none
-                
-            case .internal(.toggleSheet):
-                state.isProductDetailSheetPresented.toggle()
+            case .internal(.toggleSettingsSheet):
+                state.isSettingsSheetPresented.toggle()
                 return .none
                 
             case .internal(.increaseQuantityButtonPressed):

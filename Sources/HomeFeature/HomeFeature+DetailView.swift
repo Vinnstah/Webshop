@@ -43,11 +43,6 @@ public extension Home {
                                     .clipShape(Rectangle())
                                     .cornerRadius(40)
                                     .ignoresSafeArea()
-                                //                                    .overlay(alignment: .topTrailing) {
-                                //                                        favoriteButton(
-                                //                                            action: { viewStore.send(.internal(.favoriteButtonClicked(product))) },
-                                //                                            isFavorite: { isFavourite() }())
-                                //                                    }
                                 
                                 HStack {
                                     VStack {

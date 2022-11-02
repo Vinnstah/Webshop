@@ -56,7 +56,7 @@ public extension Home {
                                                 store: store,
                                                 product: prod,
                                                 isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku)},
-                                                toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
+                                                toggleFavourite: { viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
                                         }, label: {
                                             ProductCardView<Home>(store: store, product: prod, action:
                                                                     { viewStore.send(.internal(.favoriteButtonClicked(prod))) }

@@ -42,7 +42,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                             
                             Spacer()
                             
-                            favoriteButton(action: toggleFavourite(), isFavorite: isFavourite)
+                            favoriteButton(action: { toggleFavourite() }, isFavorite: isFavourite)
                             
                             ZStack {
                                 Image(systemName: "cart")
@@ -52,7 +52,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                                 
                                 if isCartPopulated() {
                                     Circle()
-                                        .foregroundColor(.red)
+                                        .foregroundColor(Color("ButtonColor"))
                                         .scaledToFill()
                                         .frame(width: 10, height: 10, alignment: .topTrailing)
                                         .offset(x: 8, y: -10)

@@ -38,8 +38,8 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                         .padding()
                     
                 }
-//                favoriteButton(action: action(), isFavorite: isFavorite())
-//                    .offset(x: 60, y: -100)
+                favoriteButton(action: { action() }, isFavorite: isFavorite())
+                    .offset(x: 60, y: -100)
             }
         }
     }
@@ -67,13 +67,13 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
     }
     
 @ViewBuilder
-public func favoriteButton(action: (), isFavorite: Bool?) -> some View {
+public func favoriteButton(action: @escaping ()-> Void, isFavorite: Bool?) -> some View {
     if isFavorite != nil {
         Button(action: {
-            action
+            action()
         }, label: {
             Image(systemName: isFavorite! ? "heart.fill" : "heart")
-                .foregroundColor(.red)
+                .foregroundColor(Color("ButtonColor"))
                 .frame(width: 25, height: 25)
                 .background {
                     Color("BackgroundColor")

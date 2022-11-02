@@ -72,6 +72,8 @@ public extension Home {
             case searchTextReceivesInput(String)
             case favoriteButtonClicked(Product)
             case loadFavoriteProducts([Product.SKU]?)
+            case removeFavouriteProduct(Product.SKU?)
+            case addFavouriteProduct(Product.SKU?)
         }
     }
     
@@ -160,12 +162,28 @@ public extension Home {
                 
                 if state.favoriteProducts.sku.contains(product.sku) {
                     return .run { send in
-                        try favouritesClient.removeFavorite(product.sku)
+                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.sku))))
+                        
                     }
                 }
                 return .run { send in
-                    try favouritesClient.addFavorite(product.sku)
+                    await send(.internal(.addFavouriteProduct(try favouritesClient.addFavorite(product.sku))))
                 }
+                
+            case let .internal(.removeFavouriteProduct(sku)):
+                guard let sku else {
+                    return .none
+                }
+                state.favoriteProducts.sku.removeAll(where: { $0 == sku })
+                return .none
+                
+            case let .internal(.addFavouriteProduct(sku)):
+                guard let sku else {
+                    return .none
+                }
+                state.favoriteProducts.sku.append(sku)
+                return .none
+                
                 
             case .delegate(_):
                 return .none

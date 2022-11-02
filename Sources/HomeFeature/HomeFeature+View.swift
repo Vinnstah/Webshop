@@ -17,7 +17,11 @@ public extension Home {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
-                CustomNavBar(isRoot: true, isCartPopulated: { viewStore.state.cart?.session == nil }) {
+                NavigationBar(
+                    isRoot: true,
+                    isCartPopulated: { viewStore.state.cart?.session == nil },
+                    isFavourite: nil
+                ) {
                     VStack {
                         if viewStore.searchResults.isEmpty {
                             
@@ -48,12 +52,16 @@ public extension Home {
                                         id: \.self
                                     )  { prod in
                                         NavigationLink(destination: {
-                                            DetailView(store: store, product: prod)
+                                            DetailView(
+                                                store: store,
+                                                product: prod,
+                                                isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku)},
+                                                toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
                                         }, label: {
-                                            ProductCardView<Home>(store: store, product: prod, action: {
-                                                viewStore.send(.internal(.favoriteButtonClicked(prod)))
-                                            }, isFavorite: {
-                                                viewStore.isProductDetailSheetPresented
+                                            ProductCardView<Home>(store: store, product: prod, action:
+                                                                    { viewStore.send(.internal(.favoriteButtonClicked(prod))) }
+                                                                  , isFavorite: {
+                                                viewStore.state.favoriteProducts.sku.contains(prod.sku)
                                             })
                                             
                                         })
@@ -70,14 +78,20 @@ public extension Home {
                                             viewStore.state.searchResults,
                                         id: \.self
                                     )  { prod in
-                                        ProductCardView<Home>(store: store, product: prod, action: {
-                                            viewStore.send(.internal(.favoriteButtonClicked(prod)))
-                                        },  isFavorite: {
-                                            viewStore.isProductDetailSheetPresented
+                                        NavigationLink(destination: {
+                                            DetailView(
+                                                store: store,
+                                                product: prod,
+                                                isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) },
+                                                toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
+                                        }, label: {
+                                            ProductCardView<Home>(store: store, product: prod, action:
+                                                                    { viewStore.send(.internal(.favoriteButtonClicked(prod))) }
+                                                                  , isFavorite: {
+                                                viewStore.state.favoriteProducts.sku.contains(prod.sku)
+                                            })
+                                            
                                         })
-                                        .onTapGesture {
-                                            viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                        }
                                     }
                                 }
                                 

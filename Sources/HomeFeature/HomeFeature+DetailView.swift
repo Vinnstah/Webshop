@@ -7,18 +7,32 @@ import CartModel
 
 public extension Home {
     struct DetailView: SwiftUI.View {
+        
         public let store: StoreOf<Home>
         public let product: Product
+        public let isFavourite: () -> Bool
+        public let toggleFavourite: () -> Void
         
-        public init(store: StoreOf<Home>,
-                    product: Product) {
+        public init(
+            store: StoreOf<Home>,
+            product: Product,
+            isFavourite: @escaping () -> Bool,
+            toggleFavourite: @escaping () -> Void
+        ) {
             self.store = store
             self.product = product
+            self.isFavourite = isFavourite
+            self.toggleFavourite = toggleFavourite
         }
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
-                CustomNavBar(isRoot: false, isCartPopulated: { viewStore.state.cart?.session == nil }) {
+                NavigationBar(
+                    isRoot: false,
+                    isCartPopulated: { viewStore.state.cart?.session == nil },
+                    isFavourite: isFavourite(),
+                    toggleFavourite: { toggleFavourite() }
+                ) {
                     VStack {
                         ScrollView(.vertical) {
                             
@@ -29,13 +43,11 @@ public extension Home {
                                     .clipShape(Rectangle())
                                     .cornerRadius(40)
                                     .ignoresSafeArea()
-                                //                                .overlay {
-                                //                                    favoriteButton(action: {
-                                //                                        viewStore.send(.internal(.favoriteButtonClicked(viewStore.state.product!)))
-                                //                                    }, isFavorite: {
-                                //                                        viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.sku)
-                                //                                    })
-                                //                                }
+                                //                                    .overlay(alignment: .topTrailing) {
+                                //                                        favoriteButton(
+                                //                                            action: { viewStore.send(.internal(.favoriteButtonClicked(product))) },
+                                //                                            isFavorite: { isFavourite() }())
+                                //                                    }
                                 
                                 HStack {
                                     VStack {

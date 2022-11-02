@@ -1,17 +1,27 @@
 
 import Foundation
 import SwiftUI
+import ProductViews
 
-
-public struct CustomNavBar<Content: View>: SwiftUI.View  {
+public struct NavigationBar<Content: View>: SwiftUI.View  {
     let isRoot: Bool
     let isCartPopulated: () -> Bool
+    let isFavourite: Bool?
+    let toggleFavourite: () -> Void 
     let content: Content
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     
-    public init(isRoot: Bool, isCartPopulated: @escaping () -> Bool, content: () -> Content) {
+    public init(
+        isRoot: Bool,
+        isCartPopulated: @escaping () -> Bool,
+        isFavourite: Bool?,
+        toggleFavourite: @escaping () -> Void = {},
+        content: () -> Content
+    ) {
         self.isRoot = isRoot
         self.isCartPopulated = isCartPopulated
+        self.isFavourite = isFavourite
+        self.toggleFavourite = toggleFavourite
         self.content = content()
     }
     
@@ -31,6 +41,8 @@ public struct CustomNavBar<Content: View>: SwiftUI.View  {
                                 .opacity(isRoot ? 0 : 1)
                             
                             Spacer()
+                            
+                            favoriteButton(action: toggleFavourite(), isFavorite: isFavourite)
                             
                             ZStack {
                                 Image(systemName: "cart")

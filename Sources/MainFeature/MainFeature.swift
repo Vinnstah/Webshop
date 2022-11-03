@@ -97,7 +97,6 @@ public extension Main {
                     )))
                 }
                 
-                
             case .internal(.addOrUpdateCartSession(.success)):
                 
                 state.checkout?.cart = state.cart

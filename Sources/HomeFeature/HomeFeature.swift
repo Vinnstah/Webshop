@@ -23,10 +23,9 @@ public extension Home {
         public var cart: Cart?
         public var quantity: Int
         public var searchText: String
-        public var searchResults: [Product]
+        public var filteredProducts: [Product]
         public var favoriteProducts: FavoriteProducts
         public var isSettingsSheetPresented: Bool
-        
         
         public init(
             productList: [Product] = [],
@@ -35,7 +34,7 @@ public extension Home {
             cart: Cart? = nil,
             quantity: Int = 0,
             searchText: String = "",
-            searchResults: [Product] = [],
+            filteredProducts: [Product] = [],
             favoriteProducts: FavoriteProducts = .init(),
             isSettingsSheetPresented: Bool = false
         ) {
@@ -45,7 +44,7 @@ public extension Home {
             self.cart = cart
             self.quantity = quantity
             self.searchText = searchText
-            self.searchResults = searchResults
+            self.filteredProducts = filteredProducts
             self.favoriteProducts = favoriteProducts
             self.isSettingsSheetPresented = isSettingsSheetPresented
         }
@@ -74,6 +73,7 @@ public extension Home {
             case removeFavouriteProduct(Product.SKU?)
             case addFavouriteProduct(Product.SKU?)
             case cancelSearchClicked
+            case categoryButtonPressed(ProductModel.Category)
         }
     }
     
@@ -120,6 +120,8 @@ public extension Home {
                 
             case let .internal(.getCategoryResponse(.success(categories))):
                 state.catergories = categories
+                state.catergories.append(Category.init(title: "All", subCategory: .init(title: "All")))
+                state.catergories = state.catergories.sorted(by: { $0.title < $1.title})
                 return .none
                 
             case let .internal(.getCategoryResponse(.failure(error))):
@@ -130,16 +132,16 @@ public extension Home {
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
                 
-                state.searchResults = state.productList.filter { $0.title.contains(text) }
+                state.filteredProducts = state.productList.filter { $0.title.contains(text) }
                 
-                if state.searchResults == [] {
-                    state.searchResults = state.productList.filter { $0.category.contains(text) }
+                if state.filteredProducts == [] {
+                    state.filteredProducts = state.productList.filter { $0.category.contains(text) }
                 }
                 return .none
                 
             case .internal(.cancelSearchClicked):
                 state.searchText = ""
-                state.searchResults = []
+                state.filteredProducts = []
                 return .none
                 
                 //MARK: Misc actions
@@ -197,6 +199,16 @@ public extension Home {
             case .delegate(_):
                 return .none
                 
+            case let .internal(.categoryButtonPressed(category)):
+                switch category.title {
+                case "All": state.filteredProducts = state.productList.filter({ $0.category != ""})
+                case "Board Games": state.filteredProducts = state.productList.filter({ $0.category == "Board Games"})
+                case "Magic: The Gathering": state.filteredProducts = state.productList.filter({ $0.category == "Magic: The Gathering"})
+                default:
+                    print("DEFAULT")
+                }
+            
+                return .none
             }
             }
         }

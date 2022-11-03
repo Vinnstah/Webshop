@@ -26,36 +26,36 @@ public extension Home {
                     toggleSettings: { viewStore.send(.internal(.toggleSettingsSheet)) },
                     searchableBinding: viewStore.binding(
                                             get: { $0.searchText },
-                                            send: { .internal(.searchTextReceivesInput($0)) }),
+                                            send: { .internal(.searchTextReceivesInput($0)) }).animation(),
                     cancelSearch: { viewStore.send(.internal(.cancelSearchClicked)) }
                 ) {
                     VStack {
-                        if viewStore.searchResults.isEmpty {
-                            
-                            VStack {
-                                ScrollView(.horizontal) {
-                                    HStack(spacing: 20) {
-                                        
-                                        ForEach(viewStore.state.catergories, id: \.self) { category in
-                                            Button(
-                                                category.title
-                                            ) {
-                                            //TODO: Implement action that selects the products from that category
-                                            }
-                                            
-                                            .frame(width: 100, height: 30)
-                                            .buttonStyle(.primary(cornerRadius: 25))
+                        
+                        VStack {
+                            ScrollView(.horizontal) {
+                                HStack(spacing: 20) {
+                                    
+                                    ForEach(viewStore.state.catergories, id: \.self) { category in
+                                        Button(
+                                            category.title
+                                        ) {
+                                            viewStore.send(.internal(.categoryButtonPressed(category)), animation: .default)
                                         }
+                                        .frame(minWidth: 0, maxWidth: .infinity)
+                                        .frame(height: 30)
+                                        .buttonStyle(.primary(cornerRadius: 25))
                                     }
                                 }
                             }
+                        }
+                        if viewStore.filteredProducts.isEmpty {
                             ScrollView(.horizontal) {
                                 HStack(spacing: 20) {
                                     
                                     ForEach(
-                                        (viewStore.state.searchResults == []) ?
+                                        (viewStore.state.filteredProducts == []) ?
                                         viewStore.state.productList :
-                                            viewStore.state.searchResults,
+                                            viewStore.state.filteredProducts,
                                         id: \.self
                                     )  { prod in
                                         NavigationLink(destination: {
@@ -75,14 +75,13 @@ public extension Home {
                                 }
                             }
                         }
-                        
-                        if !viewStore.searchResults.isEmpty {
+                        if !viewStore.filteredProducts.isEmpty {
                             ScrollView(.vertical) {
-                                LazyVGrid(columns: .init(repeating: .init(), count: 2)) {
+                                LazyVGrid(columns: .init(repeating: .init(), count: 2) ) {
                                     ForEach(
-                                        (viewStore.state.searchResults == []) ?
+                                        (viewStore.state.filteredProducts == []) ?
                                         viewStore.state.productList :
-                                            viewStore.state.searchResults,
+                                            viewStore.state.filteredProducts,
                                         id: \.self
                                     )  { prod in
                                         NavigationLink(destination: {

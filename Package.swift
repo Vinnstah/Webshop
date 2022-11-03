@@ -8,7 +8,6 @@ let tca: Target.Dependency = .product(name: "ComposableArchitecture", package: "
 let vapor: Target.Dependency = .product(name: "Vapor", package: "vapor")
 let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "vapor-routing")
 let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift-url-routing")
-
 let tagged: Target.Dependency = .product(name: "Tagged", package: "swift-tagged")
 
 var swiftSettings: [SwiftSetting] = [
@@ -20,7 +19,7 @@ var swiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "Webshop",
-    platforms: [.iOS(.v16), .macOS(.v13)],
+    platforms: [.iOS(.v16), .macOS(.v12)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -50,6 +49,9 @@ let package = Package(
         .library(
             name: "FavoriteFeature",
             targets: ["FavoriteFeature"]),
+        .library(
+            name: "NavigationBar",
+            targets: ["NavigationBar"]),
         .library(
             name: "ProductModel",
             targets: ["ProductModel"]),
@@ -169,6 +171,7 @@ let package = Package(
                 "ApiClient",
                 "CartModel",
                 "FavoritesClient",
+                "NavigationBar",
                 "ProductViews",
                 "SiteRouter",
                 "StyleGuide",
@@ -211,6 +214,13 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "NavigationBar",
+            dependencies: [
+                "ProductViews",
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "OnboardingFeatureTests",
             dependencies: ["OnboardingFeature"]),

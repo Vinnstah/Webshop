@@ -87,6 +87,7 @@ public extension Home {
                     await send(.delegate(.userIsLoggedOut))
                 }
                 
+                //MARK: On appear API calls
             case .internal(.onAppear):
                 return .run { [apiClient] send in
                     await send(.internal(.getProductResponse(
@@ -109,24 +110,6 @@ public extension Home {
                         await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 }
                 
-            case let .internal(.loadFavoriteProducts(products)):
-                guard let products else {
-                        return .none
-                    }
-                    
-                state.favoriteProducts.sku = products
-                return .none
-                
-            case let .internal(.searchTextReceivesInput(text)):
-                state.searchText = text
-                
-                state.searchResults = state.productList.filter { $0.title.contains(text) }
-                
-                if state.searchResults == [] {
-                    state.searchResults = state.productList.filter { $0.category.contains(text) }
-                }
-                return .none
-                
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
                 return .none
@@ -143,6 +126,23 @@ public extension Home {
                 print(error)
                 return .none
                 
+                //MARK: Search function
+            case let .internal(.searchTextReceivesInput(text)):
+                state.searchText = text
+                
+                state.searchResults = state.productList.filter { $0.title.contains(text) }
+                
+                if state.searchResults == [] {
+                    state.searchResults = state.productList.filter { $0.category.contains(text) }
+                }
+                return .none
+                
+            case .internal(.cancelSearchClicked):
+                state.searchText = ""
+                state.searchResults = []
+                return .none
+                
+                //MARK: Misc actions
             case .internal(.toggleSettingsSheet):
                 state.isSettingsSheetPresented.toggle()
                 return .none
@@ -156,6 +156,15 @@ public extension Home {
                     return .none
                 }
                 state.quantity -= 1
+                return .none
+                
+                //MARK: Favourite interaction
+            case let .internal(.loadFavoriteProducts(products)):
+                guard let products else {
+                        return .none
+                    }
+                    
+                state.favoriteProducts.sku = products
                 return .none
                 
             case let .internal(.favoriteButtonClicked(product)):
@@ -188,10 +197,6 @@ public extension Home {
             case .delegate(_):
                 return .none
                 
-            case .internal(.cancelSearchClicked):
-                state.searchText = ""
-                state.searchResults = []
-                return .none
             }
             }
         }

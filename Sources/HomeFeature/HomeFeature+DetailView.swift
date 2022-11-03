@@ -4,6 +4,7 @@ import ProductModel
 import ProductViews
 import ComposableArchitecture
 import CartModel
+import NavigationBar
 
 public extension Home {
     struct DetailView: SwiftUI.View {

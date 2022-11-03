@@ -5,6 +5,7 @@ import ProductModel
 import StyleGuide
 import ProductViews
 import CheckoutFeature
+import NavigationBar
 
 public extension Home {
     struct View: SwiftUI.View {
@@ -17,6 +18,7 @@ public extension Home {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
+                
                 NavigationBar(
                     isRoot: true,
                     isCartPopulated: { viewStore.state.cart?.session == nil },
@@ -31,18 +33,18 @@ public extension Home {
                         if viewStore.searchResults.isEmpty {
                             
                             VStack {
-                                Text("Categories")
-                                    .foregroundColor(Color("Secondary"))
-                                    .bold()
-                                    .padding()
-                                
                                 ScrollView(.horizontal) {
                                     HStack(spacing: 20) {
                                         
-                                        ForEach(viewStore.state.catergories, id: \.self) { cat in
-                                            Text(cat.title)
-                                                .foregroundColor(Color("Secondary"))
-                                                .padding()
+                                        ForEach(viewStore.state.catergories, id: \.self) { category in
+                                            Button(
+                                                category.title
+                                            ) {
+                                            //TODO: Implement action that selects the products from that category
+                                            }
+                                            
+                                            .frame(width: 100, height: 30)
+                                            .buttonStyle(.primary(cornerRadius: 25))
                                         }
                                     }
                                 }
@@ -121,10 +123,6 @@ public extension Home {
                     }
                     .presentationDetents([.fraction(0.1)])
                 }
-//                .searchable(text:  viewStore.binding(
-//                    get: { $0.searchText },
-//                    send: { .internal(.searchTextReceivesInput($0)) })
-//                )
             }
         }
     }

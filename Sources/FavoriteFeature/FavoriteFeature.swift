@@ -121,7 +121,7 @@ public extension Favorites {
                 guard let sku else {
                     return .none
                 }
-                state.favoriteProducts.sku.removeAll(where: { $0 == sku })
+                state.productList.removeAll(where: { $0.sku == sku })
                 return .none
                 
             case .delegate(_):

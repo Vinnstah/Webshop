@@ -32,9 +32,10 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                     Text(product.title)
                         .foregroundColor(Color("Secondary"))
                         .font(.title.bold())
-                        .scaledToFill()
+                        .scaledToFit()
                         .minimumScaleFactor(0.5)
-                        .lineLimit(1)
+                        .lineLimit(2)
+                        .frame(width: 150)
                         .padding()
                     
                 }

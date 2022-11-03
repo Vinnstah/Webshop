@@ -31,7 +31,8 @@ public extension Home {
                     isRoot: false,
                     isCartPopulated: { viewStore.state.cart?.session == nil },
                     isFavourite: isFavourite(),
-                    toggleFavourite: { toggleFavourite() }
+                    toggleFavourite: { toggleFavourite() },
+                    cancelSearch: { viewStore.send(.internal(.cancelSearchClicked)) }
                 ) {
                     VStack {
                         ScrollView(.vertical) {
@@ -45,12 +46,16 @@ public extension Home {
                                     .ignoresSafeArea()
                                 
                                 HStack {
+                                    Text(product.title)
+                                        .font(.largeTitle)
+                                        .scaledToFit()
+                                        .minimumScaleFactor(0.01)
+                                        .lineLimit(1)
+                                        .frame(width: 350)
+                                        .frame(alignment: .leading)
+                                }
+                                HStack {
                                     VStack {
-                                        Text(product.title)
-                                            .font(.title)
-                                            .bold()
-                                            .frame(alignment: .leading)
-                                        
                                         Text(product.category)
                                             .font(.system(size: 10))
                                             .foregroundColor(Color("Secondary"))

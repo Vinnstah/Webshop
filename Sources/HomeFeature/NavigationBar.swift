@@ -4,14 +4,15 @@ import SwiftUI
 import ProductViews
 
 public struct NavigationBar<Content: View>: SwiftUI.View  {
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     let isRoot: Bool
     let isCartPopulated: () -> Bool
     let isFavourite: Bool?
     let toggleFavourite: () -> Void
     let toggleSettings: () -> Void
     let searchableBinding: Binding<String>
+    let cancelSearch: () -> Void
     let content: Content
-    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     
     public init(
         isRoot: Bool,
@@ -20,6 +21,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         toggleFavourite: @escaping () -> Void = {},
         toggleSettings: @escaping () -> Void = {},
         searchableBinding: Binding<String> = .constant(.init()),
+        cancelSearch: @escaping () -> Void,
         content: () -> Content
     ) {
         self.isRoot = isRoot
@@ -28,6 +30,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         self.toggleFavourite = toggleFavourite
         self.toggleSettings = toggleSettings
         self.searchableBinding = searchableBinding
+        self.cancelSearch = cancelSearch
         self.content = content()
     }
     
@@ -56,10 +59,17 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                             }
                             Spacer()
                             if isRoot {
-                                searchBar(bindingText: searchableBinding)
+                                searchBar(
+                                    bindingText: searchableBinding,
+                                    showCancel: { searchableBinding.wrappedValue != "" },
+                                    cancelSearch: { cancelSearch() }
+                                )
                             }
                             
-                            favoriteButton(action: { toggleFavourite() }, isFavorite: isFavourite)
+                            favoriteButton(
+                                action: { toggleFavourite() },
+                                isFavorite: isFavourite
+                            )
                             
                             ZStack {
                                 Image(systemName: "cart")
@@ -96,26 +106,51 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
 }
 
 @ViewBuilder
-public func searchBar(bindingText: Binding<String>) -> some View {
+public func searchBar(bindingText: Binding<String>, showCancel: @escaping () -> Bool, cancelSearch: @escaping ()->Void) -> some View {
     
     ZStack {
         TextField("", text: bindingText)
             .labelsHidden()
+            .textFieldStyle(PlainTextFieldStyle())
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .padding(.horizontal)
             .foregroundColor(Color("Secondary"))
+        
         HStack {
+            
             Image(systemName: "magnifyingglass")
                 .bold()
                 .foregroundColor(.gray)
                 .padding(.horizontal)
                 .opacity(bindingText.wrappedValue == "" ? 1 : 0)
+            
             Text("Search")
                 .font(.footnote)
                 .foregroundColor(.gray)
                 .opacity(bindingText.wrappedValue == "" ? 1 : 0)
+            
             Spacer()
+            if showCancel() {
+                Button(action: {
+                    cancelSearch()
+                } , label: {
+                    Image(systemName: "x.circle")
+                        .bold()
+                        .foregroundColor(.gray)
+                })
+            }
         }
+    }
+}
+
+public struct CustomTextFieldStyle : TextFieldStyle {
+    public func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .font(.largeTitle)
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 5)
+                    .strokeBorder(Color.primary.opacity(0.5), lineWidth: 3))
     }
 }

@@ -24,7 +24,8 @@ public extension Home {
                     toggleSettings: { viewStore.send(.internal(.toggleSettingsSheet)) },
                     searchableBinding: viewStore.binding(
                                             get: { $0.searchText },
-                                            send: { .internal(.searchTextReceivesInput($0)) })
+                                            send: { .internal(.searchTextReceivesInput($0)) }),
+                    cancelSearch: { viewStore.send(.internal(.cancelSearchClicked)) }
                 ) {
                     VStack {
                         if viewStore.searchResults.isEmpty {

@@ -73,6 +73,7 @@ public extension Home {
             case loadFavoriteProducts([Product.SKU]?)
             case removeFavouriteProduct(Product.SKU?)
             case addFavouriteProduct(Product.SKU?)
+            case cancelSearchClicked
         }
     }
     
@@ -187,6 +188,10 @@ public extension Home {
             case .delegate(_):
                 return .none
                 
+            case .internal(.cancelSearchClicked):
+                state.searchText = ""
+                state.searchResults = []
+                return .none
             }
             }
         }

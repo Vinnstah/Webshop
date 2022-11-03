@@ -54,16 +54,16 @@ CREATE TABLE products (
 
 
 INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
-VALUES('Catan', 'Your adventurous settlers seek to tame the remote but rich isle of Catan. Start by revealing Catan’s many harbors and regions: pastures, fields, mountains, hills, forests, and desert.', 'https://www.dragonslair.se/images/35257/original', 539, 'Games', 'Board Games', 'CTN101');
+VALUES('Catan', 'Your adventurous settlers seek to tame the remote but rich isle of Catan. Start by revealing Catan’s many harbors and regions: pastures, fields, mountains, hills, forests, and desert.', 'https://www.dragonslair.se/images/35257/original', 539, 'Board Games', 'Classics', 'CTN101');
 
 INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
-VALUES('Ticket to Ride', '2004 vann Ticket To Ride det prestigefyllda ”Spiel des Jahres” och det är numera i mångas ögon det perfekta gateway-spelet. Spelets enkla regler, med hög interaktion passar i princip alla, från nybörjare till inbitna brädspelare.', 'https://www.dragonslair.se/images/5883/product', 479, 'Games', 'Board Games', 'TTR101');
+VALUES('Ticket to Ride', '2004 vann Ticket To Ride det prestigefyllda ”Spiel des Jahres” och det är numera i mångas ögon det perfekta gateway-spelet. Spelets enkla regler, med hög interaktion passar i princip alla, från nybörjare till inbitna brädspelare.', 'https://www.dragonslair.se/images/5883/product', 479, 'Board Games', 'Classics', 'TTR101');
 
 INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
-VALUES('Caylus 1303', 'A classic game is back! As one of the first worker placement games, Caylus stands among the true board game classics of the 2000s. The original designers team, together with the Space Cowboys, have now created a revamped version!', 'https://www.dragonslair.se/images/58046/product', 525, 'Games', 'Board Games', 'CLU101');
+VALUES('Caylus 1303', 'A classic game is back! As one of the first worker placement games, Caylus stands among the true board game classics of the 2000s. The original designers team, together with the Space Cowboys, have now created a revamped version!', 'https://www.dragonslair.se/images/58046/product', 525, 'Board Games', 'Classics', 'CLU101');
 
 INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
-VALUES('Diamant', 'Diamant är ett snabbspelat och roligt bluffspel för hela familjen.  Spelare är äventyrare som tillsammans utforskar en grotta genom att vända upp ett kort åt gången som visar vad nästa sektion i grottgången har att erbjuda, skatter eller fällor eller ingenting. Men innan nästa kort vänds upp måste spelare var för sig bestämma om de vill stanna kvar och fortsätta utforska eller om de vill vända hemåt med de skatter de samlat in, om du går hemåt får du både de skatter du själv bär på samt de som ligger bakom dig i grottan, men kruxet är att du måste dela dem med alla som går hem samtidigt som du.', 'https://www.dragonslair.se/images/41410/product', 279, 'Games', 'Board Games', 'DMT101');
+VALUES('Diamant', 'Diamant är ett snabbspelat och roligt bluffspel för hela familjen.  Spelare är äventyrare som tillsammans utforskar en grotta genom att vända upp ett kort åt gången som visar vad nästa sektion i grottgången har att erbjuda, skatter eller fällor eller ingenting. Men innan nästa kort vänds upp måste spelare var för sig bestämma om de vill stanna kvar och fortsätta utforska eller om de vill vända hemåt med de skatter de samlat in, om du går hemåt får du både de skatter du själv bär på samt de som ligger bakom dig i grottan, men kruxet är att du måste dela dem med alla som går hem samtidigt som du.', 'https://www.dragonslair.se/images/41410/product', 279, 'Board Games', 'Classics', 'DMT101');
 
 
 INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
@@ -73,7 +73,18 @@ The more exits you connect, the more points you score at the end of the game, bu
 
 Railroad Ink comes in two versions, each one including two expansions with additional dice sets that add special rules to your games. The Blazing Red Edition includes the Lava and Meteor expansions. Try to confine the lava coming from the erupting volcano before it destroys your routes, or deal with the havoc brought by the meteor strikes and mine the craters for precious ore. These special rules can spice up things and make each game play and feel different.
 
-Each box allows you to play from 1 to 6 players, and if you combine more boxes, you can play with up to 12 players (or more). The only limit to the number of players is the number of boards you have!', 'https://www.dragonslair.se/images/53107/original', 225, 'Games', 'Board Games', 'RRI101');
+Each box allows you to play from 1 to 6 players, and if you combine more boxes, you can play with up to 12 players (or more). The only limit to the number of players is the number of boards you have!', 'https://www.dragonslair.se/images/53107/original', 225, 'Board Games', 'Classics', 'RRI101');
 
 
+INSERT INTO products(title, description, image_url, price, category, sub_category, sku)
+VALUES('The Brothers War Set Booster Display', '
+• 30 The Brothers War Set Boosters—the best MTG boosters to open just for fun
+• 12 Magic: The Gathering cards per booster
+• 1–5 cards of rarity Rare or higher in every pack
+• Traditional Foil card and Art Card in every pack
+• Travel back in time to command powerful artifacts and giant robots
+
+The Brothers War Set Booster Box contains 30 The Brothers War Set Boosters. Each Set Booster contains 12 Magic cards, 1 Art Card, and 1 token/ad card or card from The List (a special card from Magics history—found in 25% of packs).
+
+Every pack includes a combination of 1–5 card(s) of rarity Rare or higher and 3–7 Uncommon, 3–6 Common, and 1 Land cards. Traditional Foil Land replaces basic land in 20% of Set Boosters. Foil-Stamped Signature Art Card replaces Art Card in 10% of Set Boosters. Traditional Foil Borderless Mythic Rare Planeswalker in 1% of boosters.', 'https://www.dragonslair.se/images/93745/original', 1695, 'Magic: The Gathering', 'Displays', 'TBW101');
 

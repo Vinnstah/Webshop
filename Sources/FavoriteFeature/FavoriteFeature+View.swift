@@ -10,6 +10,7 @@ public extension Favorites {
         
         public let store: StoreOf<Favorites>
         @ObservedObject var viewStore: ViewStore<ViewState, Favorites.Action>
+        @Namespace var animation
         
         struct ViewState: Equatable {
             var productList: [Product]
@@ -29,29 +30,42 @@ public extension Favorites {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 NavigationView {
-                ForceFullScreen {
+                    ForceFullScreen {
                         VStack {
-                            ScrollView(.vertical) {
-                                LazyVGrid(columns: .init(repeating: .init(), count: 2)) {
-                                    
-                                    ForEach(
-                                        (viewStore.state.searchResults == []) ?
-                                        viewStore.state.productList :
-                                            viewStore.state.searchResults,
-                                        id: \.self
-                                    ) { prod in
-                                        ProductCardView<Favorites>(store: store, product: prod, action: {
-                                            viewStore.send(.internal(.favoriteButtonClicked(prod)))
-                                        }, isFavorite: {
-                                            viewStore.favoriteProducts.sku.contains(prod.sku)
-                                        })
-                                            .padding(.horizontal)
-                                            .onTapGesture {
-                                                viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                            }
-                                    }
+                            
+                            StaggeredGrid(list: (viewStore.state.searchResults == []) ?
+                                          viewStore.state.productList :
+                                            viewStore.state.searchResults, columns: 2, content: { prod in
+                                ProductCardView<Favorites>(store: store, product: prod, action: {
+                                    viewStore.send(.internal(.favoriteButtonClicked(prod)))
+                                }, isFavorite: {
+                                    viewStore.favoriteProducts.sku.contains(prod.sku)
+                                })
+                                .padding(.horizontal)
+                                .onTapGesture {
+                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
                                 }
-                            }
+                                
+                            })
+                            //                            ScrollView(.vertical) {
+                            //                                LazyVGrid(columns: .init(repeating: .init(), count: 2)) {
+                            //                                    
+                            //                                    ForEach(
+                            //                                        ,
+                            //                                        id: \.self
+                            //                                    ) { prod in
+                            //                                        ProductCardView<Favorites>(store: store, product: prod, action: {
+                            //                                            viewStore.send(.internal(.favoriteButtonClicked(prod)))
+                            //                                        }, isFavorite: {
+                            //                                            viewStore.favoriteProducts.sku.contains(prod.sku)
+                            //                                        })
+                            //                                            .padding(.horizontal)
+                            //                                            .onTapGesture {
+                            //                                                viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                            //                                            }
+                            //                                    }
+                            //                                }
+                            //                            }
                         }
                     }
                     

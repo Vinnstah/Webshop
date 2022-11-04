@@ -27,6 +27,7 @@ public extension Home {
         public var favoriteProducts: FavoriteProducts
         public var isSettingsSheetPresented: Bool
         public var columnsInGrid: Int
+        public var showDetailView: Bool
         
         public init(
             productList: [Product] = [],
@@ -38,7 +39,8 @@ public extension Home {
             filteredProducts: [Product] = [],
             favoriteProducts: FavoriteProducts = .init(),
             isSettingsSheetPresented: Bool = false,
-            columnsInGrid: Int = 2
+            columnsInGrid: Int = 2,
+            showDetailView: Bool = false
         ) {
             self.productList = productList
             self.product = product
@@ -50,6 +52,7 @@ public extension Home {
             self.favoriteProducts = favoriteProducts
             self.isSettingsSheetPresented = isSettingsSheetPresented
             self.columnsInGrid = columnsInGrid
+            self.showDetailView = showDetailView
         }
     }
     
@@ -79,6 +82,7 @@ public extension Home {
             case categoryButtonPressed(ProductModel.Category)
             case increaseNumberOfColumns
             case decreaseNumberOfColumns
+            case toggleDetailView(Product?)
         }
     }
     
@@ -226,6 +230,16 @@ public extension Home {
                     return .none
                 }
                 state.columnsInGrid -= 1
+                return .none
+                
+            case let .internal(.toggleDetailView(prod)):
+                guard prod != nil else {
+                    state.product =  nil
+                    state.showDetailView.toggle()
+                    return .none
+                }
+                state.product = prod
+                state.showDetailView.toggle()
                 return .none
             }
             }

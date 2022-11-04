@@ -30,7 +30,6 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                     .cornerRadius(25)
                 
                 VStack {
-//                    getImage(imageURL: product.imageURL)
                     KFImage(URL(string: product.imageURL))
                         .resizable()
                         .padding([.horizontal, .top])
@@ -63,28 +62,6 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
         }
     }
 }
-
-
-//@ViewBuilder
-//public func getImage(imageURL: String) -> some View {
-//    AsyncImage(url: URL(string: imageURL)) { maybeImage in
-//        if let image = maybeImage.image {
-//            image
-//                .resizable()
-//                .padding([.horizontal, .top])
-//
-//        } else if maybeImage.error != nil {
-//            Text("No image available")
-//
-//        } else {
-//            Image(systemName: "photo")
-//                .resizable()
-//                .aspectRatio(contentMode: .fit)
-//                .frame(maxWidth: .infinity)
-//                .frame(height: 400)
-//        }
-//    }
-//}
 
 @ViewBuilder
 public func favoriteButton(action: @escaping ()-> Void, isFavorite: Bool?, bgColor: Color) -> some View {

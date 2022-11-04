@@ -7,30 +7,33 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     let isRoot: Bool
     let isCartPopulated: () -> Bool
-    let isFavourite: Bool?
-    let toggleFavourite: () -> Void
-    let toggleSettings: () -> Void
+    let isFavourite: () -> Bool?
+    let showFavouriteSymbol: () -> Void
+    let showSettingsSymbol: () -> Void
     let searchableBinding: Binding<String>
     let cancelSearch: () -> Void
+    let previousScreenAction: () -> Void
     let content: Content
     
     public init(
         isRoot: Bool,
         isCartPopulated: @escaping () -> Bool,
-        isFavourite: Bool?,
-        toggleFavourite: @escaping () -> Void = {},
-        toggleSettings: @escaping () -> Void = {},
+        isFavourite: @escaping () -> Bool? = {nil},
+        showFavouriteSymbol: @escaping () -> Void = {},
+        showSettingsSymbol: @escaping () -> Void = {},
         searchableBinding: Binding<String> = .constant(.init()),
         cancelSearch: @escaping () -> Void,
+        previousScreenAction: @escaping () -> Void,
         content: () -> Content
     ) {
         self.isRoot = isRoot
         self.isCartPopulated = isCartPopulated
         self.isFavourite = isFavourite
-        self.toggleFavourite = toggleFavourite
-        self.toggleSettings = toggleSettings
+        self.showFavouriteSymbol = showFavouriteSymbol
+        self.showSettingsSymbol = showSettingsSymbol
         self.searchableBinding = searchableBinding
         self.cancelSearch = cancelSearch
+        self.previousScreenAction = previousScreenAction
         self.content = content()
     }
     
@@ -41,7 +44,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                     ZStack {
                         HStack {
                             if isRoot {
-                                Button(action: { toggleSettings() }, label: {
+                                Button(action: { showSettingsSymbol() }, label: {
                                     Image(systemName: "gearshape")
                                         .bold()
                                         .padding()
@@ -53,7 +56,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                                     .padding()
                                     .foregroundColor(Color("Secondary"))
                                     .onTapGesture(count: 1, perform: {
-                                        self.mode.wrappedValue.dismiss()
+                                        previousScreenAction()
                                     })
                                     .opacity(isRoot ? 0 : 1)
                             }
@@ -67,8 +70,8 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                             }
                             
                             favoriteButton(
-                                action: { toggleFavourite() },
-                                isFavorite: isFavourite,
+                                action: { showFavouriteSymbol() },
+                                isFavorite: isFavourite(),
                                 bgColor: Color("Background")
                             )
                             
@@ -135,7 +138,7 @@ public func searchBar(bindingText: Binding<String>, showCancel: @escaping () -> 
             if showCancel() {
                 Button(action: {
                     cancelSearch()
-                } , label: {
+                }, label: {
                     Image(systemName: "x.circle")
                         .bold()
                         .foregroundColor(.gray)

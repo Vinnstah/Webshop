@@ -14,33 +14,28 @@ public extension Home {
         public let product: Product
         public let isFavourite: () -> Bool
         public let toggleFavourite: () -> Void
+        public var animation: Namespace.ID
         
         public init(
             store: StoreOf<Home>,
             product: Product,
             isFavourite: @escaping () -> Bool,
-            toggleFavourite: @escaping () -> Void
+            toggleFavourite: @escaping () -> Void,
+            animation: Namespace.ID
         ) {
             self.store = store
             self.product = product
             self.isFavourite = isFavourite
             self.toggleFavourite = toggleFavourite
+            self.animation = animation
         }
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
-                NavigationBar(
-                    isRoot: false,
-                    isCartPopulated: { viewStore.state.cart?.session == nil },
-                    isFavourite: isFavourite(),
-                    toggleFavourite: { toggleFavourite() },
-                    cancelSearch: { viewStore.send(.internal(.cancelSearchClicked)) }
-                ) {
                     VStack {
                         ScrollView(.vertical) {
                             
                             VStack {
-//                                getImage(imageURL: product.imageURL)
                                 KFImage(URL(string: product.imageURL))
                                     .resizable()
                                     .padding([.horizontal, .top])
@@ -49,7 +44,7 @@ public extension Home {
                                     .clipShape(Rectangle())
                                     .cornerRadius(40)
                                     .ignoresSafeArea()
-                                
+                                    .matchedGeometryEffect(id: product.imageURL, in: animation)
                                 HStack {
                                     Text(product.title)
                                         .font(.largeTitle)
@@ -131,8 +126,9 @@ public extension Home {
                             
                         }
                     }
+                .background {
+                    Color("BackgroundColor")
                 }
-                .navigationBarHidden(true)
             }
         }
     }

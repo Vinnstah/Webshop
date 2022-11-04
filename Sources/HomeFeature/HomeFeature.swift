@@ -204,6 +204,8 @@ public extension Home {
             case .delegate(_):
                 return .none
                 
+                //MARK: Filter by category
+                //TODO: Change Category struct to enum and switch on cases
             case let .internal(.categoryButtonPressed(category)):
                 switch category.title {
                 case "All": state.filteredProducts = state.productList.filter({ $0.category != ""})
@@ -214,6 +216,7 @@ public extension Home {
                 }
                 return .none
                 
+                //MARK: StaggeredGrid column actions
             case .internal(.increaseNumberOfColumns):
                 state.columnsInGrid += 1
                 return .none

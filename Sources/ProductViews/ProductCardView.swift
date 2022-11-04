@@ -24,60 +24,78 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
     public var body: some SwiftUI.View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
+                RoundedRectangle(cornerSize: .zero)
+                    .foregroundColor(.white)
+                    .cornerRadius(25)
+                
                 VStack {
                     getImage(imageURL: product.imageURL)
                         .scaledToFill()
-                        .frame(width: 150, height: 150)
+                    //                        .frame(width: 150, height: 150)
+                    HStack {
+                        Text(product.title)
+                            .foregroundColor(Color("Secondary"))
+                            .font(.title)
+//                            .lineLimit(2)
+                            .scaledToFit()
+                            .minimumScaleFactor(0.01)
+                        //                        .frame(width: 150)
+                        //                        .padding()
+                        Spacer()
+                    }
+                    .padding(.horizontal)
                     
-                    Text(product.title)
-                        .foregroundColor(Color("Secondary"))
-                        .font(.title.bold())
-                        .scaledToFit()
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(2)
-                        .frame(width: 150)
-                        .padding()
+                    HStack {
+                        Text("\(product.price)"+" kr")
+                            .foregroundColor(Color("ButtonColor"))
+                            .scaledToFit()
+                            .minimumScaleFactor(0.01)
+                            .bold()
+                        
+                        Spacer()
+                        
+                        favoriteButton(action: { action() }, isFavorite: isFavorite(), bgColor: .white)
+                    }
+                    .padding([.horizontal, .bottom])
                     
                 }
-                favoriteButton(action: { action() }, isFavorite: isFavorite())
-                    .offset(x: 60, y: -100)
             }
         }
     }
 }
 
-    
-    @ViewBuilder
-     public func getImage(imageURL: String) -> some View {
-        AsyncImage(url: URL(string: imageURL)) { maybeImage in
-            if let image = maybeImage.image {
-                image
-                    .resizable()
-                
-            } else if maybeImage.error != nil {
-                Text("No image available")
-                
-            } else {
-                Image(systemName: "photo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 400)
-            }
+
+@ViewBuilder
+public func getImage(imageURL: String) -> some View {
+    AsyncImage(url: URL(string: imageURL)) { maybeImage in
+        if let image = maybeImage.image {
+            image
+                .resizable()
+                .padding([.horizontal, .top])
+            
+        } else if maybeImage.error != nil {
+            Text("No image available")
+            
+        } else {
+            Image(systemName: "photo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: .infinity)
+                .frame(height: 400)
         }
     }
-    
+}
+
 @ViewBuilder
-public func favoriteButton(action: @escaping ()-> Void, isFavorite: Bool?) -> some View {
+public func favoriteButton(action: @escaping ()-> Void, isFavorite: Bool?, bgColor: Color) -> some View {
     if isFavorite != nil {
         Button(action: {
             action()
         }, label: {
             Image(systemName: isFavorite! ? "heart.fill" : "heart")
                 .foregroundColor(Color("ButtonColor"))
-                .frame(width: 25, height: 25)
                 .background {
-                    Color("BackgroundColor")
+                    bgColor
                         .clipShape(Circle())
                 }
         })

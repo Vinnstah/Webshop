@@ -68,7 +68,8 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                             
                             favoriteButton(
                                 action: { toggleFavourite() },
-                                isFavorite: isFavourite
+                                isFavorite: isFavourite,
+                                bgColor: Color("Background")
                             )
                             
                             ZStack {

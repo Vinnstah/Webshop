@@ -32,7 +32,11 @@ public extension Home {
                 ) {
                     VStack {
                         VStack {
+                            
                             HStack {
+                                
+                                Spacer()
+                                
                                 Text("Columns")
                                     .font(.footnote)
                                     .foregroundColor(.gray)
@@ -55,6 +59,8 @@ public extension Home {
                                         .foregroundColor(Color("Secondary"))
                                 })
                             }
+                            .padding(.horizontal
+                            )
                             ScrollView(.horizontal) {
                                 HStack(spacing: 20) {
                                     

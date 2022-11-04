@@ -48,6 +48,7 @@ public struct StaggeredGrid<Content: View,T: Identifiable>: View where T: Hashab
                     }
                 }
             }
+            .padding(.vertical)
         }
     }
 }

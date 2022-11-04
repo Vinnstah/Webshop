@@ -26,6 +26,7 @@ public extension Home {
         public var filteredProducts: [Product]
         public var favoriteProducts: FavoriteProducts
         public var isSettingsSheetPresented: Bool
+        public var columnsInGrid: Int
         
         public init(
             productList: [Product] = [],
@@ -36,7 +37,8 @@ public extension Home {
             searchText: String = "",
             filteredProducts: [Product] = [],
             favoriteProducts: FavoriteProducts = .init(),
-            isSettingsSheetPresented: Bool = false
+            isSettingsSheetPresented: Bool = false,
+            columnsInGrid: Int = 2
         ) {
             self.productList = productList
             self.product = product
@@ -47,6 +49,7 @@ public extension Home {
             self.filteredProducts = filteredProducts
             self.favoriteProducts = favoriteProducts
             self.isSettingsSheetPresented = isSettingsSheetPresented
+            self.columnsInGrid = columnsInGrid
         }
     }
     
@@ -74,6 +77,8 @@ public extension Home {
             case addFavouriteProduct(Product.SKU?)
             case cancelSearchClicked
             case categoryButtonPressed(ProductModel.Category)
+            case increaseNumberOfColumns
+            case decreaseNumberOfColumns
         }
     }
     
@@ -207,7 +212,17 @@ public extension Home {
                 default:
                     print("DEFAULT")
                 }
-            
+                return .none
+                
+            case .internal(.increaseNumberOfColumns):
+                state.columnsInGrid += 1
+                return .none
+
+            case .internal(.decreaseNumberOfColumns):
+                guard state.columnsInGrid > 1 else {
+                    return .none
+                }
+                state.columnsInGrid -= 1
                 return .none
             }
             }

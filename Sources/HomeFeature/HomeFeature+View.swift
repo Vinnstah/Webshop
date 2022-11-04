@@ -10,6 +10,7 @@ import NavigationBar
 public extension Home {
     struct View: SwiftUI.View {
         
+        @Namespace var animation
         public let store: StoreOf<Home>
         
         public init(store: StoreOf<Home>) {
@@ -25,13 +26,35 @@ public extension Home {
                     isFavourite: nil,
                     toggleSettings: { viewStore.send(.internal(.toggleSettingsSheet)) },
                     searchableBinding: viewStore.binding(
-                                            get: { $0.searchText },
-                                            send: { .internal(.searchTextReceivesInput($0)) }).animation(),
+                        get: { $0.searchText },
+                        send: { .internal(.searchTextReceivesInput($0)) }).animation(),
                     cancelSearch: { viewStore.send(.internal(.cancelSearchClicked)) }
                 ) {
                     VStack {
-                        
                         VStack {
+                            HStack {
+                                Text("Columns")
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
+                                    .frame(alignment: .trailing)
+                                
+                                Button(action: { viewStore.send(.internal(.decreaseNumberOfColumns), animation: .default)  },
+                                       label: {
+                                    Image(systemName: "minus")
+                                        .font(.footnote)
+                                        .foregroundColor(Color("Secondary"))
+                                })
+                                Text(String("\(viewStore.state.columnsInGrid)"))
+                                    .font(.subheadline)
+                                        .foregroundColor(Color("Secondary"))
+                                
+                                Button(action: { viewStore.send(.internal(.increaseNumberOfColumns), animation: .default) },
+                                       label: {
+                                    Image(systemName: "plus")
+                                        .font(.footnote)
+                                        .foregroundColor(Color("Secondary"))
+                                })
+                            }
                             ScrollView(.horizontal) {
                                 HStack(spacing: 20) {
                                     
@@ -48,62 +71,28 @@ public extension Home {
                                 }
                             }
                         }
-                        if viewStore.filteredProducts.isEmpty {
-                            ScrollView(.horizontal) {
-                                HStack(spacing: 20) {
-                                    
-                                    ForEach(
-                                        (viewStore.state.filteredProducts == []) ?
-                                        viewStore.state.productList :
-                                            viewStore.state.filteredProducts,
-                                        id: \.self
-                                    )  { prod in
-                                        NavigationLink(destination: {
-                                            DetailView(
-                                                store: store,
-                                                product: prod,
-                                                isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku)},
-                                                toggleFavourite: { viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
-                                        }, label: {
-                                            ProductCardView<Home>(
-                                                store: store,
-                                                product: prod,
-                                                action: { viewStore.send(.internal(.favoriteButtonClicked(prod))) },
-                                                isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) })
-                                        })
-                                    }
-                                }
-                            }
-                        }
-                        if !viewStore.filteredProducts.isEmpty {
-                            ScrollView(.vertical) {
-                                LazyVGrid(columns: .init(repeating: .init(), count: 2) ) {
-                                    ForEach(
-                                        (viewStore.state.filteredProducts == []) ?
-                                        viewStore.state.productList :
-                                            viewStore.state.filteredProducts,
-                                        id: \.self
-                                    )  { prod in
-                                        NavigationLink(destination: {
-                                            DetailView(
-                                                store: store,
-                                                product: prod,
-                                                isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) },
-                                                toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
-                                        }, label: {
-                                            ProductCardView<Home>(
-                                                store: store,
-                                                product: prod,
-                                                action:{ viewStore.send(.internal(.favoriteButtonClicked(prod))) },
-                                                isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) })
-                                        })
-                                    }
-                                }
-                                
-                            }
-                        }
+                        StaggeredGrid(
+                            list: (viewStore.state.filteredProducts == []) ? viewStore.state.productList : viewStore.state.filteredProducts,
+                            columns: viewStore.state.columnsInGrid,
+                            content: { prod in
+                            NavigationLink(destination: {
+                                DetailView(
+                                    store: store,
+                                    product: prod,
+                                    isFavourite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) },
+                                    toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(prod)))} )
+                            }, label: {
+                                ProductCardView<Home>(
+                                    store: store,
+                                    product: prod,
+                                    action:{ viewStore.send(.internal(.favoriteButtonClicked(prod))) },
+                                    isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) })
+                                .matchedGeometryEffect(id: prod.id, in: animation)
+                            })
+
+                        })
+                        
                     }
-                    
                 }
                 .onAppear {
                     viewStore.send(.internal(.onAppear))
@@ -141,3 +130,4 @@ struct Settings: View {
         .padding()
     }
 }
+

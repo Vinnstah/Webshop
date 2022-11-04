@@ -9,6 +9,7 @@ let vapor: Target.Dependency = .product(name: "Vapor", package: "vapor")
 let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "vapor-routing")
 let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift-url-routing")
 let tagged: Target.Dependency = .product(name: "Tagged", package: "swift-tagged")
+let kingfisher: Target.Dependency = .product(name: "Kingfisher", package: "Kingfisher")
 
 var swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
@@ -96,6 +97,7 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
         .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.3.1"),
+        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.4.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -176,6 +178,7 @@ let package = Package(
                 "SiteRouter",
                 "StyleGuide",
                 "UserDefaultsClient",
+                kingfisher,
                 tca,
             ],
             swiftSettings: swiftSettings
@@ -242,6 +245,7 @@ let package = Package(
             dependencies: [
                 "ProductModel",
                 "StyleGuide",
+                kingfisher,
                 tca,
             ],
             swiftSettings: swiftSettings

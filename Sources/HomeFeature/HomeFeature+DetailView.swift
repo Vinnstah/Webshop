@@ -5,6 +5,7 @@ import ProductViews
 import ComposableArchitecture
 import CartModel
 import NavigationBar
+import Kingfisher
 
 public extension Home {
     struct DetailView: SwiftUI.View {
@@ -39,7 +40,10 @@ public extension Home {
                         ScrollView(.vertical) {
                             
                             VStack {
-                                getImage(imageURL: product.imageURL)
+//                                getImage(imageURL: product.imageURL)
+                                KFImage(URL(string: product.imageURL))
+                                    .resizable()
+                                    .padding([.horizontal, .top])
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 350)
                                     .clipShape(Rectangle())

@@ -221,6 +221,7 @@ let package = Package(
             name: "NavigationBar",
             dependencies: [
                 "ProductViews",
+                "StyleGuide",
             ],
             swiftSettings: swiftSettings
         ),

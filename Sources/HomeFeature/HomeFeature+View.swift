@@ -6,6 +6,7 @@ import StyleGuide
 import ProductViews
 import CheckoutFeature
 import NavigationBar
+import CartModel
 
 public extension Home {
     struct View: SwiftUI.View {
@@ -22,6 +23,7 @@ public extension Home {
                 NavigationBar(
                     isRoot: !viewStore.state.showDetailView,
                     isCartPopulated: { viewStore.state.cart?.session == nil },
+                    showCartQuickView: { viewStore.send(.internal(.toggleCheckoutQuickView), animation: .default)},
                     isFavourite: {
                         guard (viewStore.state.product != nil) else {
                             return nil
@@ -29,8 +31,8 @@ public extension Home {
                         return viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.sku) },
                     showFavouriteSymbol: {
                         guard (viewStore.state.product != nil) else {
-                        return
-                    }
+                            return
+                        }
                         viewStore.send(.internal(.favoriteButtonClicked((viewStore.state.product!)))) },
                     showSettingsSymbol: { viewStore.send(.internal(.toggleSettingsSheet)) },
                     searchableBinding: viewStore.binding(
@@ -44,7 +46,6 @@ public extension Home {
                             VStack {
                                 
                                 HStack {
-                                    
                                     Spacer()
                                     
                                     Text("Columns")
@@ -105,6 +106,7 @@ public extension Home {
                                     
                                 })
                             
+                            
                         }
                         if viewStore.state.showDetailView && viewStore.state.product != nil {
                             DetailView(
@@ -134,6 +136,11 @@ public extension Home {
                         }
                         .presentationDetents([.fraction(0.1)])
                     }
+                    .sheet(isPresented: viewStore.binding(
+                        get: \.showCheckoutQuickView,
+                        send: .internal(.toggleCheckoutQuickView))) {
+                            CheckoutQuickView(cart: viewStore.state.cart ?? .init(id: "TEST", userJWT: "TEST"))
+                        }
                 }
                 
             }
@@ -156,3 +163,29 @@ struct Settings: View {
     }
 }
 
+public struct CheckoutQuickView: View {
+    
+    public let cart: Cart
+    public var products: [Product]
+    
+    public init(cart: Cart) {
+        self.cart = cart
+        self.products = cart.products.keys.sorted()
+    }
+    
+    public var body: some View {
+//        ZStack {
+//            RoundedRectangle(cornerSize: .zero)
+//                .foregroundColor(.white)
+//                .cornerRadius(25)
+//
+            VStack {
+                ForEach(products, id: \.self) { product in
+                    Text("\(product.quantity!)")
+                    Text(product.title)
+                    Text("\(product.price)")
+                }
+            }
+//        }
+    }
+}

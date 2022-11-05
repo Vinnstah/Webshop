@@ -28,6 +28,7 @@ public extension Home {
         public var isSettingsSheetPresented: Bool
         public var columnsInGrid: Int
         public var showDetailView: Bool
+        public var showCheckoutQuickView: Bool
         
         public init(
             productList: [Product] = [],
@@ -40,7 +41,8 @@ public extension Home {
             favoriteProducts: FavoriteProducts = .init(),
             isSettingsSheetPresented: Bool = false,
             columnsInGrid: Int = 2,
-            showDetailView: Bool = false
+            showDetailView: Bool = false,
+            showCheckoutQuickView: Bool = false
         ) {
             self.productList = productList
             self.product = product
@@ -53,6 +55,7 @@ public extension Home {
             self.isSettingsSheetPresented = isSettingsSheetPresented
             self.columnsInGrid = columnsInGrid
             self.showDetailView = showDetailView
+            self.showCheckoutQuickView = showCheckoutQuickView
         }
     }
     
@@ -83,6 +86,7 @@ public extension Home {
             case increaseNumberOfColumns
             case decreaseNumberOfColumns
             case toggleDetailView(Product?)
+            case toggleCheckoutQuickView
         }
     }
     
@@ -240,6 +244,10 @@ public extension Home {
                 }
                 state.product = prod
                 state.showDetailView.toggle()
+                return .none
+                
+            case .internal(.toggleCheckoutQuickView):
+                state.showCheckoutQuickView.toggle()
                 return .none
             }
             }

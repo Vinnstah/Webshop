@@ -79,7 +79,6 @@ func siteHandler(
         return ResultPayload(forAction: "shoppingSessionDatabaseID", payload: sessions)
     
     case let .shoppingCartSessionProducts(id):
-        print("id" + id)
         let db = try await connectDatabase()
         let cart = try await getShoppingCartProducts(db, logger: logger, sessionID: id)
         try await db.close()

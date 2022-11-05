@@ -2,11 +2,13 @@
 import Foundation
 import SwiftUI
 import ProductViews
+import StyleGuide
 
 public struct NavigationBar<Content: View>: SwiftUI.View  {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     let isRoot: Bool
     let isCartPopulated: () -> Bool
+    let showCartQuickView: () -> Void
     let isFavourite: () -> Bool?
     let showFavouriteSymbol: () -> Void
     let showSettingsSymbol: () -> Void
@@ -18,6 +20,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
     public init(
         isRoot: Bool,
         isCartPopulated: @escaping () -> Bool,
+        showCartQuickView: @escaping () -> Void,
         isFavourite: @escaping () -> Bool? = {nil},
         showFavouriteSymbol: @escaping () -> Void = {},
         showSettingsSymbol: @escaping () -> Void = {},
@@ -28,6 +31,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
     ) {
         self.isRoot = isRoot
         self.isCartPopulated = isCartPopulated
+        self.showCartQuickView = showCartQuickView
         self.isFavourite = isFavourite
         self.showFavouriteSymbol = showFavouriteSymbol
         self.showSettingsSymbol = showSettingsSymbol
@@ -76,10 +80,14 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                             )
                             
                             ZStack {
-                                Image(systemName: "cart")
-                                    .padding()
-                                    .bold()
-                                    .foregroundColor(Color("Secondary"))
+                                Button(action: {
+                                    showCartQuickView()
+                                }, label: {
+                                    Image(systemName: "cart")
+                                        .padding()
+                                        .bold()
+                                        .foregroundColor(Color("Secondary"))
+                                })
                                 
                                 if isCartPopulated() {
                                     Circle()
@@ -115,7 +123,7 @@ public func searchBar(bindingText: Binding<String>, showCancel: @escaping () -> 
     ZStack {
         TextField("", text: bindingText)
             .labelsHidden()
-            .textFieldStyle(PlainTextFieldStyle())
+            .textFieldStyle(TappableTextFieldStyle())
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .padding(.horizontal)

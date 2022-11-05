@@ -47,25 +47,6 @@ public extension Favorites {
                                 }
                                 
                             })
-                            //                            ScrollView(.vertical) {
-                            //                                LazyVGrid(columns: .init(repeating: .init(), count: 2)) {
-                            //                                    
-                            //                                    ForEach(
-                            //                                        ,
-                            //                                        id: \.self
-                            //                                    ) { prod in
-                            //                                        ProductCardView<Favorites>(store: store, product: prod, action: {
-                            //                                            viewStore.send(.internal(.favoriteButtonClicked(prod)))
-                            //                                        }, isFavorite: {
-                            //                                            viewStore.favoriteProducts.sku.contains(prod.sku)
-                            //                                        })
-                            //                                            .padding(.horizontal)
-                            //                                            .onTapGesture {
-                            //                                                viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                            //                                            }
-                            //                                    }
-                            //                                }
-                            //                            }
                         }
                     }
                     

@@ -1,6 +1,4 @@
-#  <#Title#>
-
-
+#  Old DB Model
 
  DB Model
  Tables:
@@ -67,5 +65,41 @@ VALUES('Diamant', 'Diamant är ett snabbspelat och roligt bluffspel för hela fa
 
 
 
+#  New DB Model
+
+CREATE TABLE boardgames (
+    db_id SERIAL PRIMARY KEY,
+    boardgame_id VARCHAR,
+    title VARCHAR,
+    image_url: VARCHAR,
+    publisher VARCHAR,
+    release_date DATE,
+    duration integer,
+    players_min VARCHAR,
+    players_max VARCHAR,
+    category VARCHAR
+);
+
+CREATE TABLE warehouse (
+    db_id SERIAL PRIMARY KEY,
+    prod_id VARCHAR,
+    quantity integer
+);
+
+CREATE TABLE cart (
+    db_id SERIAL PRIMARY KEY,
+    cart_id VARCHAR,
+    product_id VARCHAR,
+    quantity integer,
+    jwt VARCHAR
+);
+
+CREATE TABLE product (
+    db_id SERIAL PRIMARY KEY,
+    boardgame_id VARCHAR,
+    product_id VARCHAR,
+    price integer,
+    currency VARCHAR
+);
 
 

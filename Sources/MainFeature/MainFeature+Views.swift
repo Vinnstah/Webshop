@@ -45,9 +45,10 @@ public extension Main {
                             Label("Checkout", systemImage: "cart")
                         }
                     }
+                    .accentColor(Color("ButtonColor"))
                 }
                 .onAppear {
-                    viewStore.send(.internal(.onAppear))
+                    viewStore.send(.internal(.onAppear), animation: .default)
                 }
             }
         }

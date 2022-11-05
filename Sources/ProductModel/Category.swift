@@ -5,12 +5,18 @@ import SwiftUI
 extension Image: @unchecked Sendable {}
 
 public struct Category: Equatable, Codable, Sendable, Hashable, Identifiable {
+    
     public var title: String
     public var id: String
     public var image: String?
     public var subCategory: SubCategory
     
-    public init(title: String, id: String = UUID().uuidString, image: String? = nil, subCategory: SubCategory) {
+    public init
+    (title: String,
+     id: String = UUID().uuidString,
+     image: String? = nil,
+     subCategory: SubCategory
+    ) {
         self.title = title
         self.id = id
         self.image = image
@@ -23,8 +29,6 @@ public struct Category: Equatable, Codable, Sendable, Hashable, Identifiable {
         }
         return Image(systemName: image)
     }
-    
-    
     
     public enum CodingKeys: String, CodingKey {
         case title
@@ -44,19 +48,15 @@ public struct Category: Equatable, Codable, Sendable, Hashable, Identifiable {
         public var id: String
         public var image: String?
         
-        public init(title: String, id: String = UUID().uuidString, image: String? = nil) {
+        public init(
+            title: String,
+            id: String = UUID().uuidString,
+            image: String? = nil
+        ) {
             self.title = title
             self.id = id
             self.image = image
         }
-        
-        //TODO: Fix this to be a hardcoded image, Async image or an image stored in the DB
-//        public func getImage() -> Image? {
-//            guard let image else {
-//                return nil
-//            }
-//            return Image(systemName: image)
-//        }
         
         public enum CodingKeys: String, CodingKey {
             case title

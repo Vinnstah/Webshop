@@ -18,33 +18,44 @@ public struct Home: ReducerProtocol, Sendable {
 public extension Home {
     struct State: Equatable, Sendable {
         public var productList: [Product]
-        public var isProductDetailSheetPresented: Bool
         public var product: Product?
         public var catergories: [ProductModel.Category]
         public var cart: Cart?
         public var quantity: Int
         public var searchText: String
-        public var searchResults: [Product]
-        
+        public var filteredProducts: [Product]
+        public var favoriteProducts: FavoriteProducts
+        public var isSettingsSheetPresented: Bool
+        public var columnsInGrid: Int
+        public var showDetailView: Bool
+        public var showCheckoutQuickView: Bool
         
         public init(
             productList: [Product] = [],
-            isProductDetailSheetPresented: Bool = false,
             product: Product? = nil,
             catergories: [ProductModel.Category] = [],
             cart: Cart? = nil,
             quantity: Int = 0,
             searchText: String = "",
-            searchResults: [Product] = []
+            filteredProducts: [Product] = [],
+            favoriteProducts: FavoriteProducts = .init(),
+            isSettingsSheetPresented: Bool = false,
+            columnsInGrid: Int = 2,
+            showDetailView: Bool = false,
+            showCheckoutQuickView: Bool = false
         ) {
             self.productList = productList
-            self.isProductDetailSheetPresented = isProductDetailSheetPresented
             self.product = product
             self.catergories = catergories
             self.cart = cart
             self.quantity = quantity
             self.searchText = searchText
-            self.searchResults = searchResults
+            self.filteredProducts = filteredProducts
+            self.favoriteProducts = favoriteProducts
+            self.isSettingsSheetPresented = isSettingsSheetPresented
+            self.columnsInGrid = columnsInGrid
+            self.showDetailView = showDetailView
+            self.showCheckoutQuickView = showCheckoutQuickView
         }
     }
     
@@ -61,13 +72,21 @@ public extension Home {
             case logOutUser
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
-            case toggleSheet
-            case showProductDetailViewFor(Product)
+            case toggleSettingsSheet
             case getCategoryResponse(TaskResult<[ProductModel.Category]>)
             case increaseQuantityButtonPressed
             case decreaseQuantityButtonPressed
             case searchTextReceivesInput(String)
             case favoriteButtonClicked(Product)
+            case loadFavoriteProducts([Product.SKU]?)
+            case removeFavouriteProduct(Product.SKU?)
+            case addFavouriteProduct(Product.SKU?)
+            case cancelSearchClicked
+            case categoryButtonPressed(ProductModel.Category)
+            case increaseNumberOfColumns
+            case decreaseNumberOfColumns
+            case toggleDetailView(Product?)
+            case toggleCheckoutQuickView
         }
     }
     
@@ -81,6 +100,7 @@ public extension Home {
                     await send(.delegate(.userIsLoggedOut))
                 }
                 
+                //MARK: On appear API calls
             case .internal(.onAppear):
                 return .run { [apiClient] send in
                     await send(.internal(.getProductResponse(
@@ -99,12 +119,9 @@ public extension Home {
                             ).value.status.get()
                         }
                     )))
+                    
+                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 }
-                
-            case let .internal(.searchTextReceivesInput(text)):
-                state.searchText = text
-                state.searchResults = state.productList.filter { $0.title.contains(text)  }
-                return .none
                 
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
@@ -116,19 +133,33 @@ public extension Home {
                 
             case let .internal(.getCategoryResponse(.success(categories))):
                 state.catergories = categories
+                state.catergories.append(Category.init(title: "All", subCategory: .init(title: "All")))
+                state.catergories = state.catergories.sorted(by: { $0.title < $1.title})
                 return .none
                 
             case let .internal(.getCategoryResponse(.failure(error))):
                 print(error)
                 return .none
                 
-            case let .internal(.showProductDetailViewFor(product)):
-                state.product = product
-                state.isProductDetailSheetPresented.toggle()
+                //MARK: Search function
+            case let .internal(.searchTextReceivesInput(text)):
+                state.searchText = text
+                
+                state.filteredProducts = state.productList.filter { $0.title.contains(text) }
+                
+                if state.filteredProducts == [] {
+                    state.filteredProducts = state.productList.filter { $0.category.contains(text) }
+                }
                 return .none
                 
-            case .internal(.toggleSheet):
-                state.isProductDetailSheetPresented.toggle()
+            case .internal(.cancelSearchClicked):
+                state.searchText = ""
+                state.filteredProducts = []
+                return .none
+                
+                //MARK: Misc actions
+            case .internal(.toggleSettingsSheet):
+                state.isSettingsSheetPresented.toggle()
                 return .none
                 
             case .internal(.increaseQuantityButtonPressed):
@@ -136,20 +167,89 @@ public extension Home {
                 return .none
                 
             case .internal(.decreaseQuantityButtonPressed):
+                guard state.quantity != 0 else {
+                    return .none
+                }
                 state.quantity -= 1
                 return .none
                 
+                //MARK: Favourite interaction
+            case let .internal(.loadFavoriteProducts(products)):
+                guard let products else {
+                        return .none
+                    }
+                    
+                state.favoriteProducts.sku = products
+                return .none
+                
             case let .internal(.favoriteButtonClicked(product)):
-                return .run { send in
-                    try favouritesClient.addFavorite(product.sku)
+                
+                if state.favoriteProducts.sku.contains(product.sku) {
+                    return .run { send in
+                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.sku))))
+                        
+                    }
                 }
+                return .run { send in
+                    await send(.internal(.addFavouriteProduct(try favouritesClient.addFavorite(product.sku))))
+                }
+                
+            case let .internal(.removeFavouriteProduct(sku)):
+                guard let sku else {
+                    return .none
+                }
+                state.favoriteProducts.sku.removeAll(where: { $0 == sku })
+                return .none
+                
+            case let .internal(.addFavouriteProduct(sku)):
+                guard let sku else {
+                    return .none
+                }
+                state.favoriteProducts.sku.append(sku)
+                return .none
+                
                 
             case .delegate(_):
                 return .none
                 
+                //MARK: Filter by category
+                //TODO: Change Category struct to enum and switch on cases
+            case let .internal(.categoryButtonPressed(category)):
+                switch category.title {
+                case "All": state.filteredProducts = state.productList.filter({ $0.category != ""})
+                case "Board Games": state.filteredProducts = state.productList.filter({ $0.category == "Board Games"})
+                case "Magic: The Gathering": state.filteredProducts = state.productList.filter({ $0.category == "Magic: The Gathering"})
+                default:
+                    print("DEFAULT")
+                }
+                return .none
+                
+                //MARK: StaggeredGrid column actions
+            case .internal(.increaseNumberOfColumns):
+                state.columnsInGrid += 1
+                return .none
+
+            case .internal(.decreaseNumberOfColumns):
+                guard state.columnsInGrid > 1 else {
+                    return .none
+                }
+                state.columnsInGrid -= 1
+                return .none
+                
+            case let .internal(.toggleDetailView(prod)):
+                guard prod != nil else {
+                    state.product =  nil
+                    state.showDetailView.toggle()
+                    return .none
+                }
+                state.product = prod
+                state.showDetailView.toggle()
+                return .none
+                
+            case .internal(.toggleCheckoutQuickView):
+                state.showCheckoutQuickView.toggle()
+                return .none
             }
             }
         }
     }
-
-

@@ -166,7 +166,6 @@ public func getAllProducts(
 
 public func addShoppingCartProducts(_ db: PostgresConnection, logger: Logger, cart: Cart) async throws {
     var sessionProdId: String = ""
-    print(cart.products)
     for product in cart.products {
         sessionProdId = "\(cart.id)"  + "_" + "\(product.key.id)"
         try await db.query("""
@@ -210,12 +209,11 @@ public func returnProductRowsAsCart(_ rows: PostgresRowSequence, id: String) asy
             price: try randomRow["price"].decode(Int.self, context: .default),
             category: try randomRow["category"].decode(String.self, context: .default),
             subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
-            sku: Product.SKU(rawValue: try randomRow["sku"].decode(String.self, context: .default)))
-        print(randomRow)
-        print(product)
-        cart.addItemToCart(product: product, quantity: try randomRow["quantity"].decode(Int.self, context: .default))
-//
-        print(randomRow)
+            sku: Product.SKU(rawValue: try randomRow["sku"].decode(String.self, context: .default)),
+            quantity: try randomRow["quantity"].decode(Int.self, context: .default))
+        
+        cart.addItemToCart(product: product, quantity: product.quantity!)
+//        cart.addItemToCart(product: product, quantity: try randomRow["quantity"].decode(Int.self, context: .default))
     }
     return cart
 }
@@ -232,7 +230,8 @@ public func returnProductRowsAsArray(_ rows: PostgresRowSequence) async throws -
             price: try randomRow["price"].decode(Int.self, context: .default),
             category: try randomRow["category"].decode(String.self, context: .default),
             subCategory: try randomRow["sub_category"].decode(String.self, context: .default),
-            sku: Product.SKU(rawValue: try randomRow["sku"].decode(String.self, context: .default)))
+            sku: Product.SKU(rawValue: try randomRow["sku"].decode(String.self, context: .default)),
+            quantity: nil)
         products.append(product)
 
     }

@@ -1,14 +1,8 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-10-24.
-//
-
 import Foundation
 import SwiftUI
 import ComposableArchitecture
 import ProductModel
+import Kingfisher
 
 public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: Equatable {
     public let store: StoreOf<T>
@@ -31,53 +25,57 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
     public var body: some SwiftUI.View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
+                RoundedRectangle(cornerSize: .zero)
+                    .foregroundColor(.white)
+                    .cornerRadius(25)
+                
                 VStack {
-                    getImage(imageURL: product.imageURL)
-                    
-                    Text(product.title)
-                        .foregroundColor(Color("Secondary"))
-                        .font(.title.bold())
+                    KFImage(URL(string: product.imageURL))
+                        .resizable()
+                        .padding([.horizontal, .top])
                         .scaledToFill()
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                        .padding()
-                    favoriteButton(action: action, isFavorite: isFavorite)
+                    HStack {
+                        Text(product.title)
+                            .foregroundColor(Color("Secondary"))
+                            .font(.title)
+                            .scaledToFit()
+                            .minimumScaleFactor(0.01)
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    
+                    HStack {
+                        Text("\(product.price)"+" kr")
+                            .foregroundColor(Color("ButtonColor"))
+                            .scaledToFit()
+                            .minimumScaleFactor(0.01)
+                            .bold()
+                        
+                        Spacer()
+                        
+                        favoriteButton(action: { action() }, isFavorite: isFavorite(), bgColor: .white)
+                    }
+                    .padding([.horizontal, .bottom])
+                    
                 }
             }
-            .frame(width: 200, height: 250)
         }
     }
 }
 
-    
-    @ViewBuilder
-     func getImage(imageURL: String) -> some View {
-        AsyncImage(url: URL(string: imageURL)) { maybeImage in
-            if let image = maybeImage.image {
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 150, height: 150)
-                
-            } else if maybeImage.error != nil {
-                Text("No image available")
-                
-            } else {
-                Image(systemName: "photo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            }
-        }
-    }
-    
 @ViewBuilder
-func favoriteButton(action: @escaping () -> Void, isFavorite: @escaping () -> Bool) -> some View {
-    Button(action: {
-        action()
-    }, label: {
-        Image(systemName: isFavorite() ? "heart.fill" : "heart")
-            .clipShape(Circle())
-            .frame(width: 50, height: 50)
-    })
+public func favoriteButton(action: @escaping ()-> Void, isFavorite: Bool?, bgColor: Color) -> some View {
+    if isFavorite != nil {
+        Button(action: {
+            action()
+        }, label: {
+            Image(systemName: isFavorite! ? "heart.fill" : "heart")
+                .foregroundColor(Color("ButtonColor"))
+                .background {
+                    bgColor
+                        .clipShape(Circle())
+                }
+        })
+    }
 }
 

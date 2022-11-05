@@ -25,7 +25,6 @@ public struct Product: Equatable, Codable, Sendable, Hashable, Identifiable, Com
         hasher.combine(sku)
     }
     
-    
     public let id: Int
     public let title: String
     public let description: String

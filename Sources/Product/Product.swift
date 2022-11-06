@@ -7,7 +7,6 @@ public struct Product: Equatable, Sendable, Identifiable, Codable, Hashable {
     public let sku: Product.SKU
     public let price: Price
     public let id: ID
-    
 }
 
 public extension Product {
@@ -25,7 +24,6 @@ public extension Product.Price {
     enum Currency: Equatable, Sendable, Codable, Hashable {
         case sek
     }
-    
 }
 
 public extension Product {

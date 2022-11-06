@@ -55,7 +55,7 @@ public extension App {
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
             case let .internal(.logInUser(jwt)):
-                state = .main(.init(cart: .init(id: UUID().uuidString, userJWT: jwt)))
+                state = .main(.init())
                 return .none
                  
                 ///When a user logs out from `main` we initialize onboarding again.
@@ -65,12 +65,12 @@ public extension App {
                 
                 ///After a user have finished onboarding and received the jwt we will send them through to `main`
             case let .onboarding(.delegate(.userFinishedOnboarding(jwt))):
-                state = .main(.init(cart: .init(id: UUID().uuidString, userJWT: jwt)))
+                state = .main(.init())
                 return .none
                
                 ///When a user logs in through onboarding we change state to `main` and send their jwt through.
             case let .onboarding(.delegate(.userLoggedIn(jwt))):
-                state = .main(.init(cart: .init(id: UUID().uuidString, userJWT: jwt)))
+                state = .main(.init())
                 return .none
                 
             case .splash(.internal(_)):

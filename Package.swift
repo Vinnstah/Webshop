@@ -181,6 +181,7 @@ let package = Package(
             name: "HomeFeature",
             dependencies: [
                 "ApiClient",
+                "Boardgame",
                 "CartModel",
                 "FavoritesClient",
                 "NavigationBar",

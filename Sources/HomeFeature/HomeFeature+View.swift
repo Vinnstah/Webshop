@@ -72,21 +72,22 @@ public extension Home {
                                 }
                                 .padding(.horizontal
                                 )
-                                ScrollView(.horizontal) {
-                                    HStack(spacing: 20) {
-                                        
-                                        ForEach(viewStore.state.catergories, id: \.self) { category in
-                                            Button(
-                                                category.title
-                                            ) {
-                                                viewStore.send(.internal(.categoryButtonPressed(category)), animation: .default)
-                                            }
-                                            .frame(minWidth: 0, maxWidth: .infinity)
-                                            .frame(height: 30)
-                                            .buttonStyle(.primary(cornerRadius: 25))
-                                        }
-                                    }
-                                }
+                                //TODO: Add category filtering
+//                                ScrollView(.horizontal) {
+//                                    HStack(spacing: 20) {
+//
+//                                        ForEach(viewStore.state.catergories.allCases, id: \.self) { category in
+//                                            Button(
+//                                                category.title
+//                                            ) {
+//                                                viewStore.send(.internal(.categoryButtonPressed(category)), animation: .default)
+//                                            }
+//                                            .frame(minWidth: 0, maxWidth: .infinity)
+//                                            .frame(height: 30)
+//                                            .buttonStyle(.primary(cornerRadius: 25))
+//                                        }
+//                                    }
+//                                }
                             }
                             StaggeredGrid(
                                 list: (viewStore.state.filteredProducts == []) ? viewStore.state.productList : viewStore.state.filteredProducts,
@@ -101,7 +102,7 @@ public extension Home {
                                             action:{ viewStore.send(.internal(.favoriteButtonClicked(prod))) },
                                             isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) }
                                         )
-                                        .matchedGeometryEffect(id: prod.imageURL, in: animation)
+                                        .matchedGeometryEffect(id: prod.boardgame.imageURL, in: animation)
                                     })
                                     
                                 })
@@ -139,7 +140,8 @@ public extension Home {
                     .sheet(isPresented: viewStore.binding(
                         get: \.showCheckoutQuickView,
                         send: .internal(.toggleCheckoutQuickView))) {
-                            CheckoutQuickView(cart: viewStore.state.cart ?? .init(id: "TEST", userJWT: "TEST"))
+                            EmptyView()
+//                            CheckoutQuickView(cart: viewStore.state.cart ?? .init(id: "TEST", userJWT: "TEST"))
                         }
                 }
                 
@@ -163,29 +165,29 @@ struct Settings: View {
     }
 }
 
-public struct CheckoutQuickView: View {
-    
-    public let cart: Cart
-    public var products: [Product]
-    
-    public init(cart: Cart) {
-        self.cart = cart
-        self.products = cart.products.keys.sorted()
-    }
-    
-    public var body: some View {
-//        ZStack {
-//            RoundedRectangle(cornerSize: .zero)
-//                .foregroundColor(.white)
-//                .cornerRadius(25)
+//public struct CheckoutQuickView: View {
 //
-            VStack {
-                ForEach(products, id: \.self) { product in
-                    Text("\(product.quantity!)")
-                    Text(product.title)
-                    Text("\(product.price)")
-                }
-            }
-//        }
-    }
-}
+//    public let cart: Cart
+//    public var products: [Product]
+//
+//    public init(cart: Cart) {
+//        self.cart = cart
+//        self.products = cart.products.keys.sorted()
+//    }
+//
+//    public var body: some View {
+////        ZStack {
+////            RoundedRectangle(cornerSize: .zero)
+////                .foregroundColor(.white)
+////                .cornerRadius(25)
+////
+//            VStack {
+//                ForEach(products, id: \.self) { product in
+//                    Text("\(product.quantity!)")
+//                    Text(product.title)
+//                    Text("\(product.price)")
+//                }
+//            }
+////        }
+//    }
+//}

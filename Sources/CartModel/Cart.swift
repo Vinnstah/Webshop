@@ -9,13 +9,13 @@ public struct Cart: Equatable, Identifiable, Sendable, Hashable, Codable {
     public var databaseID: String?
     public var session: Cart.Session?
     
-    public var numberOfItemsInCart: Int {
-        products.values.reduce(0, +)
-        }
-    
-    public var price: Int {
-        products.map({ $0.value * $0.key.price}).reduce(0, +)
-    }
+//    public var numberOfItemsInCart: Int {
+//        products.values.count
+//        }
+//
+//    public var price: Int {
+//        products.map({ $0.value * $0.key.price.brutto}).reduce(0, +)
+//    }
     
     public init(
         id: String,

@@ -23,6 +23,7 @@ public extension Boardgame {
 public extension Boardgame.Details {
     struct PlayInfo: Sendable, Codable, Hashable {
         public let duration: Int
+        public let descriptionText: String
     }
 }
 
@@ -45,7 +46,25 @@ public extension Boardgame {
 }
 
 public extension Boardgame {
-    enum Category: Sendable, Hashable, Codable, CaseIterable {
-        case strategy
+    enum Category: String, Sendable, Hashable, Codable, CaseIterable {
+        public typealias RawValue = String
+        
+        case strategy = "Strategy"
+        case classics = "Classics"
+        case children = "Children"
+        case scifi = "Sci-fi"
+        
+        public init?(rawValue: RawValue) {
+            switch rawValue {
+            case "Strategy": self = .strategy
+            case "Classics": self = .classics
+            case "Children": self = .children
+            case "Sci-fi": self = .scifi
+            default:
+                self = .scifi
+            }
+        }
+
+        
     }
 }

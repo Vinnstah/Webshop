@@ -7,6 +7,7 @@ import ApiClient
 import SiteRouter
 import CartModel
 import FavoritesClient
+import Boardgame
 
 public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -19,7 +20,7 @@ public extension Home {
     struct State: Equatable, Sendable {
         public var productList: [Product]
         public var product: Product?
-        public var catergories: [Product.Category]
+        public var catergories: Boardgame.Category?
         public var cart: Cart?
         public var quantity: Int
         public var searchText: String
@@ -33,7 +34,7 @@ public extension Home {
         public init(
             productList: [Product] = [],
             product: Product? = nil,
-            catergories: [Product.Category] = [],
+            catergories: Boardgame.Category? = nil,
             cart: Cart? = nil,
             quantity: Int = 0,
             searchText: String = "",
@@ -73,7 +74,6 @@ public extension Home {
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
             case toggleSettingsSheet
-            case getCategoryResponse(TaskResult<[Product.Category]>)
             case increaseQuantityButtonPressed
             case decreaseQuantityButtonPressed
             case searchTextReceivesInput(String)
@@ -82,7 +82,7 @@ public extension Home {
             case removeFavouriteProduct(Product.SKU?)
             case addFavouriteProduct(Product.SKU?)
             case cancelSearchClicked
-            case categoryButtonPressed(Product.Category)
+            case categoryButtonPressed(Boardgame.Category)
             case increaseNumberOfColumns
             case decreaseNumberOfColumns
             case toggleDetailView(Product?)
@@ -111,15 +111,6 @@ public extension Home {
                         }
                     )))
                     
-                    await send(.internal(.getCategoryResponse(
-                        TaskResult {
-                            try await apiClient.decodedResponse(
-                                for: .getCategories,
-                                as: ResultPayload<[Product.Category]>.self
-                            ).value.status.get()
-                        }
-                    )))
-                    
                         await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 }
                 
@@ -131,24 +122,15 @@ public extension Home {
                 print(error)
                 return .none
                 
-            case let .internal(.getCategoryResponse(.success(categories))):
-                state.catergories = categories
-                state.catergories.append(Category.init(title: "All", subCategory: .init(title: "All")))
-                state.catergories = state.catergories.sorted(by: { $0.title < $1.title})
-                return .none
-                
-            case let .internal(.getCategoryResponse(.failure(error))):
-                print(error)
-                return .none
                 
                 //MARK: Search function
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
                 
-                state.filteredProducts = state.productList.filter { $0.title.contains(text) }
+                state.filteredProducts = state.productList.filter { $0.boardgame.title.contains(text) }
                 
                 if state.filteredProducts == [] {
-                    state.filteredProducts = state.productList.filter { $0.category.contains(text) }
+                    state.filteredProducts = state.productList.filter { $0.boardgame.category.rawValue.contains(text) }
                 }
                 return .none
                 
@@ -212,15 +194,18 @@ public extension Home {
             case .delegate(_):
                 return .none
                 
-                //MARK: Filter by category
-                //TODO: Change Category struct to enum and switch on cases
             case let .internal(.categoryButtonPressed(category)):
-                switch category.title {
-                case "All": state.filteredProducts = state.productList.filter({ $0.category != ""})
-                case "Board Games": state.filteredProducts = state.productList.filter({ $0.category == "Board Games"})
-                case "Magic: The Gathering": state.filteredProducts = state.productList.filter({ $0.category == "Magic: The Gathering"})
-                default:
-                    print("DEFAULT")
+                switch category {
+                case .strategy:
+                    state.filteredProducts = state.productList.filter(
+                        { $0.boardgame.category.rawValue == "Strategy"}
+                    )
+                case .classics:
+                    state.filteredProducts = state.productList.filter({ $0.boardgame.category.rawValue == "Classics"})
+                case .children:
+                    state.filteredProducts = state.productList.filter({ $0.boardgame.category.rawValue == "Children"})
+                case .scifi:
+                    state.filteredProducts = state.productList.filter({ $0.boardgame.category.rawValue == "Sci-fi"})
                 }
                 return .none
                 

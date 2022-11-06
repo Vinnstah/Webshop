@@ -96,7 +96,7 @@ public extension Favorites {
                 
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
-                state.searchResults = state.productList.filter { $0.title.contains(text)  }
+                state.searchResults = state.productList.filter { $0.boardgame.title.contains(text)  }
                 return .none
                 
             case let .internal(.showProductDetailViewFor(product)):

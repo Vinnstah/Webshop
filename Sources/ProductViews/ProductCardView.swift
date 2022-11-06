@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
-import ProductModel
+import Product
 import Kingfisher
 
 public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: Equatable {

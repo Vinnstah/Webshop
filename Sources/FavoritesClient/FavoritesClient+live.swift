@@ -2,7 +2,7 @@
 import Foundation
 import UserDefaultsClient
 import ComposableArchitecture
-import ProductModel
+import Product
 
 public extension FavoritesClient {
     

@@ -1,5 +1,5 @@
 import Foundation
-import ProductModel
+import Product
 
 public struct Cart: Equatable, Identifiable, Sendable, Hashable, Codable {
     

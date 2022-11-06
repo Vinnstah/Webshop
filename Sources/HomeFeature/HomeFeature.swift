@@ -1,7 +1,7 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-import ProductModel
+import Product
 import UserDefaultsClient
 import ApiClient
 import SiteRouter
@@ -19,7 +19,7 @@ public extension Home {
     struct State: Equatable, Sendable {
         public var productList: [Product]
         public var product: Product?
-        public var catergories: [ProductModel.Category]
+        public var catergories: [Product.Category]
         public var cart: Cart?
         public var quantity: Int
         public var searchText: String
@@ -33,7 +33,7 @@ public extension Home {
         public init(
             productList: [Product] = [],
             product: Product? = nil,
-            catergories: [ProductModel.Category] = [],
+            catergories: [Product.Category] = [],
             cart: Cart? = nil,
             quantity: Int = 0,
             searchText: String = "",
@@ -73,7 +73,7 @@ public extension Home {
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
             case toggleSettingsSheet
-            case getCategoryResponse(TaskResult<[ProductModel.Category]>)
+            case getCategoryResponse(TaskResult<[Product.Category]>)
             case increaseQuantityButtonPressed
             case decreaseQuantityButtonPressed
             case searchTextReceivesInput(String)
@@ -82,7 +82,7 @@ public extension Home {
             case removeFavouriteProduct(Product.SKU?)
             case addFavouriteProduct(Product.SKU?)
             case cancelSearchClicked
-            case categoryButtonPressed(ProductModel.Category)
+            case categoryButtonPressed(Product.Category)
             case increaseNumberOfColumns
             case decreaseNumberOfColumns
             case toggleDetailView(Product?)
@@ -115,7 +115,7 @@ public extension Home {
                         TaskResult {
                             try await apiClient.decodedResponse(
                                 for: .getCategories,
-                                as: ResultPayload<[ProductModel.Category]>.self
+                                as: ResultPayload<[Product.Category]>.self
                             ).value.status.get()
                         }
                     )))

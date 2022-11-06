@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import ProductModel
+import Product
 import ProductViews
 import ComposableArchitecture
 import CartModel

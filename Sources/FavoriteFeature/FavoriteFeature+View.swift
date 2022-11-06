@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
-import ProductModel
+import Product
 import StyleGuide
 import ProductViews
 

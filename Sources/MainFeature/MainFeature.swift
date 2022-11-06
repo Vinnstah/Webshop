@@ -7,7 +7,7 @@ import CheckoutFeature
 import CartModel
 import ApiClient
 import SiteRouter
-import ProductModel
+import Product
 
 public struct Main: ReducerProtocol {
     @Dependency(\.apiClient) var apiClient

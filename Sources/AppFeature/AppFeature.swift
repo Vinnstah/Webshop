@@ -55,7 +55,11 @@ public extension App {
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
             case let .internal(.logInUser(jwt)):
-                state = .main(.init(cart: .init(id: UUID().uuidString, userJWT: jwt)))
+                state = .main(.init(
+                    cart: .init(
+                        id: UUID().uuidString,
+                        userJWT: jwt
+                    )))
                 return .none
                  
                 ///When a user logs out from `main` we initialize onboarding again.

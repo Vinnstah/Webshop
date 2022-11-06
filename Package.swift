@@ -36,8 +36,8 @@ let package = Package(
             name: "CheckoutFeature",
             targets: ["CheckoutFeature"]),
         .library(
-            name: "CartModel",
-            targets: ["CartModel"]),
+            name: "Cart",
+            targets: ["Cart"]),
         .library(
             name: "FavoritesClient",
             targets: ["FavoritesClient"]),
@@ -89,6 +89,9 @@ let package = Package(
         .library(
             name: "UserLocalSettingsFeature",
             targets: ["UserLocalSettingsFeature"]),
+        .library(
+            name: "Warehouse",
+            targets: ["Warehouse"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
@@ -111,32 +114,34 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         
-        .target(
-            name: "AppFeature",
-            dependencies: [
-                tca,
-                "MainFeature",
-                "OnboardingFeature",
-                "SplashFeature",
-                "UserModel",
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "AppFeature",
+                dependencies: [
+                    tca,
+                    "MainFeature",
+                    "OnboardingFeature",
+                    "SplashFeature",
+                    "UserModel",
+                ],
+                swiftSettings: swiftSettings
+            ),
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
         
+        
             .target(
-                name: "CartModel",
+                name: "BoardGame",
                 dependencies: [
-                    "ProductModel",
+                    postgres,
+                    tagged,
                 ],
                 swiftSettings: swiftSettings
             ),
         .target(
-            name: "BoardGame",
+            name: "Cart",
             dependencies: [
-                postgres,
+                "ProductModel",
                 tagged,
             ],
             swiftSettings: swiftSettings
@@ -145,7 +150,7 @@ let package = Package(
             name: "CheckoutFeature",
             dependencies: [
                 tca,
-                "CartModel",
+                "Cart",
                 "ProductModel",
             ],
             swiftSettings: swiftSettings
@@ -163,7 +168,7 @@ let package = Package(
             name: "FavoriteFeature",
             dependencies: [
                 "ApiClient",
-                "CartModel",
+                "Cart",
                 "FavoritesClient",
                 "ProductModel",
                 "ProductViews",
@@ -178,7 +183,7 @@ let package = Package(
             name: "HomeFeature",
             dependencies: [
                 "ApiClient",
-                "CartModel",
+                "Cart",
                 "FavoritesClient",
                 "ProductViews",
                 "SiteRouter",
@@ -196,7 +201,7 @@ let package = Package(
                 name: "MainFeature",
                 dependencies: [
                     "ApiClient",
-                    "CartModel",
+                    "Cart",
                     "CheckoutFeature",
                     "HomeFeature",
                     "SiteRouter",
@@ -228,16 +233,16 @@ let package = Package(
         
             .executableTarget(name: "runner", dependencies: [.target(name: "Server")]),
         
-        .target(
-            name: "ProductModel",
-            dependencies: [
-                "StyleGuide",
-                postgres,
-                tagged,
-                tca,
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "ProductModel",
+                dependencies: [
+                    "StyleGuide",
+                    postgres,
+                    tagged,
+                    tca,
+                ],
+                swiftSettings: swiftSettings
+            ),
         .target(
             name: "ProductViews",
             dependencies: [
@@ -247,19 +252,19 @@ let package = Package(
             ],
             swiftSettings: swiftSettings
         ),
-            .target(
-                name: "Server",
-                dependencies: [
-                    "CartModel",
-                    "ProductModel",
-                    "SiteRouter",
-                    "UserModel",
-                    postgres,
-                    vapor,
-                    vaporRouting,
-                ],
-                swiftSettings: swiftSettings
-            ),
+        .target(
+            name: "Server",
+            dependencies: [
+                "Cart",
+                "ProductModel",
+                "SiteRouter",
+                "UserModel",
+                postgres,
+                vapor,
+                vaporRouting,
+            ],
+            swiftSettings: swiftSettings
+        ),
         
         
             .target(
@@ -279,29 +284,29 @@ let package = Package(
             name: "SignInFeatureTests",
             dependencies: ["SignInFeature"]),
         
-        .target(
-            name: "SignUpFeature",
-            dependencies: [
-                "StyleGuide",
-                "UserModel",
-                tca,
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "SignUpFeature",
+                dependencies: [
+                    "StyleGuide",
+                    "UserModel",
+                    tca,
+                ],
+                swiftSettings: swiftSettings
+            ),
         .testTarget(
             name: "SignUpFeatureTests",
             dependencies: ["SignUpFeature"]),
         
-        .target(
-            name: "SiteRouter",
-            dependencies: [
-                "CartModel",
-                "UserModel",
-                tca,
-                urlRouting,
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "SiteRouter",
+                dependencies: [
+                    "Cart",
+                    "UserModel",
+                    tca,
+                    urlRouting,
+                ],
+                swiftSettings: swiftSettings
+            ),
         
         
             .target(
@@ -322,30 +327,30 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-            .target(
-                name: "TermsAndConditionsFeature",
-                dependencies: [
-                    "SiteRouter",
-                    "StyleGuide",
-                    "ApiClient",
-                    "UserDefaultsClient",
-                    "UserModel",
-                    tca,
-                ],
-                swiftSettings: swiftSettings
-            ),
+        .target(
+            name: "TermsAndConditionsFeature",
+            dependencies: [
+                "SiteRouter",
+                "StyleGuide",
+                "ApiClient",
+                "UserDefaultsClient",
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "TermsAndConditionsFeatureTests",
             dependencies: ["TermsAndConditionsFeature"]),
-            .target(
-                name: "UserDefaultsClient",
-                dependencies: [
-                    "ProductModel",
-                    "UserModel",
-                    tca,
-                ],
-                swiftSettings: swiftSettings
-            ),
+        .target(
+            name: "UserDefaultsClient",
+            dependencies: [
+                "ProductModel",
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "UserDefaultsClientTests",
             dependencies: ["UserDefaultsClient"]),
@@ -354,7 +359,7 @@ let package = Package(
                 name: "UserModel",
                 dependencies: [
                     postgres,
-                              ],
+                ],
                 swiftSettings: swiftSettings
             ),
         .target(
@@ -369,5 +374,13 @@ let package = Package(
         .testTarget(
             name: "UserLocalSettingsFeatureTests",
             dependencies: ["UserLocalSettingsFeature"]),
+        .target(
+            name: "Warehouse",
+            dependencies: [
+                "ProductModel",
+                tagged,
+            ],
+            swiftSettings: swiftSettings
+        ),
     ]
 )

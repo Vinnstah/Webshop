@@ -102,4 +102,6 @@ CREATE TABLE product (
     currency VARCHAR
 );
 
+CREATE TABLE cart_session (
 
+);

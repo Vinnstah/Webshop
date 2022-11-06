@@ -22,7 +22,7 @@ public extension Home {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 NavigationBar(
                     isRoot: !viewStore.state.showDetailView,
-                    isCartPopulated: { viewStore.state.cart?.session == nil },
+                    isCartPopulated: { viewStore.state.cart == nil },
                     showCartQuickView: { viewStore.send(.internal(.toggleCheckoutQuickView), animation: .default)},
                     isFavourite: {
                         guard (viewStore.state.product != nil) else {

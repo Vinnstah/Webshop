@@ -92,6 +92,9 @@ let package = Package(
         .library(
             name: "UserLocalSettingsFeature",
             targets: ["UserLocalSettingsFeature"]),
+        .library(
+            name: "Warehouse",
+            targets: ["Warehouse"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
@@ -134,6 +137,7 @@ let package = Package(
                 name: "CartModel",
                 dependencies: [
                     "Product",
+                    tagged,
                 ],
                 swiftSettings: swiftSettings
             ),
@@ -382,5 +386,13 @@ let package = Package(
         .testTarget(
             name: "UserLocalSettingsFeatureTests",
             dependencies: ["UserLocalSettingsFeature"]),
+        .target(
+            name: "Warehouse",
+            dependencies: [
+                "Product",
+                tagged,
+            ],
+            swiftSettings: swiftSettings
+        ),
     ]
 )

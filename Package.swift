@@ -30,6 +30,9 @@ let package = Package(
             name: "AppFeature",
             targets: ["AppFeature"]),
         .library(
+            name: "Boardgame",
+            targets: ["Boardgame"]),
+        .library(
             name: "CheckoutFeature",
             targets: ["CheckoutFeature"]),
         .library(
@@ -134,6 +137,13 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "Boardgame",
+            dependencies: [
+                tagged,
+            ],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "CheckoutFeature",
             dependencies: [

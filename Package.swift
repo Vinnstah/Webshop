@@ -267,6 +267,7 @@ let package = Package(
             .target(
                 name: "Server",
                 dependencies: [
+                    
                     "CartModel",
                     "Product",
                     "SiteRouter",
@@ -312,8 +313,10 @@ let package = Package(
         .target(
             name: "SiteRouter",
             dependencies: [
+                "Boardgame",
                 "CartModel",
                 "UserModel",
+                "Warehouse",
                 tca,
                 urlRouting,
             ],

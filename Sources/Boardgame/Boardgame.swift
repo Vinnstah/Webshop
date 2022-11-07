@@ -29,8 +29,8 @@ public extension Boardgame.Details {
 
 public extension Boardgame.Details {
     struct PlayersInfo: Sendable, Codable, Hashable {
-        public let count: PlayerCount
         public let age: Int
+        public let count: PlayerCount
     }
 }
 

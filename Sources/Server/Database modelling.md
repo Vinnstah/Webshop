@@ -88,3 +88,18 @@ The Brothers War Set Booster Box contains 30 The Brothers War Set Boosters. Each
 
 Every pack includes a combination of 1–5 card(s) of rarity Rare or higher and 3–7 Uncommon, 3–6 Common, and 1 Land cards. Traditional Foil Land replaces basic land in 20% of Set Boosters. Foil-Stamped Signature Art Card replaces Art Card in 10% of Set Boosters. Traditional Foil Borderless Mythic Rare Planeswalker in 1% of boosters.', 'https://www.dragonslair.se/images/93745/original', 1695, 'Magic: The Gathering', 'Displays', 'TBW101');
 
+
+NEW DB MODEL
+
+CREATE TABLE boardgames ( db_id SERIAL, boardgame_id VARCHAR PRIMARY KEY, title VARCHAR, image_url VARCHAR, publisher VARCHAR, release_date DATE, duration integer, desciption VARCHAR, agi integer, players_min VARCHAR, players_max VARCHAR, category VARCHAR );
+
+CREATE TABLE warehouse ( db_id SERIAL, prod_id VARCHAR PRIMARY KEY, quantity integer );
+
+CREATE type productAndQuantity as (
+product_id VARCHAR,
+quantity integer);
+
+CREATE TABLE cart ( db_id SERIAL , cart_id VARCHAR PRIMARY KEY, product_id productAndQuantity[], jwt VARCHAR );
+
+CREATE TABLE products ( db_id SERIAL , boardgame_id VARCHAR, product_id VARCHAR PRIMARY KEY, price integer, currency VARCHAR );
+

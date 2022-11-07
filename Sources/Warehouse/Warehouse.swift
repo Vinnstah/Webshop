@@ -2,7 +2,8 @@ import Foundation
 import Tagged
 import Product
 
-public enum Warehouse {}
+public enum Warehouse {
+}
 
 public extension Warehouse {
     struct Product: Sendable, Codable, Hashable, Identifiable {

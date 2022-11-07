@@ -11,7 +11,7 @@ public extension FavoritesClient {
         
         let favouritesKey = "favouritesKey"
         
-        @Sendable func mutatingFavourites(_ mutate: ( inout [Product.SKU]) throws -> Void) throws -> Product.SKU? {
+        @Sendable func mutatingFavourites(_ mutate: ( inout [Product.ID]) throws -> Void) throws -> Product.ID? {
             var currentUserDefaultsData: Data? = userDefaults.data(forKey: favouritesKey)
             
             var decodedData: Favourites = try currentUserDefaultsData.map { try JSONDecoder().decode(Favourites.self, from: $0) } ?? .init(favourites: [])

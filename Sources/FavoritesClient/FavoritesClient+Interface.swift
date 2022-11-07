@@ -5,16 +5,16 @@ import Product
 public struct FavoritesClient: Sendable {
     
     public struct Favourites: Codable {
-        var favourites: [Product.SKU]
+        var favourites: [Product.ID]
         
-        public init(favourites: [Product.SKU]) {
+        public init(favourites: [Product.ID]) {
             self.favourites = favourites
         }
     }
     
-    public typealias AddFavorite = @Sendable (Product.SKU) throws -> Product.SKU?
-    public typealias RemoveFavorite = @Sendable (Product.SKU) throws -> Product.SKU?
-    public typealias GetFavourites = @Sendable () throws -> [Product.SKU]?
+    public typealias AddFavorite = @Sendable (Product.ID) throws -> Product.ID?
+    public typealias RemoveFavorite = @Sendable (Product.ID) throws -> Product.ID?
+    public typealias GetFavourites = @Sendable () throws -> [Product.ID]?
     
     public var addFavorite: AddFavorite
     public var removeFavorite: RemoveFavorite

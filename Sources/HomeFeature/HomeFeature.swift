@@ -78,9 +78,9 @@ public extension Home {
             case decreaseQuantityButtonPressed
             case searchTextReceivesInput(String)
             case favoriteButtonClicked(Product)
-            case loadFavoriteProducts([Product.SKU]?)
-            case removeFavouriteProduct(Product.SKU?)
-            case addFavouriteProduct(Product.SKU?)
+            case loadFavoriteProducts([Product.ID]?)
+            case removeFavouriteProduct(Product.ID?)
+            case addFavouriteProduct(Product.ID?)
             case cancelSearchClicked
             case categoryButtonPressed(Boardgame.Category)
             case increaseNumberOfColumns
@@ -166,14 +166,14 @@ public extension Home {
                 
             case let .internal(.favoriteButtonClicked(product)):
                 
-                if state.favoriteProducts.sku.contains(product.sku) {
+                if state.favoriteProducts.sku.contains(product.id) {
                     return .run { send in
-                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.sku))))
+                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.id))))
                         
                     }
                 }
                 return .run { send in
-                    await send(.internal(.addFavouriteProduct(try favouritesClient.addFavorite(product.sku))))
+                    await send(.internal(.addFavouriteProduct(try favouritesClient.addFavorite(product.id))))
                 }
                 
             case let .internal(.removeFavouriteProduct(sku)):

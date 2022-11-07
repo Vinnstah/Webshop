@@ -54,9 +54,9 @@ public extension Favorites {
             case searchTextReceivesInput(String)
             case showProductDetailViewFor(Product)
             case toggleSheet
-            case loadFavoriteProducts([Product.SKU]?)
+            case loadFavoriteProducts([Product.ID]?)
             case favoriteButtonClicked(Product)
-            case removeFavouriteProduct(Product.SKU?)
+            case removeFavouriteProduct(Product.ID?)
         }
     }
     
@@ -87,7 +87,7 @@ public extension Favorites {
                     }
                     
                 state.favoriteProducts.sku = products
-                state.productList = state.productList.filter { state.favoriteProducts.sku.contains($0.sku) }
+                state.productList = state.productList.filter { state.favoriteProducts.sku.contains($0.id) }
                 return .none
                 
             case let .internal(.getProductResponse(.failure(error))):
@@ -110,9 +110,9 @@ public extension Favorites {
                 
             case let .internal(.favoriteButtonClicked(product)):
                 
-                if state.favoriteProducts.sku.contains(product.sku) {
+                if state.favoriteProducts.sku.contains(product.id) {
                     return .run { send in
-                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.sku))))
+                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.id))))
                     }
                 }
                 return .none
@@ -121,7 +121,7 @@ public extension Favorites {
                 guard let sku else {
                     return .none
                 }
-                state.productList.removeAll(where: { $0.sku == sku })
+                state.productList.removeAll(where: { $0.id == sku })
                 return .none
                 
             case .delegate(_):

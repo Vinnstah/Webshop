@@ -28,7 +28,7 @@ public extension Home {
                         guard (viewStore.state.product != nil) else {
                             return nil
                         }
-                        return viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.sku) },
+                        return viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.id) },
                     showFavouriteSymbol: {
                         guard (viewStore.state.product != nil) else {
                             return
@@ -100,7 +100,7 @@ public extension Home {
                                             store: store,
                                             product: prod,
                                             action:{ viewStore.send(.internal(.favoriteButtonClicked(prod))) },
-                                            isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.sku) }
+                                            isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.id) }
                                         )
                                         .matchedGeometryEffect(id: prod.boardgame.imageURL, in: animation)
                                     })
@@ -113,7 +113,7 @@ public extension Home {
                             DetailView(
                                 store: store,
                                 product: viewStore.state.product!,
-                                isFavourite: { viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.sku) },
+                                isFavourite: { viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.id) },
                                 toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(viewStore.state.product!)))},
                                 animation: animation
                             )

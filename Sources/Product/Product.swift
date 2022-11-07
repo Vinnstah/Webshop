@@ -4,7 +4,6 @@ import Boardgame
 
 public struct Product: Equatable, Sendable, Identifiable, Codable, Hashable {
     public let boardgame: Boardgame
-    public let sku: Product.SKU
     public let price: Price
     public let id: ID
 }
@@ -26,7 +25,3 @@ public extension Product.Price {
     }
 }
 
-public extension Product {
-    struct SKUtag: Sendable, Codable {}
-    typealias SKU = Tagged<SKUtag, String>
-}

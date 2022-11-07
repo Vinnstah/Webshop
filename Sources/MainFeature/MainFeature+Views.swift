@@ -54,11 +54,3 @@ public extension Main {
         }
     }
 }
-
-//public extension Main {
-//    
-//    @ViewBuilder
-//    func topBar(numberOfProductsInCart: Int ) -> some View {
-//        Image(systemName: "cart")
-//    }
-//}

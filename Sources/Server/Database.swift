@@ -6,7 +6,7 @@ import NIOPosix
 import SiteRouter
 import UserModel
 import Vapor
-import ProductModel
+import Product
 import CartModel
 
 public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)
@@ -91,8 +91,8 @@ public func loginUser(
 
 
 
-public func returnCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws -> Set<ProductModel.Category> {
-    var categories: Set<ProductModel.Category> = []
+public func returnCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws -> Set<Product.Category> {
+    var categories: Set<Product.Category> = []
     for try await row in rows {
         let randomRow = row.makeRandomAccess()
         let category = Category(
@@ -108,8 +108,8 @@ public func returnCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws 
     return categories
 }
 
-public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws -> Set<ProductModel.Category.SubCategory> {
-    var categories: Set<ProductModel.Category.SubCategory> = []
+public func returnSubCategoryRowsAsArray(_ rows: PostgresRowSequence) async throws -> Set<Product.Category.SubCategory> {
+    var categories: Set<Product.Category.SubCategory> = []
     for try await row in rows {
         let randomRow = row.makeRandomAccess()
         let category = Category.SubCategory(
@@ -255,7 +255,7 @@ public func returnCartRowsAsArray(_ rows: PostgresRowSequence) async throws -> [
 
 public func getAllCategories(
     _ db: PostgresConnection
-) async throws -> Set<ProductModel.Category> {
+) async throws -> Set<Product.Category> {
     let rows = try await db.query(
                     """
                     SELECT category,sub_category FROM products;
@@ -268,7 +268,7 @@ public func getAllCategories(
 
 public func getAllSubCategories(
     _ db: PostgresConnection
-) async throws -> Set<ProductModel.Category.SubCategory> {
+) async throws -> Set<Product.Category.SubCategory> {
     let rows = try await db.query(
                     """
                     SELECT sub_category FROM products;

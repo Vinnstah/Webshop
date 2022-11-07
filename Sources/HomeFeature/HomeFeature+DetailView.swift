@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import ProductModel
+import Product
 import ProductViews
 import ComposableArchitecture
 import CartModel
@@ -36,7 +36,7 @@ public extension Home {
                         ScrollView(.vertical) {
                             
                             VStack {
-                                KFImage(URL(string: product.imageURL))
+                                KFImage(URL(string: product.boardgame.imageURL))
                                     .resizable()
                                     .padding([.horizontal, .top])
                                     .frame(maxWidth: .infinity)
@@ -44,9 +44,9 @@ public extension Home {
                                     .clipShape(Rectangle())
                                     .cornerRadius(40)
                                     .ignoresSafeArea()
-                                    .matchedGeometryEffect(id: product.imageURL, in: animation)
+                                    .matchedGeometryEffect(id: product.boardgame.imageURL, in: animation)
                                 HStack {
-                                    Text(product.title)
+                                    Text(product.boardgame.title)
                                         .font(.largeTitle)
                                         .scaledToFit()
                                         .minimumScaleFactor(0.01)
@@ -56,21 +56,16 @@ public extension Home {
                                 }
                                 HStack {
                                     VStack {
-                                        Text(product.category)
+                                        Text(product.boardgame.category.rawValue)
                                             .font(.system(size: 10))
                                             .foregroundColor(Color("Secondary"))
                                             .frame(alignment:.leading)
-                                        
-                                        Text(product.subCategory)
-                                            .font(.system(size: 8))
-                                            .foregroundColor(Color("Secondary"))
-                                            .frame(alignment: .leading)
                                     }
                                     .padding(.leading, 30)
                                     
                                     Spacer()
                                     
-                                    Text("\(product.price) kr")
+                                    Text("\(product.price.brutto) kr")
                                         .font(.title)
                                         .bold()
                                         .foregroundColor(Color("ButtonColor"))
@@ -82,7 +77,7 @@ public extension Home {
                                     .foregroundColor(.black)
                                     .offset(y: -15)
                                 
-                                Text(product.description)
+                                Text(product.boardgame.details.playInfo.descriptionText)
                                     .font(.caption)
                                     .multilineTextAlignment(.leading)
                                     .frame(maxWidth: .infinity, alignment: .leading)

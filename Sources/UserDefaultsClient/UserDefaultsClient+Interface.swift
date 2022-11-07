@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import UserModel
-import ProductModel
+import Product
 
 public struct UserDefaultsClient: Sendable {
     public var boolForKey: @Sendable (String) async -> Bool

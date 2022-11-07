@@ -1,6 +1,6 @@
 import Foundation
 import UserDefaultsClient
-import ProductModel
+import Product
 
 public struct FavoritesClient: Sendable {
     

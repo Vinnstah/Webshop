@@ -2,20 +2,21 @@ import Foundation
 import Tagged
 import Product
 
-public struct Cart: Equatable, Identifiable, Codable, Sendable, Hashable {
-    public let id: ID
-    
-    public struct Item: Equatable, Codable, Sendable, Hashable  {
+public enum Warehouse {}
+
+public extension Warehouse {
+    struct Product: Sendable, Codable, Hashable, Identifiable {
+        public let id: ID
         public let product: Product.ID
         public let quantity: Quantity
     }
 }
 
-public extension Cart {
+public extension Warehouse {
     typealias ID = Tagged<Self, UUID>
 }
 
-public extension Cart {
+public extension Warehouse {
     struct QuantityTag: Sendable, Codable {}
     typealias Quantity = Tagged<QuantityTag, Int>
 }

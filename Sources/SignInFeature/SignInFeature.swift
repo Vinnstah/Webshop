@@ -38,7 +38,7 @@ public extension SignIn {
         
         ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
         public var disableButton: Bool {
-             !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight
+            !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight
         }
         
         public init(
@@ -96,7 +96,13 @@ public extension SignIn {
                 /// When loginButton is pressed set `loginInFlight` to `true`. Send a api request to login endpoint with `state.user` and receive the TaskResult back.
             case .internal(.loginButtonPressed):
                 state.isLoginInFlight = true
-                state.user = User(email: state.email, password: state.password, jwt: "")
+                
+                state.user = User(
+                    credentials: .init(
+                        email: state.email,
+                        password: state.password
+                    ), jwt: ""
+                )
                 
                 return .run { [apiClient, user = state.user] send in
                     guard let user else {
@@ -112,7 +118,9 @@ public extension SignIn {
                                 as: ResultPayload<JWT>.self
                             ).value.status.get()
                         }
-                    )))
+                    )
+                    )
+                    )
                 }
                 
                 /// If login is successful we set `loginInFlight` to `false`. We then set userDefaults `isLoggedIn` to `true` and add the user JWT.
@@ -157,5 +165,5 @@ public extension SignIn {
         }
     }
 }
-    
-    
+
+

@@ -12,17 +12,14 @@ public struct UserLocalSettings: ReducerProtocol {
 public extension UserLocalSettings {
     
     struct State: Equatable, Sendable {
-        public var userSettings: UserSettings
         public var alert: AlertState<Action>?
         public var user: User
         
         
         public init(
-            userSettings: UserSettings = .init(),
             alert: AlertState<Action>? = nil,
             user: User
         ) {
-            self.userSettings = userSettings
             self.alert = alert
             self.user = user
         }
@@ -37,7 +34,6 @@ public extension UserLocalSettings {
             case nextStep
             case previousStep
             case cancelButtonPressed
-            case defaultCurrencyChosen(Currency)
             case alertConfirmTapped
         }
         
@@ -63,16 +59,10 @@ public extension UserLocalSettings {
                     await send(.delegate(.previousStep(user)))
                 }
             
-                
-            case let .internal(.defaultCurrencyChosen(currency)):
-                state.userSettings.defaultCurrency = currency
-                return .none
-                
             case .internal(.cancelButtonPressed):
                 return .run { send in
                     await send(.delegate(.goBackToLoginView))
                 }
-                
 
             case .internal(.alertConfirmTapped):
                 state.alert = nil
@@ -88,12 +78,3 @@ public extension UserLocalSettings {
         }
     }
 }
-
-//public func doesEmailMeetRequirements(email: String) -> Bool? {
-//    guard let regex = try? Regex(#"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$"#) else { return nil }
-//    if email.wholeMatch(of: regex) != nil {
-//        return true
-//    }
-//    return false
-//}
-

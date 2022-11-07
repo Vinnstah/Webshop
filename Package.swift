@@ -370,7 +370,6 @@ let package = Package(
             .target(
                 name: "UserModel",
                 dependencies: [
-                    postgres,
                               ],
                 swiftSettings: swiftSettings
             ),

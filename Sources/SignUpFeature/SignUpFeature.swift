@@ -80,8 +80,13 @@ public extension SignUp {
                 return .none
                 
             case .internal(.nextStep):
-                state.user = User(email: state.email, password: state.password, jwt: "")
-//                
+                state.user = User(
+                    credentials: .init(
+                        email: state.email,
+                        password: state.password
+                    ), jwt: ""
+                )
+
                 return .run { [user = state.user] send in
                     await send(.delegate(.goToNextStep(user!)))
                 }

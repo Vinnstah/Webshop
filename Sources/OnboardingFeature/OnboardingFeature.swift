@@ -116,7 +116,7 @@ public extension Onboarding {
                 
             case let .userLocalSettings(.delegate(.previousStep(user))):
                 state.userLocalSettings = nil
-                state.signUp = .init(user: user, email: user.email, password: user.password)
+                state.signUp = .init(user: user, email: user.credentials.email, password: user.credentials.password)
                 return .none
                 
             case let .termsAndConditions(.delegate(.previousStep(user))):

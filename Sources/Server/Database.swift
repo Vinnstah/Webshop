@@ -44,50 +44,7 @@ public func closeDatabaseEventLoop() {
     }
 }
 
-public func insertUser(_ db: PostgresConnection, logger: Logger, user: User) async throws {
-    try await db.query("""
-                        INSERT INTO users(user_name,password,jwt)
-                        VALUES (\(user.email),\(user.password),\(user.jwt));
-                        """,
-                       logger: logger
-    )
-}
 
-public func returnUserRowsAsArray(_ rows: PostgresRowSequence) async throws -> [User] {
-    var users: [User] = []
-    for try await row in rows {
-        let randomRow = row.makeRandomAccess()
-        let user = User(
-            email: try randomRow["user_name"].decode(String.self, context: .default),
-            password: try randomRow["password"].decode(String.self, context: .default),
-            jwt: try randomRow["jwt"].decode(String.self, context: .default))
-        users.append(user)
-    }
-    return users
-}
-
-public func loginUser(
-    _ db: PostgresConnection,
-    _ email: String,
-    _ password: String
-) async throws -> String? {
-    let rows = try await db.query(
-                    """
-                    SELECT * FROM users WHERE user_name=\(email);
-                    """,
-                    logger: logger
-    )
-    let user = try await returnUserRowsAsArray(rows).first
-    if user == nil {
-        return nil
-    } else {
-        let user = user!
-        if user.password == password {
-            return user.jwt
-        }
-        return nil
-    }
-}
 
 
 

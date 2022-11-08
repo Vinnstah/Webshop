@@ -8,6 +8,7 @@ func warehouseHandler(
     switch route {
     case .fetch:
         return ResultPayload(forAction: "placeholder", payload: "placerholder")
+        
     case let .update(product):
         return ResultPayload(forAction: "placeholder", payload: "placerholder")
     }

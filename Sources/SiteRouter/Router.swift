@@ -82,6 +82,6 @@ public let warehouseRouter = OneOf {
     Route(.case(WarehouseRoute.update)) {
         Path { "warehouse" }
         Method.post
-        Body(.json(Warehouse.Product.self))
+        Body(.json(Warehouse.Item.self))
     }
 }

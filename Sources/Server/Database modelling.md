@@ -91,15 +91,16 @@ Every pack includes a combination of 1–5 card(s) of rarity Rare or higher and 
 
 NEW DB MODEL
 
-CREATE TABLE boardgames ( db_id SERIAL, boardgame_id VARCHAR PRIMARY KEY, title VARCHAR, image_url VARCHAR, publisher VARCHAR, release_date DATE, duration integer, desciption VARCHAR, age integer, players_min VARCHAR, players_max VARCHAR, category VARCHAR );
-
-CREATE TABLE warehouse ( db_id SERIAL, prod_id VARCHAR PRIMARY KEY, quantity integer );
-
-CREATE type productAndQuantity as (
-product_id VARCHAR,
+CREATE type productAndQuant as (
+product_id uuid,
 quantity integer);
 
-CREATE TABLE cart ( db_id SERIAL , cart_id VARCHAR PRIMARY KEY, product_id productAndQuantity[], jwt VARCHAR );
+CREATE TABLE boardgames ( db_id SERIAL, boardgame_id uuid PRIMARY KEY, title VARCHAR, image_url VARCHAR, publisher VARCHAR, release_date DATE, duration integer, desciption VARCHAR, age integer, players_min VARCHAR, players_max VARCHAR, category VARCHAR );
 
-CREATE TABLE products ( db_id SERIAL , boardgame_id VARCHAR, product_id VARCHAR PRIMARY KEY, price integer, currency VARCHAR );
+CREATE TABLE warehouse ( db_id SERIAL, warehouse_id uuid PRIMARY KEY,prod_id uuid , quantity integer );
+
+CREATE TABLE cart ( db_id SERIAL , cart_id uuid PRIMARY KEY, product_id productAndQuantity[], jwt VARCHAR );
+
+CREATE TABLE products ( db_id SERIAL , boardgame_id uuid, product_id uuid PRIMARY KEY, price integer, currency VARCHAR );
+
 

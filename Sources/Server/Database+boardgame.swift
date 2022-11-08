@@ -36,7 +36,8 @@ public func fetchBoardgames(from rows: PostgresRowSequence) async throws -> [Boa
                         max: try randomRow["players_max"].decode(Int.self, context: .default))
                 )
             ),
-            category: .init(rawValue: try randomRow["category"].decode(String.self, context: .default))!
+            category: .init(rawValue: try randomRow["category"].decode(String.self, context: .default))!,
+            description: ""
         )
         
         boardgames.append(boardgame)

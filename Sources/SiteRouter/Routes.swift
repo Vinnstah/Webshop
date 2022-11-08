@@ -32,7 +32,7 @@ public enum ItemRoute: Equatable {
 }
 public enum WarehouseRoute: Equatable {
     case fetch
-    case update(Warehouse.Product)
+    case update(Warehouse.Item)
 }
 public enum BoardgameRoute: Equatable {
     case fetch

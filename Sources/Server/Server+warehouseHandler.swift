@@ -3,7 +3,8 @@ import SiteRouter
 import Foundation
 
 func warehouseHandler(
-    route: WarehouseRoute
+    route: WarehouseRoute,
+    request: Request
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case .fetch:

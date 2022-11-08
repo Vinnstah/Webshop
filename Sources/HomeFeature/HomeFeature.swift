@@ -102,17 +102,18 @@ public extension Home {
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
-                return .run { [apiClient] send in
-                    await send(.internal(.getProductResponse(
-                        TaskResult {
-                            try await apiClient.decodedResponse(
-                                for: .getProducts,
-                                as: ResultPayload<[Product]>.self).value.status.get()
-                        }
-                    )))
-                    
-                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
-                }
+                return .none
+//                return .run { [apiClient] send in
+//                    await send(.internal(.getProductResponse(
+//                        TaskResult {
+//                            try await apiClient.decodedResponse(
+//                                for: .getProducts,
+//                                as: ResultPayload<[Product]>.self).value.status.get()
+//                        }
+//                    )))
+//
+//                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
+//                }
                 
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products

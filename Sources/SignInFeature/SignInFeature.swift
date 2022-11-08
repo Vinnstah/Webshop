@@ -114,7 +114,7 @@ public extension SignIn {
                     return await send(.internal(.loginResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(
-                                for: .login(user),
+                                for: .users(.login(user)),
                                 as: ResultPayload<JWT>.self
                             ).value.status.get()
                         }

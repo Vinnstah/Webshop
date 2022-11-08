@@ -3,20 +3,22 @@ import SiteRouter
 import Foundation
 
 func cartHandler(
-    route: CartRoute
+    route: CartRoute,
+    request: Request
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case let .session(route):
-        return try await sessionHandler(route: route)
+        return try await sessionHandler(route: route, request: request)
     }
 }
 
 func sessionHandler(
-    route: SessionRoute
+    route: SessionRoute,
+    request: Request
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case let .items(route):
-        return try await itemsHandler(route: route)
+        return try await itemsHandler(route: route, request: request)
     case let .create(cart):
         return ResultPayload(forAction: "placeholder", payload: "placerholder")
     case .fetch(id: let id):
@@ -25,7 +27,8 @@ func sessionHandler(
 }
 
 func itemsHandler(
-    route: ItemRoute
+    route: ItemRoute,
+    request: Request
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case .fetch:

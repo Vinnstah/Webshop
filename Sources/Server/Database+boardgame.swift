@@ -11,11 +11,11 @@ public func fetchBoardgames(
                     """,
                     logger: logger
     )
-    let boardgames = try await fetchBoardgames(from: rows)
+    let boardgames = try await decodeBoardgames(from: rows)
     return boardgames
 }
 
-public func fetchBoardgames(from rows: PostgresRowSequence) async throws -> [Boardgame] {
+public func decodeBoardgames(from rows: PostgresRowSequence) async throws -> [Boardgame] {
     var boardgames: [Boardgame] = []
     for try await row in rows {
         let randomRow = row.makeRandomAccess()

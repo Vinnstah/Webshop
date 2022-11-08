@@ -99,7 +99,7 @@ CREATE TABLE boardgames ( db_id SERIAL, boardgame_id uuid PRIMARY KEY, title VAR
 
 CREATE TABLE warehouse ( db_id SERIAL, warehouse_id uuid PRIMARY KEY,prod_id uuid , quantity integer );
 
-CREATE TABLE cart ( db_id SERIAL , cart_id uuid PRIMARY KEY, product_id productAndQuantity[], jwt VARCHAR );
+CREATE TABLE cart ( db_id SERIAL , cart_id uuid PRIMARY KEY, product_id uuid[], quantity integer[], jwt VARCHAR );
 
 CREATE TABLE products ( db_id SERIAL , boardgame_id uuid, product_id uuid PRIMARY KEY, price integer, currency VARCHAR );
 

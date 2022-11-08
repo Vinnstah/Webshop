@@ -3,7 +3,8 @@ import SiteRouter
 import Foundation
 
 func boardgameHandler(
-    route: BoardgameRoute
+    route: BoardgameRoute,
+    request: Request
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case .fetch:

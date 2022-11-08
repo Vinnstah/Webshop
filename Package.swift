@@ -141,6 +141,7 @@ let package = Package(
                 dependencies: [
                     "Product",
                     tagged,
+                    postgres,
                 ],
                 swiftSettings: swiftSettings
             ),
@@ -278,6 +279,7 @@ let package = Package(
                 dependencies: [
                     
                     "CartModel",
+                    "JWT",
                     "Product",
                     "SiteRouter",
                     "UserModel",

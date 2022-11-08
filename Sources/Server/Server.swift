@@ -16,13 +16,13 @@ func siteHandler(
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case let .boardgame(route):
-        return try await boardgameHandler(route: route)
+        return try await boardgameHandler(route: route, request: request)
     case let .cart(route):
-        return try await cartHandler(route: route)
+        return try await cartHandler(route: route, request: request)
     case let .users(route):
-        return try await usersHandler(route: route)
+        return try await usersHandler(route: route, request: request)
     case let .warehouse(route):
-        return try await warehouseHandler(route: route)
+        return try await warehouseHandler(route: route, request: request)
     }
 }
 

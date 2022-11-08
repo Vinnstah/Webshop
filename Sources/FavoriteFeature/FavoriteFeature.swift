@@ -65,15 +65,16 @@ public extension Favorites {
             switch action {
                 
             case .internal(.onAppear):
-                return .run { [apiClient] send in
-                    return await send(.internal(.getProductResponse(
-                        TaskResult {
-                            try await apiClient.decodedResponse(
-                                for: .getProducts,
-                                as: ResultPayload<[Product]>.self).value.status.get()
-                        }
-                    )))
-                }
+                return .none
+//                return .run { [apiClient] send in
+//                    return await send(.internal(.getProductResponse(
+//                        TaskResult {
+//                            try await apiClient.decodedResponse(
+//                                for: .getProducts,
+//                                as: ResultPayload<[Product]>.self).value.status.get()
+//                        }
+//                    )))
+//                }
                 
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products

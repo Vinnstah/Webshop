@@ -1,14 +1,31 @@
 import Vapor
 import SiteRouter
 import Foundation
+import JWT
+import UserModel
 
 func usersHandler(
-    route: UserRoute
+    route: UserRoute,
+    request: Request
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case let .create(user):
-        return ResultPayload(forAction: "placeholder", payload: "placerholder")
+        let db = try await connectDatabase()
+        
+        let jwt = constructJWT(
+            secretKey: user.credentials.password,
+            header: JWT.Header.init(),
+            payload: JWT.Payload(name: user.credentials.email)
+        )
+        
+        try await createUser(in: db,  with: user, and: jwt, logger)
+        try await db.close()
+        return ResultPayload(forAction: "create", payload: jwt)
+        
     case let .login(user):
-        return ResultPayload(forAction: "placeholder", payload: "placerholder")
+        let db = try await connectDatabase()
+        let jwt = try await loginUser(in: db, with: user)
+        try await db.close()
+        return ResultPayload(forAction: "login", payload: jwt)
     }
 }

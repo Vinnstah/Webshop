@@ -31,7 +31,7 @@ public let userRouter = OneOf {
     }
     
     Route(.case(UserRoute.login)) {
-        Path { "users/login" }
+        Path { "users"; "login" }
         Method.post
         Body(.json(User.self))
     }

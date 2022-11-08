@@ -100,7 +100,7 @@ public extension TermsAndConditions {
                         .createUserResponse(
                             TaskResult {
                                 try await apiClient.decodedResponse(
-                                    for: .create(user),
+                                    for: .users(.create(user)),
                                     as: ResultPayload<JWT>.self
                                 ).value.status.get()
                             }

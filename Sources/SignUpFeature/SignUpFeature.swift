@@ -84,7 +84,7 @@ public extension SignUp {
                     credentials: .init(
                         email: state.email,
                         password: state.password
-                    ), jwt: ""
+                    )
                 )
 
                 return .run { [user = state.user] send in

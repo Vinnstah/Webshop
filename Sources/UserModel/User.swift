@@ -5,14 +5,11 @@ import CryptoKit
 public struct User: Equatable, Codable, Sendable {
     
     public var credentials: Credentials
-    public var jwt: String
     
     public init(
-        credentials: Credentials,
-        jwt: String
+        credentials: Credentials
     ) {
         self.credentials = credentials
-        self.jwt = jwt
     }
 }
 

@@ -101,7 +101,7 @@ public extension SignIn {
                     credentials: .init(
                         email: state.email,
                         password: state.password
-                    ), jwt: ""
+                    )
                 )
                 
                 return .run { [apiClient, user = state.user] send in

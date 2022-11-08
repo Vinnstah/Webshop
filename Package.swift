@@ -45,6 +45,9 @@ let package = Package(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
         .library(
+            name: "JWT",
+            targets: ["JWT"]),
+        .library(
             name: "MainFeature",
             targets: ["MainFeature"]),
         .library(
@@ -216,6 +219,12 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "JWT",
+            dependencies: [
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "MainFeatureTests",
             dependencies: ["MainFeature"]),

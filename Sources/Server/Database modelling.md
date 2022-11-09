@@ -95,12 +95,22 @@ CREATE type productAndQuant as (
 product_id uuid,
 quantity integer);
 
-CREATE TABLE boardgames ( db_id SERIAL, boardgame_id uuid PRIMARY KEY, title VARCHAR, image_url VARCHAR, publisher VARCHAR, release_date DATE, duration integer, desciption VARCHAR, age integer, players_min VARCHAR, players_max VARCHAR, category VARCHAR );
+CREATE TABLE boardgames (boardgame_id uuid PRIMARY KEY, title VARCHAR, image_url VARCHAR, publisher VARCHAR, release_date DATE, duration integer, description VARCHAR, age integer, players_min integer, players_max integer, category VARCHAR );
 
 CREATE TABLE warehouse ( db_id SERIAL, warehouse_id uuid PRIMARY KEY,prod_id uuid , quantity integer );
 
 CREATE TABLE cart ( db_id SERIAL , cart_id uuid PRIMARY KEY, product_id uuid[], quantity integer[], jwt VARCHAR );
 
 CREATE TABLE products ( db_id SERIAL , boardgame_id uuid, product_id uuid PRIMARY KEY, price integer, currency VARCHAR );
+
+
+INSERT INTO boardgames(boardgame_id, title, image_url, publisher, release_date, duration, description, age, players_min, players_max, category)
+VALUES(gen_random_uuid (), 'Railroad Ink', 'https://www.dragonslair.se/images/53107/original', 'CoolMiniOrNot Inc', '2012-01-01', 2, 'In the multiplayer puzzle game Railroad Ink, your goal is to connect as many exits on your board as possible. Each round, a set of dice are rolled in the middle of the table, determining which kind of road and railway routes are available to all players. You have to draw these routes on your erasable boards to create transport lines and connect your exits, trying to optimize the available symbols better than your opponents.
+
+The more exits you connect, the more points you score at the end of the game, but you lose points for each incomplete route, so plan carefully! Will you press your luck and try to stretch your transportation network to the next exit, or will you play it safe and start a new, simpler to manage route?
+
+Railroad Ink comes in two versions, each one including two expansions with additional dice sets that add special rules to your games. The Blazing Red Edition includes the Lava and Meteor expansions. Try to confine the lava coming from the erupting volcano before it destroys your routes, or deal with the havoc brought by the meteor strikes and mine the craters for precious ore. These special rules can spice up things and make each game play and feel different.
+
+Each box allows you to play from 1 to 6 players, and if you combine more boxes, you can play with up to 12 players (or more). The only limit to the number of players is the number of boards you have!', 8, 1, 6, 'Strategy');
 
 

@@ -2,37 +2,36 @@ import Foundation
 import SwiftUI
 import Tagged
 
-public struct Boardgame: Sendable, Codable, Hashable, CustomStringConvertible, Identifiable {
+public struct Boardgame: Sendable, Codable, Hashable, Identifiable {
     public let id: ID
     public let title: String
     public let imageURL: String
     public let details: Details
     public let category: Category
-    public var description: String
     
-    public init(id: ID, title: String, imageURL: String, details: Details, category: Category, description: String) {
+    public init(id: ID, title: String, imageURL: String, details: Details, category: Category) {
         self.id = id
         self.title = title
         self.imageURL = imageURL
         self.details = details
         self.category = category
-        self.description = description
     }
 }
 
 public extension Boardgame {
     struct Details: Sendable, Codable, Hashable {
         public let publisher: String
-        public let releaseOn: Date
+        public let releaseOn: String
         public let playInfo: PlayInfo
         public let players: PlayersInfo
         
-        public init(publisher: String, releaseOn: Date, playInfo: PlayInfo, players: PlayersInfo) {
+        public init(publisher: String, releaseOn: String, playInfo: PlayInfo, players: PlayersInfo) {
             self.publisher = publisher
             self.releaseOn = releaseOn
             self.playInfo = playInfo
             self.players = players
         }
+        
     }
 }
 
@@ -72,6 +71,7 @@ public extension Boardgame.Details.PlayersInfo {
     }
 }
 
+
 public extension Boardgame {
     typealias ID = Tagged<Self, UUID>
 }
@@ -97,3 +97,4 @@ public extension Boardgame {
         }
     }
 }
+

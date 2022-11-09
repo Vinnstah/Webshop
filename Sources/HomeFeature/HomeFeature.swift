@@ -87,6 +87,7 @@ public extension Home {
             case decreaseNumberOfColumns
             case toggleDetailView(Product?)
             case toggleCheckoutQuickView
+            case getFetchBoardgamesResponse(TaskResult<[Boardgame]>)
         }
     }
     
@@ -102,19 +103,28 @@ public extension Home {
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
-                return .none
-//                return .run { [apiClient] send in
-//                    await send(.internal(.getProductResponse(
-//                        TaskResult {
-//                            try await apiClient.decodedResponse(
-//                                for: .getProducts,
-//                                as: ResultPayload<[Product]>.self).value.status.get()
-//                        }
-//                    )))
+                return .run { [apiClient] send in
+                    await send(.internal(.getFetchBoardgamesResponse(
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .boardgame(.fetch),
+                                as: ResultPayload<[Boardgame]>.self).value.status.get()
+                        }
+                    )))
+                }
 //
 //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
 //                }
-                
+                case let .internal(.getFetchBoardgamesResponse(.success(boardgames))):
+                    print(boardgames)
+//                    state.productList = products
+                    return .none
+                    
+                case let .internal(.getFetchBoardgamesResponse(.failure(error))):
+                    print(error)
+                    return .none
+                    
+                    
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
                 return .none

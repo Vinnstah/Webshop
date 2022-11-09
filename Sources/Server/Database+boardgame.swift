@@ -23,21 +23,18 @@ public func decodeBoardgames(from rows: PostgresRowSequence) async throws -> [Bo
             id: Boardgame.ID(rawValue: try randomRow["boardgame_id"].decode(UUID.self, context: .default)),
             title: try randomRow["title"].decode(String.self, context: .default),
             imageURL: try randomRow["image_url"].decode(String.self, context: .default),
-            details: .init(
+            details: Boardgame.Details(
                 publisher: try randomRow["publisher"].decode(String.self, context: .default),
-                releaseOn: try randomRow["release_date"].decode(Date.self, context: .default),
-                playInfo: .init(
+                releaseOn: try randomRow["release_date"].decode(Date.self, context: .default).formatted(.iso8601),
+                playInfo: Boardgame.Details.PlayInfo(
                     duration: try randomRow["duration"].decode(Int.self, context: .default),
                     descriptionText: try randomRow["description"].decode(String.self, context: .default)),
-                players: .init(
+                players: Boardgame.Details.PlayersInfo(
                     age: try randomRow["age"].decode(Int.self, context: .default),
-                    count: .init(
+                    count: Boardgame.Details.PlayersInfo.PlayerCount(
                         min: try randomRow["players_min"].decode(Int.self, context: .default),
-                        max: try randomRow["players_max"].decode(Int.self, context: .default))
-                )
-            ),
-            category: .init(rawValue: try randomRow["category"].decode(String.self, context: .default))!,
-            description: ""
+                        max: try randomRow["players_max"].decode(Int.self, context: .default)))),
+            category: Boardgame.Category(rawValue: try randomRow["category"].decode(String.self, context: .default)) ?? .classics
         )
         
         boardgames.append(boardgame)

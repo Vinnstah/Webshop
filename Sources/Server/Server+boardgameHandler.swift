@@ -8,6 +8,9 @@ func boardgameHandler(
 ) async throws -> any AsyncResponseEncodable {
     switch route {
     case .fetch:
-        return ResultPayload(forAction: "placeholder", payload: "placerholder")
+        let db = try await connectDatabase()
+        let boardgames = try await fetchBoardgames(db)
+        try await db.close()
+        return ResultPayload(forAction: "fetchBoardgames", payload: boardgames)
     }
 }

@@ -19,11 +19,11 @@ public extension Warehouse {
     }
 }
 
-public extension Warehouse {
+public extension Warehouse.Item {
     typealias ID = Tagged<Self, UUID>
 }
 
-public extension Warehouse {
+public extension Warehouse.Item {
     struct QuantityTag: Sendable, Codable {}
     typealias Quantity = Tagged<QuantityTag, Int>
 }

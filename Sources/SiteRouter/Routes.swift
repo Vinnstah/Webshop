@@ -3,6 +3,7 @@ import ComposableArchitecture
 import UserModel
 import CartModel
 import Warehouse
+import Product
 
 public enum SiteRoute: Equatable {
     case users(UserRoute)
@@ -32,6 +33,7 @@ public enum ItemRoute: Equatable {
 }
 public enum WarehouseRoute: Equatable {
     case fetch
+    case get(id: String)
     case update(Warehouse.Item)
 }
 public enum BoardgameRoute: Equatable {

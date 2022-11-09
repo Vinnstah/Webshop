@@ -97,9 +97,7 @@ public extension Home {
         Reduce { state, action in
             switch action {
                 
-            case let .internal(.getUpdateWarehouseResponse(.success(test))):
-                print(test)
-                return .none
+            
                 
             case .internal(.logOutUser):
                 return .run { [userDefaultsClient] send in
@@ -109,7 +107,8 @@ public extension Home {
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
-                let test = Warehouse.Item(id: .init(rawValue: UUID()), product: .init(rawValue: UUID()), quantity: .init(rawValue: 1))
+                let id: String = "A1B3E7A0-CD6C-43FA-B96F-FB44CAF47C8A"
+                //                let test = Warehouse.Item(id: .init(rawValue: UUID()), product: .init(rawValue: UUID()), quantity: .init(rawValue: 1))
                 return .run { [apiClient] send in
                     await send(.internal(.getFetchBoardgamesResponse(
                         TaskResult {
@@ -118,28 +117,32 @@ public extension Home {
                                 as: ResultPayload<[Boardgame]>.self).value.status.get()
                         }
                     )))
+                    
+                    await send(.internal(.getUpdateWarehouseResponse(
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .warehouse(.get(id: id)),
+                                as: ResultPayload<[Warehouse.Item]>.self).value.status.get()
+                        }
+                    )))
+                }
+                //
+                //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
+                //                }
+            case let .internal(.getUpdateWarehouseResponse(.success(test))):
+                print(test)
+                return .none
                 
-                await send(.internal(.getUpdateWarehouseResponse(
-                    TaskResult {
-                        try await apiClient.decodedResponse(
-                            for: .warehouse(.fetch),
-                            as: ResultPayload<[Warehouse.Item]>.self).value.status.get()
-                    }
-                )))
-            }
-//
-//                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
-//                }
-                case let .internal(.getFetchBoardgamesResponse(.success(boardgames))):
-                    print(boardgames)
-//                    state.productList = products
-                    return .none
-                    
-                case let .internal(.getFetchBoardgamesResponse(.failure(error))):
-                    print(error)
-                    return .none
-                    
-                    
+            case let .internal(.getFetchBoardgamesResponse(.success(boardgames))):
+                print(boardgames)
+                //                    state.productList = products
+                return .none
+                
+            case let .internal(.getFetchBoardgamesResponse(.failure(error))):
+                print(error)
+                return .none
+                
+                
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
                 return .none
@@ -184,9 +187,9 @@ public extension Home {
                 //MARK: Favourite interaction
             case let .internal(.loadFavoriteProducts(products)):
                 guard let products else {
-                        return .none
-                    }
-                    
+                    return .none
+                }
+                
                 state.favoriteProducts.sku = products
                 return .none
                 
@@ -239,7 +242,7 @@ public extension Home {
             case .internal(.increaseNumberOfColumns):
                 state.columnsInGrid += 1
                 return .none
-
+                
             case .internal(.decreaseNumberOfColumns):
                 guard state.columnsInGrid > 1 else {
                     return .none
@@ -264,6 +267,6 @@ public extension Home {
                 print("ERROR")
                 return .none
             }
-            }
         }
     }
+}

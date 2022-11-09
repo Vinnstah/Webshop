@@ -3,6 +3,7 @@ import URLRouting
 import UserModel
 import CartModel
 import Warehouse
+import Product
 
 public let router = OneOf {
     
@@ -83,5 +84,12 @@ public let warehouseRouter = OneOf {
         Path { "warehouse" }
         Method.post
         Body(.json(Warehouse.Item.self))
+    }
+    
+    Route(.case(WarehouseRoute.get(id: ))) {
+        Path { "warehouse" }
+        Query {
+            Field("id")
+        }
     }
 }

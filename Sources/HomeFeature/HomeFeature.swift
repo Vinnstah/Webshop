@@ -8,6 +8,7 @@ import SiteRouter
 import CartModel
 import FavoritesClient
 import Boardgame
+import Warehouse
 
 public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -88,12 +89,17 @@ public extension Home {
             case toggleDetailView(Product?)
             case toggleCheckoutQuickView
             case getFetchBoardgamesResponse(TaskResult<[Boardgame]>)
+            case getUpdateWarehouseResponse(TaskResult<[Warehouse.Item]>)
         }
     }
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
+                
+            case let .internal(.getUpdateWarehouseResponse(.success(test))):
+                print(test)
+                return .none
                 
             case .internal(.logOutUser):
                 return .run { [userDefaultsClient] send in
@@ -103,6 +109,7 @@ public extension Home {
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
+                let test = Warehouse.Item(id: .init(rawValue: UUID()), product: .init(rawValue: UUID()), quantity: .init(rawValue: 1))
                 return .run { [apiClient] send in
                     await send(.internal(.getFetchBoardgamesResponse(
                         TaskResult {
@@ -111,7 +118,15 @@ public extension Home {
                                 as: ResultPayload<[Boardgame]>.self).value.status.get()
                         }
                     )))
-                }
+                
+                await send(.internal(.getUpdateWarehouseResponse(
+                    TaskResult {
+                        try await apiClient.decodedResponse(
+                            for: .warehouse(.fetch),
+                            as: ResultPayload<[Warehouse.Item]>.self).value.status.get()
+                    }
+                )))
+            }
 //
 //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
 //                }
@@ -244,6 +259,9 @@ public extension Home {
                 
             case .internal(.toggleCheckoutQuickView):
                 state.showCheckoutQuickView.toggle()
+                return .none
+            case .internal(.getUpdateWarehouseResponse(.failure(_))):
+                print("ERROR")
                 return .none
             }
             }

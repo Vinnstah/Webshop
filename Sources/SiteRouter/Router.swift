@@ -45,13 +45,13 @@ public let cartRouter = OneOf {
 
 public let sessionRouter = OneOf {
     Route(.case(SessionRoute.create)) {
-        Path { "cart/session" }
+        Path { "cart"; "session" }
         Method.post
         Body(.json(Cart.self))
     }
 
     Route(.case(SessionRoute.fetch(id:))) {
-        Path { "cart/session" }
+        Path { "cart"; "session" }
         Query {
             Field("id")
         }
@@ -64,11 +64,11 @@ public let sessionRouter = OneOf {
 
 public let itemRouter = OneOf {
     Route(.case(ItemRoute.fetch)) {
-        Path { "cart/session/item" }
+        Path { "cart"; "session"; "item" }
     }
     
     Route(.case(ItemRoute.add)) {
-        Path { "cart/session/item" }
+        Path { "cart"; "session"; "item" }
         Method.post
         Body(.json(Cart.Item.self))
     }

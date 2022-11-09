@@ -97,11 +97,11 @@ quantity integer);
 
 CREATE TABLE boardgames (boardgame_id uuid PRIMARY KEY, title VARCHAR, image_url VARCHAR, publisher VARCHAR, release_date DATE, duration integer, description VARCHAR, age integer, players_min integer, players_max integer, category VARCHAR );
 
-CREATE TABLE warehouse ( db_id SERIAL, warehouse_id uuid PRIMARY KEY,prod_id uuid , quantity integer );
+CREATE TABLE warehouse (warehouse_id uuid PRIMARY KEY,prod_id uuid , quantity integer );
 
-CREATE TABLE cart ( db_id SERIAL , cart_id uuid PRIMARY KEY, product_id uuid[], quantity integer[], jwt VARCHAR );
+CREATE TABLE cart (cart_id uuid PRIMARY KEY, product_id uuid[], quantity integer[], jwt VARCHAR );
 
-CREATE TABLE products ( db_id SERIAL , boardgame_id uuid, product_id uuid PRIMARY KEY, price integer, currency VARCHAR );
+CREATE TABLE products (boardgame_id uuid, product_id uuid PRIMARY KEY, price integer, currency VARCHAR );
 
 
 INSERT INTO boardgames(boardgame_id, title, image_url, publisher, release_date, duration, description, age, players_min, players_max, category)
@@ -113,4 +113,8 @@ Railroad Ink comes in two versions, each one including two expansions with addit
 
 Each box allows you to play from 1 to 6 players, and if you combine more boxes, you can play with up to 12 players (or more). The only limit to the number of players is the number of boards you have!', 8, 1, 6, 'Strategy');
 
-
+                    INSERT INTO warehouse
+                    VALUES(gen_random_uuid (), gen_random_uuid (), 2)
+                    ON CONFLICT (warehouse_id)
+                    DO UPDATE
+                    SET quantity=3;

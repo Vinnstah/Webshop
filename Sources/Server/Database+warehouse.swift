@@ -29,3 +29,18 @@ public func fetchWarehouseStatus(from rows: PostgresRowSequence) async throws ->
     }
     return warehouse
 }
+
+
+public func updateWarehouse(with item: Warehouse.Item, _ db: PostgresConnection) async throws -> String? {
+    try await db.query(
+                    """
+                    INSERT INTO warehouse
+                    VALUES(\(item.id.rawValue), \(item.product.rawValue), \(item.quantity.rawValue))
+                    ON CONFLICT (warehouse_id)
+                    DO UPDATE
+                    SET quantity=\(item.quantity.rawValue);
+                    """,
+                    logger: logger
+    )
+    return "OK"
+}

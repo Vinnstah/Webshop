@@ -3,16 +3,31 @@ import Tagged
 import Product
 import PostgresNIO
 
-public struct Cart: Equatable, Identifiable, Codable, Sendable, Hashable {
-    public let id: ID
-    public let item: [Item]
+public struct Cart: Equatable, Codable, Sendable, Hashable {
+    public var session: Session
+    public var item: [Item]
     
-    public init(id: ID, item: [Item]) {
-        self.id = id
+    public init(session: Session, item: [Item]) {
+        self.session = session
         self.item = item
     }
-    
-    public struct Item: Equatable, Codable, Sendable, Hashable  {
+}
+
+public extension Cart {
+    struct Session: Identifiable, Equatable, Codable, Sendable, Hashable {
+        
+        public var id: ID
+        public var jwt: JWT
+        
+        public init(id: ID, jwt: JWT) {
+            self.id = id
+            self.jwt = jwt
+        }
+    }
+}
+
+public extension Cart {
+    struct Item: Equatable, Codable, Sendable, Hashable  {
         
         public let product: Product.ID
         public let quantity: Quantity
@@ -24,11 +39,16 @@ public struct Cart: Equatable, Identifiable, Codable, Sendable, Hashable {
     }
 }
 
-public extension Cart {
+public extension Cart.Session {
     typealias ID = Tagged<Self, UUID>
 }
 
-public extension Cart {
+public extension Cart.Session {
+    struct JWTTag: Sendable, Codable {}
+    typealias JWT = Tagged<JWTTag, String>
+}
+
+public extension Cart.Item {
     struct QuantityTag: Sendable, Codable {}
     typealias Quantity = Tagged<QuantityTag, Int>
 }

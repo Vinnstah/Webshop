@@ -89,15 +89,13 @@ public extension Home {
             case toggleDetailView(Product?)
             case toggleCheckoutQuickView
             case getFetchBoardgamesResponse(TaskResult<[Boardgame]>)
-            case getUpdateWarehouseResponse(TaskResult<[Warehouse.Item]>)
+            case createCartSession(TaskResult<String>)
         }
     }
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
-                
-            
                 
             case .internal(.logOutUser):
                 return .run { [userDefaultsClient] send in
@@ -107,8 +105,7 @@ public extension Home {
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
-                let id: String = "A1B3E7A0-CD6C-43FA-B96F-FB44CAF47C8A"
-                //                let test = Warehouse.Item(id: .init(rawValue: UUID()), product: .init(rawValue: UUID()), quantity: .init(rawValue: 1))
+//                let cart: Cart = Cart(id: Cart.ID.init(rawValue: .init()), item: [Cart.Item(product: Product.ID(rawValue: .init()), quantity: Cart.Quantity(rawValue: 4))], jwt: Cart.JWT(rawValue: "TEST124fafaffaf34"))
                 return .run { [apiClient] send in
                     await send(.internal(.getFetchBoardgamesResponse(
                         TaskResult {
@@ -118,19 +115,18 @@ public extension Home {
                         }
                     )))
                     
-                    await send(.internal(.getUpdateWarehouseResponse(
-                        TaskResult {
-                            try await apiClient.decodedResponse(
-                                for: .warehouse(.get(id: id)),
-                                as: ResultPayload<[Warehouse.Item]>.self).value.status.get()
-                        }
-                    )))
+//                    await send(.internal(.createCartSession(
+//                        TaskResult {
+//                            try await self.apiClient.decodedResponse(
+//                                for: .cart(.create(cart)),
+//                                as: ResultPayload<String>.self).value.status.get()
+//                        }
+//                    )))
                 }
                 //
                 //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 //                }
-            case let .internal(.getUpdateWarehouseResponse(.success(test))):
-                print(test)
+            case let .internal(.createCartSession(.success(test))):
                 return .none
                 
             case let .internal(.getFetchBoardgamesResponse(.success(boardgames))):
@@ -263,7 +259,7 @@ public extension Home {
             case .internal(.toggleCheckoutQuickView):
                 state.showCheckoutQuickView.toggle()
                 return .none
-            case .internal(.getUpdateWarehouseResponse(.failure(_))):
+            case .internal(.createCartSession(.failure(_))):
                 print("ERROR")
                 return .none
             }

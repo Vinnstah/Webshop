@@ -18,24 +18,18 @@ public enum UserRoute: Equatable {
 }
 
 public enum CartRoute: Equatable {
-    case session(SessionRoute)
-}
-
-public enum SessionRoute: Equatable {
     case create(Cart)
     case fetch(id: String)
-    case items(ItemRoute)
+    case add(item: Cart.Item)
+    case fetchItems
 }
 
-public enum ItemRoute: Equatable {
-    case add(Cart.Item)
-    case fetch
-}
 public enum WarehouseRoute: Equatable {
     case fetch
     case get(id: String)
     case update(Warehouse.Item)
 }
+
 public enum BoardgameRoute: Equatable {
     case fetch
 }

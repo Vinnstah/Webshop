@@ -6,99 +6,70 @@ import Product
 public func createCartSession(
     _ db: PostgresConnection,
     from cart: Cart,
-    with jwt: String,
     logger: Logger
-) async throws -> Cart.ID? {
-    var allProductsInCart: [UUID] = []
-    for item in cart.item {
-        allProductsInCart.append(item.product.rawValue)
-    }
-    
-    var quantityOfAllProductsInCart: [Int] = []
-    for item in cart.item {
-        quantityOfAllProductsInCart.append(item.quantity.rawValue)
-    }
-    
+) async throws -> Cart.Session.ID {
     try await db.query("""
             INSERT INTO cart
-            VALUES(\(cart.id.rawValue), ARRAY[\(allProductsInCart)], ARRAY[\(quantityOfAllProductsInCart), \(jwt))
+            VALUES(\(cart.session.id.rawValue), \(cart.session.jwt.rawValue))
             ON CONFLICT (jwt)
             DO NOTHING;
             """, logger: logger)
-    
-    return cart.id
+    return cart.session.id
 }
 
 public func fetchCartSession(
     _ db: PostgresConnection,
-    from id: Cart.ID,
+    from jwt: String,
     logger: Logger
 ) async throws -> Cart? {
     let rows = try await db.query("""
                         SELECT * FROM cart
-                        WHERE cart_id=\(id.rawValue)
-                        """, logger: logger)
-    let cart = try await decodeCartSession(from: rows)
+                        WHERE jwt=\(jwt)
+                        """, logger: logger
+    )
+    guard let session = try await decodeCartSession(from: rows) else {
+        return nil
+    }
+    
+    var cart = Cart(session: session, item: [])
+    
+    let itemRows = try await db.query("""
+                            SELECT * FROM cart_items
+                            WHERE cart_id=\(cart.session.id.rawValue)
+                            """, logger: logger)
+
+    cart.item = try await addCartItems(from: itemRows)
+    
     return cart
     
 }
 
-public func decodeCartSession(from rows: PostgresRowSequence) async throws -> Cart {
-    var cart: Cart? = nil
-    var item: [Cart.Item] = []
+public func decodeCartSession(from rows: PostgresRowSequence) async throws -> Cart.Session? {
+    var sessions: [Cart.Session] = []
     for try await row in rows {
         let randomRow = row.makeRandomAccess()
-        item.append(Cart.Item(
-            product: Product.ID(rawValue: try randomRow["product_id"].decode(UUID.self, context: .default)),
-            quantity: Cart.Quantity(rawValue: try randomRow["quantity"].decode(Int.self, context: .default))
-        ))
-        cart = Cart(
-            id: Cart.ID(rawValue: try randomRow["cart_id"].decode(UUID.self, context: .default)),
-            item: [Cart.Item(
-                product: Product.ID(rawValue: try randomRow["product_id"].decode(UUID.self, context: .default)),
-                quantity: Cart.Quantity(rawValue: try randomRow["quantity"].decode(Int.self, context: .default)))
-            ]
+        let session = Cart.Session(
+            id: Cart.Session.ID(rawValue: try randomRow["cart_id"].decode(UUID.self, context: .default)),
+            jwt: Cart.Session.JWT(rawValue: try randomRow["jwt"].decode(String.self, context: .default))
         )
+        sessions.append(session)
+        
     }
-    return cart!
+    if sessions == [] {
+        return nil
+    }
+    return sessions.first
 }
-    
 
-
-//                       CREATE TABLE cart ( db_id SERIAL , cart_id uuid PRIMARY KEY, product_id_quantity text[][], jwt VARCHAR );
-//    db.query("""
-//INSERT INTO cart
-//VALUES(\(cart.id.rawValue), ARRAY[[\(allProductsInCart)], [\(quantityOfAllProductsInCart)]], \(jwt)
-//""", logger: logger)
-//    try await db.query("""
-//                        INSERT INTO shopping_session
-//                        VALUES(\(cart.id.rawValue), \(cart.item))
-//                        ON CONFLICT (jwt)
-//                        DO NOTHING;
-//                        """,
-//                       logger: logger
-//                       )
-//
-//    return cart.id
-
-
-//
-//case let .items(route):
-//    return try await itemsHandler(route: route)
-//case let .create(cart):
-//    return ResultPayload(forAction: "placeholder", payload: "placerholder")
-//case .fetch(id: let id):
-//    return ResultPayload(forAction: "placeholder", payload: "placerholder")
-//}
-//}
-//
-//func itemsHandler(
-//route: ItemRoute
-//) async throws -> any AsyncResponseEncodable {
-//switch route {
-//case .fetch:
-//    return ResultPayload(forAction: "placeholder", payload: "placerholder")
-//case let .add(item):
-//    return ResultPayload(forAction: "placeholder", payload: "placerholder")
-//}
-//}
+public func addCartItems(from rows: PostgresRowSequence) async throws -> [Cart.Item] {
+    var items: [Cart.Item] = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let item = Cart.Item(
+            product: Product.ID(rawValue: try randomRow["product_id"].decode(UUID.self, context: .default)),
+            quantity: Cart.Item.Quantity(rawValue: try randomRow["quantity"].decode(Int.self, context: .default))
+        )
+        items.append(item)
+    }
+    return items
+}

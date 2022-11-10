@@ -47,7 +47,7 @@ public func updateWarehouse(
                     """,
                     logger: logger
     )
-    return "OK"
+    return item.id.rawValue.uuidString
 }
 
 public func fetchItemStatus(

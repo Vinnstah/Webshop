@@ -99,7 +99,10 @@ CREATE TABLE boardgames (boardgame_id uuid PRIMARY KEY, title VARCHAR, image_url
 
 CREATE TABLE warehouse (warehouse_id uuid PRIMARY KEY,prod_id uuid , quantity integer );
 
-CREATE TABLE cart (cart_id uuid PRIMARY KEY, product_id uuid[], quantity integer[], jwt VARCHAR );
+<!--CREATE TABLE cart (cart_id uuid, product_id uuid[], quantity integer[], jwt VARCHAR PRIMARY KEY);-->
+
+CREATE TABLE cart (cart_id uuid, jwt VARCHAR PRIMARY KEY);
+CREATE TABLE cart_items (cart_id uuid, product_id uuid, quantity integer, UNIQUE(cart_id, product_id));
 
 CREATE TABLE products (boardgame_id uuid, product_id uuid PRIMARY KEY, price integer, currency VARCHAR );
 
@@ -118,3 +121,17 @@ Each box allows you to play from 1 to 6 players, and if you combine more boxes, 
                     ON CONFLICT (warehouse_id)
                     DO UPDATE
                     SET quantity=3;
+
+            INSERT INTO cart
+            VALUES('65F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, ARRAY ['72987608-7EB5-40D8-8DEC-27944EA93C51'::UUID], ARRAY [4], 'TEST1234')
+            ON CONFLICT (jwt)
+            DO NOTHING;
+            
+            INSERT INTO cart_items
+            VALUES('65F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, '25F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, 5)
+                        ON CONFLICT (cart_id, product_id)
+            DO 
+            UPDATE SET quantity=2;
+            
+            INSERT INTO cart
+            VALUES('65F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, 'TEST1234');

@@ -7,33 +7,23 @@ func cartHandler(
     request: Request
 ) async throws -> any AsyncResponseEncodable {
     switch route {
-    case let .session(route):
-        return try await sessionHandler(route: route, request: request)
-    }
-}
-
-func sessionHandler(
-    route: SessionRoute,
-    request: Request
-) async throws -> any AsyncResponseEncodable {
-    switch route {
-    case let .items(route):
-        return try await itemsHandler(route: route, request: request)
     case let .create(cart):
-        return ResultPayload(forAction: "placeholder", payload: "placerholder")
+        let db = try await connectDatabase()
+        let jwt = try await createCartSession(db, from: cart, logger: logger)
+        try await db.close()
+        return ResultPayload(forAction: "placeholder", payload: jwt.rawValue)
+        
     case .fetch(id: let id):
+        let db = try await connectDatabase()
+        let cart = try await fetchCartSession(db, from: id, logger: logger)
+        try await db.close()
+        return ResultPayload(forAction: "placeholder", payload: cart)
+        
+    case .add(item: let item):
+        return ResultPayload(forAction: "placeholder", payload: "placerholder")
+    case .fetchItems:
         return ResultPayload(forAction: "placeholder", payload: "placerholder")
     }
 }
 
-func itemsHandler(
-    route: ItemRoute,
-    request: Request
-) async throws -> any AsyncResponseEncodable {
-    switch route {
-    case .fetch:
-        return ResultPayload(forAction: "placeholder", payload: "placerholder")
-    case let .add(item):
-        return ResultPayload(forAction: "placeholder", payload: "placerholder")
-    }
-}
+

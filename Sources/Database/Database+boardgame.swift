@@ -15,10 +15,15 @@ public func fetchBoardgames(
     return boardgames
 }
 
-public func decodeBoardgames(from rows: PostgresRowSequence) async throws -> [Boardgame] {
+public func decodeBoardgames(
+    from rows: PostgresRowSequence
+) async throws -> [Boardgame] {
+    
     var boardgames: [Boardgame] = []
+    
     for try await row in rows {
         let randomRow = row.makeRandomAccess()
+        
         let boardgame = Boardgame(
             id: Boardgame.ID(rawValue: try randomRow["boardgame_id"].decode(UUID.self, context: .default)),
             title: try randomRow["title"].decode(String.self, context: .default),

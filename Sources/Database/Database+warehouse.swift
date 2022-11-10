@@ -12,26 +12,24 @@ public func fetchWarehouse(
                     """,
                     logger: logger
     )
-    let warehouse = try await fetchWarehouseStatus(from: rows)
+    let warehouse = try await decodeWarehouseStatus(from: rows)
     return warehouse
 }
 
-public func fetchWarehouseStatus(
-    from rows: PostgresRowSequence
+public func fetchWarehouseStatusForProduct(
+    from id: String,
+    _ db: PostgresConnection
 ) async throws -> [Warehouse.Item] {
-    var warehouse: [Warehouse.Item] = []
-    for try await row in rows {
-        let randomRow = row.makeRandomAccess()
-        let product = Warehouse.Item(
-            id: Warehouse.Item.ID(rawValue: try randomRow["warehouse_id"].decode(UUID.self, context: .default)),
-            product: Product.ID(rawValue: try randomRow["prod_id"].decode(UUID.self, context: .default)),
-            quantity: Warehouse.Item.Quantity(rawValue: try randomRow["quantity"].decode(Int.self, context: .default))
-        )
-        warehouse.append(product)
-    }
+    let rows = try await db.query(
+                    """
+                    SELECT * FROM warehouse
+                    WHERE prod_id=\(id);
+                    """,
+                    logger: logger
+    )
+    let warehouse = try await decodeItemStatus(from: rows)
     return warehouse
 }
-
 
 public func updateWarehouse(
     with item: Warehouse.Item,
@@ -50,8 +48,25 @@ public func updateWarehouse(
     return item.id.rawValue.uuidString
 }
 
-public func fetchItemStatus(
-    for rows: PostgresRowSequence
+public func decodeWarehouseStatus(
+    from rows: PostgresRowSequence
+) async throws -> [Warehouse.Item] {
+    
+    var warehouse: [Warehouse.Item] = []
+    for try await row in rows {
+        let randomRow = row.makeRandomAccess()
+        let product = Warehouse.Item(
+            id: Warehouse.Item.ID(rawValue: try randomRow["warehouse_id"].decode(UUID.self, context: .default)),
+            product: Product.ID(rawValue: try randomRow["prod_id"].decode(UUID.self, context: .default)),
+            quantity: Warehouse.Item.Quantity(rawValue: try randomRow["quantity"].decode(Int.self, context: .default))
+        )
+        warehouse.append(product)
+    }
+    return warehouse
+}
+
+public func decodeItemStatus(
+    from rows: PostgresRowSequence
 ) async throws -> [Warehouse.Item] {
     
     var warehouse: [Warehouse.Item] = []
@@ -67,17 +82,4 @@ public func fetchItemStatus(
     return warehouse
 }
 
-public func fetchWarehouseStatusForProduct(
-    from id: String,
-    _ db: PostgresConnection
-) async throws -> [Warehouse.Item] {
-    let rows = try await db.query(
-                    """
-                    SELECT * FROM warehouse
-                    WHERE prod_id=\(id);
-                    """,
-                    logger: logger
-    )
-    let warehouse = try await fetchItemStatus(for: rows)
-    return warehouse
-}
+

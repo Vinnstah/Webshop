@@ -129,7 +129,7 @@ Each box allows you to play from 1 to 6 players, and if you combine more boxes, 
             
             INSERT INTO cart_items
             VALUES('65F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, '25F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, 5)
-                        ON CONFLICT (cart_id, product_id)
+            ON CONFLICT (cart_id, product_id)
             DO 
             UPDATE SET quantity=2;
             

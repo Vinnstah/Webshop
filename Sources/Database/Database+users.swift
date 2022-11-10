@@ -2,7 +2,12 @@ import Foundation
 import UserModel
 import PostgresNIO
 
-public func createUser(in db: PostgresConnection, with user: User,and jwt: String,_ logger: Logger) async throws {
+public func createUser(
+    in db: PostgresConnection,
+    with user: User,
+    and jwt: String,
+    _ logger: Logger
+) async throws {
     try await db.query("""
                         INSERT INTO users(user_name,password,jwt)
                         VALUES (\(user.credentials.email),\(user.credentials.hashedPassword),\(jwt));
@@ -11,7 +16,9 @@ public func createUser(in db: PostgresConnection, with user: User,and jwt: Strin
     )
 }
 
-public func fetchUsers(from rows: PostgresRowSequence) async throws -> [User] {
+public func decodeUsers(
+    from rows: PostgresRowSequence
+) async throws -> [User] {
     var users: [User] = []
     for try await row in rows {
         let randomRow = row.makeRandomAccess()
@@ -26,7 +33,11 @@ public func fetchUsers(from rows: PostgresRowSequence) async throws -> [User] {
     return users
 }
 
-public func loggedInUsersJWT(_ db: PostgresConnection, user: User) async throws -> String {
+public func fetchLoggedInUserJWTandDecode(
+    _ db: PostgresConnection,
+    user: User
+) async throws -> String {
+    
     let rows = try await db.query(
                     """
                     SELECT jwt FROM users WHERE user_name=\(user.credentials.email);
@@ -54,13 +65,14 @@ public func loginUser(
                     """,
                     logger: logger
     )
-    guard let databaseUser = try await fetchUsers(from: rows).first else {
+    guard let databaseUser = try await decodeUsers(from: rows).first else {
         return nil
     }
+    
     guard databaseUser.credentials.password == user.credentials.hashedPassword else {
         return nil
     }
     
-    let jwt = try await loggedInUsersJWT(db, user: databaseUser)
+    let jwt = try await fetchLoggedInUserJWTandDecode(db, user: databaseUser)
     return jwt
 }

@@ -45,21 +45,17 @@ public let cartRouter = OneOf {
         Body(.json(Cart.self))
     }
 
-    Route(.case(CartRoute.fetch(id:))) {
+    Route(.case(CartRoute.fetch(jwt:))) {
         Path { "cart" }
         Query {
-            Field("id")
+            Field("jwt")
         }
-    }
-    
-    Route(.case(CartRoute.fetchItems)) {
-        Path { "cart"; "item" }
     }
     
     Route(.case(CartRoute.add(item:))) {
         Path { "cart"; "item" }
         Method.post
-        Body(.json(Cart.Item.self))
+        Body(.json(Cart.self))
     }
 }
 

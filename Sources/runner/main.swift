@@ -1,5 +1,6 @@
 import Server
 import Vapor
+import Database
 
 var env = try Environment.detect()
 try LoggingSystem.bootstrap(from: &env)

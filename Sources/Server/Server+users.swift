@@ -3,12 +3,15 @@ import SiteRouter
 import Foundation
 import JWT
 import UserModel
+import Database
 
 func usersHandler(
     route: UserRoute,
     request: Request
 ) async throws -> any AsyncResponseEncodable {
+    
     switch route {
+        
     case let .create(user):
         let db = try await connectDatabase()
         

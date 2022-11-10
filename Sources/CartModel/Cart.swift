@@ -29,8 +29,8 @@ public extension Cart {
 public extension Cart {
     struct Item: Equatable, Codable, Sendable, Hashable  {
         
-        public let product: Product.ID
-        public let quantity: Quantity
+        public var product: Product.ID
+        public var quantity: Quantity
         
         public init(product: Product.ID, quantity: Quantity) {
             self.product = product

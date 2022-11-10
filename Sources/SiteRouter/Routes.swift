@@ -19,9 +19,8 @@ public enum UserRoute: Equatable {
 
 public enum CartRoute: Equatable {
     case create(Cart)
-    case fetch(id: String)
-    case add(item: Cart.Item)
-    case fetchItems
+    case fetch(jwt: String)
+    case add(item: Cart)
 }
 
 public enum WarehouseRoute: Equatable {

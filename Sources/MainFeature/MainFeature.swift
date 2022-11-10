@@ -55,7 +55,6 @@ public extension Main {
         public enum InternalAction: Equatable, Sendable {
             case onAppear
             case tabSelected
-            case getCartSession(TaskResult<Cart>)
         }
     }
     
@@ -75,26 +74,6 @@ public extension Main {
                     case .settings: return .none
                     case .checkout: return .none
                 }
-                return .none
-                
-            case .internal(.onAppear):
-//                let cart: Cart = Cart(id: Cart.ID.init(rawValue: .init()), item: [Cart.Item(product: Product.ID(rawValue: .init()), quantity: Cart.Quantity(rawValue: 4))], jwt: Cart.JWT(rawValue: "TEST124fafaffaf34"))
-                return .run { send in
-                    await send(.internal(.getCartSession(
-                    TaskResult {
-                        try await self.apiClient.decodedResponse(
-                            for: .cart(.fetch(id: "TEST1234")),
-                            as: ResultPayload<Cart>.self).value.status.get()
-                    }
-                )))
-                }
-                
-            case let .internal(.getCartSession(.success(test))):
-                print(test)
-                return .none
-                
-            case let .internal(.getCartSession(.failure(_))):
-                print("FAIL")
                 return .none
                 
             case .delegate(_):

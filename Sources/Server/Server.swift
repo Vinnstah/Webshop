@@ -2,32 +2,42 @@ import Vapor
 import VaporRouting
 import SiteRouter
 import UserModel
+import ComposableArchitecture
+import DatabaseLive
 
-// configures your application
-public func configure(_ app: Application) throws {
-    
-    app.mount(router, use: siteHandler)
-    
+public struct Server: Sendable {
+    @Dependency(\.databaseClient) var databaseClient
+    public init() {}
 }
 
-func siteHandler(
-    request: Request,
-    route: SiteRoute
-) async throws -> any AsyncResponseEncodable {
+public extension Server {
     
-    switch route {
+     func configure(_ app: Application) throws {
         
-    case let .boardgame(route):
-        return try await boardgameHandler(route: route, request: request)
+        app.mount(router, use: siteHandler)
         
-    case let .cart(route):
-        return try await cartHandler(route: route, request: request)
-        
-    case let .users(route):
-        return try await usersHandler(route: route, request: request)
-        
-    case let .warehouse(route):
-        return try await warehouseHandler(route: route, request: request)
     }
+    
+    func siteHandler(
+        request: Request,
+        route: SiteRoute
+    ) async throws -> any AsyncResponseEncodable {
+        
+        switch route {
+            
+        case let .boardgame(route):
+            return try await boardgameHandler(route: route, request: request)
+            
+        case let .cart(route):
+            return try await cartHandler(route: route, request: request)
+            
+        case let .users(route):
+            return try await usersHandler(route: route, request: request)
+            
+        case let .warehouse(route):
+            return try await warehouseHandler(route: route, request: request)
+        }
+    }
+    
 }
 extension ResultPayload: Content {}

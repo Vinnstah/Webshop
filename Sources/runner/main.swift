@@ -1,13 +1,15 @@
 import Server
 import Vapor
-import Database
+import DatabaseClient
+import ComposableArchitecture
 
+let server = Server()
 var env = try Environment.detect()
 try LoggingSystem.bootstrap(from: &env)
 let app = Application(env)
 defer {
     app.shutdown()
-    closeDatabaseEventLoop()
+    DatabaseClient.live.closeDatabaseEventLoop()
 }
-try configure(app)
+try server.configure(app)
 try app.run()

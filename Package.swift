@@ -39,8 +39,11 @@ let package = Package(
             name: "CartModel",
             targets: ["CartModel"]),
         .library(
-            name: "Database",
-            targets: ["Database"]),
+            name: "DatabaseClient",
+            targets: ["DatabaseClient"]),
+        .library(
+            name: "DatabaseLive",
+            targets: ["DatabaseLive"]),
         .library(
             name: "FavoritesClient",
             targets: ["FavoritesClient"]),
@@ -165,11 +168,25 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
-            name: "Database",
+            name: "DatabaseClient",
             dependencies: [
                 "CartModel",
                 "Product",
                 "SiteRouter",
+                tca,
+                postgres,
+                vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseLive",
+            dependencies: [
+                "CartModel",
+                "DatabaseClient",
+                "Product",
+                "SiteRouter",
+                tca,
                 postgres,
                 vapor,
             ],
@@ -291,13 +308,14 @@ let package = Package(
             .target(
                 name: "Server",
                 dependencies: [
-                    "Database",
+                    "DatabaseLive",
                     "CartModel",
                     "JWT",
                     "Product",
                     "SiteRouter",
                     "UserModel",
                     postgres,
+                    tca,
                     vapor,
                     vaporRouting,
                 ],

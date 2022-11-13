@@ -99,8 +99,6 @@ CREATE TABLE boardgames (boardgame_id uuid PRIMARY KEY, title VARCHAR, image_url
 
 CREATE TABLE warehouse (warehouse_id uuid PRIMARY KEY,prod_id uuid , quantity integer );
 
-<!--CREATE TABLE cart (cart_id uuid, product_id uuid[], quantity integer[], jwt VARCHAR PRIMARY KEY);-->
-
 CREATE TABLE cart (cart_id uuid, jwt VARCHAR PRIMARY KEY);
 CREATE TABLE cart_items (cart_id uuid, product_id uuid, quantity integer, UNIQUE(cart_id, product_id));
 

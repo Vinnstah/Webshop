@@ -87,8 +87,13 @@ public extension SignUp {
                     )
                 )
 
-                return .run { [user = state.user] send in
-                    await send(.delegate(.goToNextStep(user!)))
+                return .run { [email = state.email, password = state.password] send in
+                    await send(.delegate(.goToNextStep(
+                        User(
+                            credentials: User.Credentials(
+                                email: email, password: password)
+                        )
+                    )))
                 }
                 
             case .delegate(_):

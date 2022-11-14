@@ -7,9 +7,10 @@ import Vapor
 import XCTestDynamicOverlay
 import DatabaseClient
 
-public extension DatabaseClient {
+extension DatabaseClient: DependencyKey {
+    public static let liveValue = DatabaseClient.live
     
-    static let live: Self = {
+    public static let live: Self = {
         let database = Database()
         let logger = Logger(label: "postgres-logger")
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)
@@ -67,6 +68,3 @@ public extension DatabaseClient {
     }()
 }
 
-extension DatabaseClient {
-    static let liveValue = DatabaseClient.live
-}

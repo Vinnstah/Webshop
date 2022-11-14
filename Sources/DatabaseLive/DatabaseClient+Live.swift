@@ -67,32 +67,6 @@ public extension DatabaseClient {
     }()
 }
 
-//extension DatabaseClient {
-//    public static let unimplemented = Self(
-//        fetchBoardgames: { _ in return [] },
-//        createCartSession: { _,_  in return .init(rawValue: UUID()) },
-//        getAllItemsInCart: { _,_  in return []},
-//        fetchCartSession: { _,_  in return nil },
-//        insertItemsToCart: { _,_  in return nil },
-//        createUser: { _,_,_  in return  },
-//        fetchLoggedInUserJWT: { _,_  in return "" },
-//        signInUser: { _,_   in return nil },
-//        fetchWarehouse: { _ in return [] },
-//        fetchWarehouseStatusForProduct: { _,_  in return [] },
-//        updateWarehouse: { _,_  in return nil },
-//        connectToDatabase: { XCTUnimplementedFailure() as! PostgresConnection },
-//        closeDatabaseEventLoop: { return }
-//        
-//    )
-//}
-private enum DatabaseClientKey: DependencyKey {
-    typealias Value = DatabaseClient
+extension DatabaseClient {
     static let liveValue = DatabaseClient.live
-//    static let testValue = DatabaseClient.unimplemented
-}
-public extension DependencyValues {
-    var databaseClient: DatabaseClient {
-        get { self[DatabaseClientKey.self] }
-        set { self[DatabaseClientKey.self] = newValue }
-    }
 }

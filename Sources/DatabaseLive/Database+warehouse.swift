@@ -66,7 +66,7 @@ public extension Database {
         return warehouse
     }
     
-    public func decodeItemStatus(
+     func decodeItemStatus(
         from rows: PostgresRowSequence
     ) async throws -> [Warehouse.Item] {
         

@@ -33,7 +33,6 @@ public extension Database {
         }
         
         var cart = Cart(session: session, item: [])
-//        let itemRows = try await getAllItemsInCart(from: cart.session, db, logger: logger)
         
         cart.item = try await getAllItemsInCart(from: cart.session, db, logger: logger)
         

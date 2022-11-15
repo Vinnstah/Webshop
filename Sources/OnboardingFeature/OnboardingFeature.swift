@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Viktor Jansson on 2022-09-24.
-//
-
 import Foundation
 import ComposableArchitecture
 import SwiftUI
@@ -16,7 +9,6 @@ import SignInFeature
 
 ///Conforming AlertState to Sendable
 extension AlertState: @unchecked Sendable {}
-
 
 public struct Onboarding: ReducerProtocol {
     
@@ -72,104 +64,181 @@ public extension Onboarding {
         }
     }
     
+    
     var body: some ReducerProtocol<State, Action> {
-        Reduce { state, action in
-            
-            switch action {
+        CombineReducers {
+            Reduce(self.`internal`)
+            Reduce(self.signIn)
+                .ifLet(\.signIn, action: /Action.signIn) {
+                    SignIn()
+                }
+            Reduce(self.signUp)
+                .ifLet(\.signUp, action: /Action.signUp) {
+                    SignUp()
+                }
+            Reduce(self.userLocalSettings)
+                .ifLet(\.userLocalSettings, action: /Action.userLocalSettings) {
+                    UserLocalSettings()
+                }
+            Reduce(self.termsAndConditions)
+                .ifLet(\.termsAndConditions, action: /Action.termsAndConditions) {
+                    TermsAndConditions()
+                }
+        }
+    }
+}
 
-                /// Go back to the `LoginView` when the user clicks `cancel`
-            case .internal(.goBackToLoginView):
-                state.signIn = .init()
-                return .none
-                
-                /// When the user clicks confirm on the alert we set the `state.alert` to `nil` to remove the alert
-            case .internal(.alertConfirmTapped):
-                state.alert = nil
-                return .none
-                
-            case let .signUp(.delegate(.goToNextStep(user))):
-                state.signUp = nil
-                state.userLocalSettings = .init(user: user)
-                return .none
-                
-            case .signUp(.delegate(.goToThePreviousStep)):
-                state.signUp = nil
-                state.signIn = .init()
-                return .none
-                
-            case .signUp(.delegate(.goBackToLoginView)):
-                state.signUp = nil
-                return .run { send in
-                    await send(.internal(.goBackToLoginView))
-                    
-                }
-            case .userLocalSettings(.delegate(.goBackToLoginView)):
-                state.userLocalSettings = nil
-                return .run { send in
-                    await send(.internal(.goBackToLoginView))
-                }
-                
-            case let .userLocalSettings(.delegate(.nextStep(user))):
-                state.userLocalSettings = nil
-                state.termsAndConditions = .init(user: user)
-                return .none
-                
-            case let .userLocalSettings(.delegate(.previousStep(user))):
-                state.userLocalSettings = nil
-                state.signUp = .init(user: user, email: user.credentials.email, password: user.credentials.password)
-                return .none
-                
-            case let .termsAndConditions(.delegate(.previousStep(user))):
-                state.termsAndConditions = nil
-                state.userLocalSettings = .init(user: user)
-                return .none
-                
-            case .termsAndConditions(.delegate(.goBackToLoginView)):
-                state.termsAndConditions = nil
-                return .run { send in
-                    await send(.internal(.goBackToLoginView))
-                }
-                
-            case .signIn(.delegate(.userPressedSignUp)):
-                state.signIn = nil
-                state.signUp = .init()
-                return .none
-                
-            case let .signIn(.delegate(.userLoggedIn(jwt: jwt))):
-                return .run { send in
-                    await send(.delegate(.userLoggedIn(jwt: jwt)))
-                }
-                
-            case let .termsAndConditions(.delegate(.userFinishedOnboarding(jwt))):
-                return .run { send in
-                    await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
-                }
-                
-            case .internal(_):  
-                return .none
-            case .delegate(_):
-                return .none
-            case .signIn(.internal(_)):
-                return .none
-            case .signUp(.internal(_)):
-                return .none
-            case .userLocalSettings(.internal(_)):
-                return .none
-            case .termsAndConditions(.internal(_)):
-                return .none
+public extension Onboarding {
+    func signUp(into state: inout State, action: Action) -> Effect<Action, Never> {
+        switch action {
+        case let .signUp(.delegate(.goToNextStep(user))):
+            state.signUp = nil
+            state.userLocalSettings = .init(user: user)
+            return .none
+            
+        case .signUp(.delegate(.goToThePreviousStep)):
+            state.signUp = nil
+            state.signIn = .init()
+            return .none
+            
+        case .signUp(.delegate(.goBackToLoginView)):
+            state.signUp = nil
+            return .run { send in
+                await send(.internal(.goBackToLoginView))
             }
+        case .delegate(_):
+            return  .none
+        case .internal(_):
+            return  .none
+        case .signIn(_):
+            return .none
+        case .signUp(.internal(_)):
+            return .none
+        case .userLocalSettings(_):
+            return .none
+        case .termsAndConditions(_):
+            return .none
         }
-        .ifLet(\.signIn, action: /Action.signIn) {
-            SignIn()
+    }
+}
+
+public extension Onboarding {
+    func signIn(into state: inout State, action: Action) -> Effect<Action, Never> {
+        switch action {
+        case .signIn(.delegate(.userPressedSignUp)):
+            state.signIn = nil
+            state.signUp = .init()
+            return .none
+            
+        case let .signIn(.delegate(.userLoggedIn(jwt: jwt))):
+            return .run { send in
+                await send(.delegate(.userLoggedIn(jwt: jwt)))
+            }
+        case .delegate(_):
+            return  .none
+        case .internal(_):
+            return  .none
+        case .signIn(.internal(_)):
+            return .none
+        case .signUp(_):
+            return .none
+        case .userLocalSettings(_):
+            return .none
+        case .termsAndConditions(_):
+            return .none
         }
-        .ifLet(\.signUp, action: /Action.signUp) {
-            SignUp()
+    }
+}
+
+public extension Onboarding {
+    func termsAndConditions(into state: inout State, action: Action) -> Effect<Action, Never> {
+        switch action {
+        case let .termsAndConditions(.delegate(.previousStep(user))):
+            state.termsAndConditions = nil
+            state.userLocalSettings = .init(user: user)
+            return .none
+            
+        case .termsAndConditions(.delegate(.goBackToLoginView)):
+            state.termsAndConditions = nil
+            return .run { send in
+                await send(.internal(.goBackToLoginView))
+            }
+        case let .termsAndConditions(.delegate(.userFinishedOnboarding(jwt))):
+            return .run { send in
+                await send(.delegate(.userFinishedOnboarding(jwt: jwt)))
+            }
+        case .delegate(_):
+            return  .none
+        case .internal(_):
+            return  .none
+        case .signIn(_):
+            return .none
+        case .signUp(_):
+            return .none
+        case .userLocalSettings(_):
+            return .none
+        case .termsAndConditions(.internal(_)):
+            return .none
         }
-        .ifLet(\.userLocalSettings, action: /Action.userLocalSettings) {
-            UserLocalSettings()
+    }
+}
+
+public extension Onboarding {
+    func `internal`(into state: inout State, action: Action) -> Effect<Action, Never> {
+        switch action {
+        case .internal(.goBackToLoginView):
+            state.signIn = .init()
+            return .none
+            
+        case .internal(.alertConfirmTapped):
+            state.alert = nil
+            return .none
+        case .delegate(_):
+            return  .none
+        case .internal(_):
+            return  .none
+        case .signIn(_):
+            return .none
+        case .signUp(_):
+            return .none
+        case .userLocalSettings(_):
+            return .none
+        case .termsAndConditions(_):
+            return .none
         }
-        .ifLet(\.termsAndConditions, action: /Action.termsAndConditions) {
-            TermsAndConditions()
+    }
+}
+
+public extension Onboarding {
+    func userLocalSettings(into state: inout State, action: Action) -> Effect<Action, Never> {
+        switch action {
+        case .userLocalSettings(.delegate(.goBackToLoginView)):
+            state.userLocalSettings = nil
+            return .run { send in
+                await send(.internal(.goBackToLoginView))
+            }
+            
+        case let .userLocalSettings(.delegate(.nextStep(user))):
+            state.userLocalSettings = nil
+            state.termsAndConditions = .init(user: user)
+            return .none
+            
+        case let .userLocalSettings(.delegate(.previousStep(user))):
+            state.userLocalSettings = nil
+            state.signUp = .init(user: user, email: user.credentials.email, password: user.credentials.password)
+            return .none
+        case .delegate(_):
+            return  .none
+        case .internal(_):
+            return  .none
+        case .signIn(_):
+            return .none
+        case .signUp(_):
+            return .none
+        case .userLocalSettings(.internal(_)):
+            return .none
+        case .termsAndConditions(_):
+            return .none
         }
     }
 }

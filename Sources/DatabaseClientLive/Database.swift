@@ -9,7 +9,7 @@ public struct Database: Sendable {
     public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)
     public let logger = Logger(label: "postgres-logger")
 
-    public func connectDatabase() async throws -> PostgresConnection  {
+    public func connect() async throws -> PostgresConnection  {
         let config = PostgresConnection.Configuration(
             connection: .init(
                 host: "localhost",

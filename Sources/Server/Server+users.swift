@@ -14,7 +14,7 @@ public extension Server {
         switch route {
             
         case let .create(user):
-            let db = try await databaseClient.connectToDatabase()
+            let db = try await databaseClient.connect()
             
             let jwt = constructJWT(
                 secretKey: user.credentials.password,
@@ -27,7 +27,7 @@ public extension Server {
             return ResultPayload(forAction: "create", payload: jwt)
             
         case let .login(user):
-            let db = try await databaseClient.connectToDatabase()
+            let db = try await databaseClient.connect()
             let jwt = try await databaseClient.signInUser(db, user)
             try await db.close()
             return ResultPayload(forAction: "login", payload: jwt)

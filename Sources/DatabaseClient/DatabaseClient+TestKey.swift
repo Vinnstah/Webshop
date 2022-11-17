@@ -18,7 +18,7 @@ extension DatabaseClient {
         fetchWarehouse: XCTUnimplemented("\(Self.self).fetchWarehouse"),
         fetchWarehouseStatusForProduct: XCTUnimplemented("\(Self.self).fetchWarehouseStatusForProduct"),
         updateWarehouse: XCTUnimplemented("\(Self.self).updateWarehouse"),
-        connectToDatabase: XCTUnimplemented("\(Self.self).connectToDatabase"),
+        connect: XCTUnimplemented("\(Self.self).connect"),
         closeDatabaseEventLoop: XCTUnimplemented("\(Self.self).closeDatabaseEventLoop")
     )
 }

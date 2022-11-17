@@ -12,7 +12,7 @@ public extension Server {
         switch route {
             
         case .fetch:
-            let db = try await databaseClient.connectToDatabase()
+            let db = try await databaseClient.connect()
             let boardgames = try await databaseClient.fetchBoardgames(db)
             try await db.close()
             return ResultPayload(forAction: "fetch Boardgames", payload: boardgames)

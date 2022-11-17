@@ -42,8 +42,8 @@ let package = Package(
             name: "DatabaseClient",
             targets: ["DatabaseClient"]),
         .library(
-            name: "DatabaseLive",
-            targets: ["DatabaseLive"]),
+            name: "DatabaseClientLive",
+            targets: ["DatabaseClientLive"]),
         .library(
             name: "FavoritesClient",
             targets: ["FavoritesClient"]),
@@ -147,7 +147,6 @@ let package = Package(
                 dependencies: [
                     "Product",
                     tagged,
-                    postgres,
                 ],
                 swiftSettings: swiftSettings
             ),
@@ -180,7 +179,7 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
-            name: "DatabaseLive",
+            name: "DatabaseClientLive",
             dependencies: [
                 "CartModel",
                 "DatabaseClient",
@@ -308,7 +307,7 @@ let package = Package(
             .target(
                 name: "Server",
                 dependencies: [
-                    "DatabaseLive",
+                    "DatabaseClientLive",
                     "CartModel",
                     "JWT",
                     "Product",

@@ -18,7 +18,7 @@ public struct DatabaseClient: Sendable {
     public typealias FetchWarehouse = @Sendable (PostgresConnection) async throws -> [Warehouse.Item]
     public typealias FetchWarehouseStatusForProduct = @Sendable (PostgresConnection, String) async throws -> [Warehouse.Item]
     public typealias UpdateWarehouse = @Sendable (PostgresConnection, Warehouse.Item) async throws -> String?
-    public typealias ConnectToDatabase = @Sendable () async throws -> (PostgresConnection)
+    public typealias Connect = @Sendable () async throws -> (PostgresConnection)
     public typealias CloseDatabaseEventLoop = @Sendable () -> Void
     
     public var fetchBoardgames: FetchBoardgames
@@ -32,7 +32,7 @@ public struct DatabaseClient: Sendable {
     public var fetchWarehouse: FetchWarehouse
     public var fetchWarehouseStatusForProduct: FetchWarehouseStatusForProduct
     public var updateWarehouse: UpdateWarehouse
-    public var connectToDatabase: ConnectToDatabase
+    public var connect: Connect
     public var closeDatabaseEventLoop: CloseDatabaseEventLoop
     
     public init(
@@ -47,7 +47,7 @@ public struct DatabaseClient: Sendable {
         fetchWarehouse: @escaping FetchWarehouse,
         fetchWarehouseStatusForProduct: @escaping FetchWarehouseStatusForProduct,
         updateWarehouse: @escaping UpdateWarehouse,
-        connectToDatabase: @escaping ConnectToDatabase,
+        connect: @escaping Connect,
         closeDatabaseEventLoop: @escaping CloseDatabaseEventLoop
     ) {
         self.fetchBoardgames = fetchBoardgames
@@ -61,7 +61,7 @@ public struct DatabaseClient: Sendable {
         self.fetchWarehouse = fetchWarehouse
         self.fetchWarehouseStatusForProduct = fetchWarehouseStatusForProduct
         self.updateWarehouse = updateWarehouse
-        self.connectToDatabase = connectToDatabase
+        self.connect = connect
         self.closeDatabaseEventLoop = closeDatabaseEventLoop
     }
     

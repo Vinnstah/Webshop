@@ -3,7 +3,7 @@ import VaporRouting
 import SiteRouter
 import UserModel
 import ComposableArchitecture
-import DatabaseLive
+import DatabaseClientLive
 
 public struct Server: Sendable {
     @Dependency(\.databaseClient) var databaseClient

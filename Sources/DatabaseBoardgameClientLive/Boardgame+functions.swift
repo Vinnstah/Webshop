@@ -1,6 +1,7 @@
 import Foundation
 import Boardgame
 import PostgresNIO
+import Database
 
 public extension Database {
     func fetchBoardgames(

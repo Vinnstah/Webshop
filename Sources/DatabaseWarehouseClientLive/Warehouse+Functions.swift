@@ -2,6 +2,7 @@ import Foundation
 import PostgresNIO
 import Warehouse
 import Product
+import Database
 
 public extension Database {
     func decodeWarehouseStatus(

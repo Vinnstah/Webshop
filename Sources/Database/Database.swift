@@ -8,6 +8,8 @@ import Vapor
 public struct Database: Sendable {
     public let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)
     public let logger = Logger(label: "postgres-logger")
+    
+    public init() {}
 
     public func connect() async throws -> PostgresConnection  {
         let config = PostgresConnection.Configuration(

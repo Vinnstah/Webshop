@@ -1,6 +1,7 @@
 import Foundation
 import UserModel
 import PostgresNIO
+import Database
 
 public extension Database {
      func createUser(

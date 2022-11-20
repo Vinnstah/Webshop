@@ -6,11 +6,12 @@ import NIOPosix
 import Vapor
 import XCTestDynamicOverlay
 import DatabaseClient
+import Database
 
 extension DatabaseClient: DependencyKey {
-    public static let liveValue = DatabaseClient.live
+//    public static let liveValue = DatabaseClient.live
     
-    public static let live: Self = {
+    public static let liveValue: Self = {
         let database = Database()
         let logger = Logger(label: "postgres-logger")
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 4)

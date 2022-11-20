@@ -39,6 +39,33 @@ let package = Package(
             name: "CartModel",
             targets: ["CartModel"]),
         .library(
+            name: "Database",
+            targets: ["Database"]),
+        .library(
+            name: "DatabaseBoardgameClient",
+            targets: ["DatabaseBoardgameClient"]),
+        .library(
+            name: "DatabaseBoardgameClientLive",
+            targets: ["DatabaseBoardgameClientLive"]),
+        .library(
+            name: "DatabaseCartClient",
+            targets: ["DatabaseCartClient"]),
+        .library(
+            name: "DatabaseCartClientLive",
+            targets: ["DatabaseCartClientLive"]),
+        .library(
+            name: "DatabaseUserClient",
+            targets: ["DatabaseUserClient"]),
+        .library(
+            name: "DatabaseUserClientLive",
+            targets: ["DatabaseUserClientLive"]),
+        .library(
+            name: "DatabaseWarehouseClient",
+            targets: ["DatabaseWarehouseClient"]),
+        .library(
+            name: "DatabaseWarehouseClientLive",
+            targets: ["DatabaseWarehouseClientLive"]),
+        .library(
             name: "DatabaseClient",
             targets: ["DatabaseClient"]),
         .library(
@@ -142,17 +169,17 @@ let package = Package(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
         
-            .target(
-                name: "CartModel",
-                dependencies: [
-                    "Product",
-                    tagged,
-                ],
-                swiftSettings: swiftSettings
-            ),
         .target(
             name: "Boardgame",
             dependencies: [
+                tagged,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "CartModel",
+            dependencies: [
+                "Product",
                 tagged,
             ],
             swiftSettings: swiftSettings
@@ -163,6 +190,71 @@ let package = Package(
                 tca,
                 "CartModel",
                 "Product",
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "Database",
+            dependencies: [
+                postgres,
+                vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseBoardgameClient",
+            dependencies: [
+                "Boardgame",
+                postgres,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseBoardgameClientLive",
+            dependencies: [
+                "Boardgame",
+                "Database",
+                "DatabaseBoardgameClient",
+                postgres,
+                tca
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseCartClient",
+            dependencies: [
+                "CartModel",
+                postgres,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseCartClientLive",
+            dependencies: [
+                "CartModel",
+                "Database",
+                "DatabaseCartClient",
+                postgres,
+                tca
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseUserClient",
+            dependencies: [
+                "UserModel",
+                postgres,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseUserClientLive",
+            dependencies: [
+                "UserModel",
+                "Database",
+                "DatabaseUserClient",
+                postgres,
+                tca
             ],
             swiftSettings: swiftSettings
         ),
@@ -188,6 +280,26 @@ let package = Package(
                 tca,
                 postgres,
                 vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseWarehouseClient",
+            dependencies: [
+                "Warehouse",
+                postgres,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DatabaseWarehouseClientLive",
+            dependencies: [
+                "Warehouse",
+                "Database",
+                "DatabaseWarehouseClient",
+                "Product",
+                postgres,
+                tca
             ],
             swiftSettings: swiftSettings
         ),

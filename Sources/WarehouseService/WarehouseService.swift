@@ -3,9 +3,15 @@ import SiteRouter
 import Foundation
 import Warehouse
 import Product
-import DatabaseClient
+import DatabaseWarehouseClient
+import ComposableArchitecture
 
-public extension Server {
+public struct WarehouseService: Sendable {
+    @Dependency(\.databaseWarehouseClient) var databaseWarehouseClient
+    public init() {}
+}
+
+public extension WarehouseService {
     func warehouseHandler(
         route: WarehouseRoute,
         request: Request
@@ -14,22 +20,25 @@ public extension Server {
         switch route {
             
         case .fetch:
-            let db = try await databaseClient.connect()
-            let warehouseStatus = try await databaseClient.fetchWarehouse(db)
+            let db = try await databaseWarehouseClient.connect()
+            let warehouseStatus = try await databaseWarehouseClient.fetchWarehouse(db)
             try await db.close()
             return ResultPayload(forAction: "fetch Warehouse Status", payload: warehouseStatus)
             
         case let .update(product):
-            let db = try await databaseClient.connect()
-            let status = try await databaseClient.updateWarehouse(db, product)
+            let db = try await databaseWarehouseClient.connect()
+            let status = try await databaseWarehouseClient.updateWarehouse(db, product)
             try await db.close()
             return ResultPayload(forAction: "update Warehouse Status", payload: status)
             
         case .get(id: let id):
-            let db = try await databaseClient.connect()
-            let warehouseStatus = try await databaseClient.fetchWarehouseStatusForProduct(db, id)
+            let db = try await databaseWarehouseClient.connect()
+            let warehouseStatus = try await databaseWarehouseClient.fetchWarehouseStatusForProduct(db, id)
             try await db.close()
             return ResultPayload(forAction: "fetch Warehouse Status For Product", payload: warehouseStatus)
         }
     }
 }
+
+extension ResultPayload: Content {}
+

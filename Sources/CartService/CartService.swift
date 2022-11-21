@@ -1,9 +1,15 @@
 import Vapor
 import SiteRouter
 import Foundation
-import DatabaseClient
+import DatabaseCartClient
+import ComposableArchitecture
 
-public extension Server {
+public struct CartService: Sendable {
+    @Dependency(\.databaseCartClient) var databaseCartClient
+    public init() {}
+}
+
+public extension CartService {
     func cartHandler(
         route: CartRoute,
         request: Request
@@ -12,23 +18,24 @@ public extension Server {
         switch route {
             
         case let .create(cart):
-            let db = try await databaseClient.connect()
-            let jwt = try await databaseClient.createCartSession(db, cart)
+            let db = try await databaseCartClient.connect()
+            let jwt = try await databaseCartClient.createCartSession(db, cart)
             try await db.close()
             return ResultPayload(forAction: "create Cart", payload: jwt.rawValue)
             
         case let .fetch(jwt):
-            let db = try await databaseClient.connect()
-            let cart = try await databaseClient.fetchCartSession(db, jwt)
+            let db = try await databaseCartClient.connect()
+            let cart = try await databaseCartClient.fetchCartSession(db, jwt)
             try await db.close()
             return ResultPayload(forAction: "fetch Cart Session", payload: cart)
             
         case let .add(cart):
-            let db = try await databaseClient.connect()
-            let id = try await databaseClient.insertItemsToCart(db, cart)
+            let db = try await databaseCartClient.connect()
+            let id = try await databaseCartClient.insertItemsToCart(db, cart)
             try await db.close()
             return ResultPayload(forAction: "Add items to cart", payload: id)
         }
     }
 }
 
+extension ResultPayload: Content {}

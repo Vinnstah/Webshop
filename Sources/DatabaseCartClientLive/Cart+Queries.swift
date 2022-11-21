@@ -2,6 +2,7 @@ import PostgresNIO
 import Foundation
 import CartModel
 import Product
+import Database
 
 public extension Database {
     func createCartSession(

@@ -33,11 +33,17 @@ let package = Package(
             name: "Boardgame",
             targets: ["Boardgame"]),
         .library(
+            name: "BoardgameService",
+            targets: ["BoardgameService"]),
+        .library(
             name: "CheckoutFeature",
             targets: ["CheckoutFeature"]),
         .library(
             name: "CartModel",
             targets: ["CartModel"]),
+        .library(
+            name: "CartService",
+            targets: ["CartService"]),
         .library(
             name: "Database",
             targets: ["Database"]),
@@ -126,11 +132,17 @@ let package = Package(
             name: "UserModel",
             targets: ["UserModel"]),
         .library(
+            name: "UserService",
+            targets: ["UserService"]),
+        .library(
             name: "UserLocalSettingsFeature",
             targets: ["UserLocalSettingsFeature"]),
         .library(
             name: "Warehouse",
             targets: ["Warehouse"]),
+        .library(
+            name: "WarehouseService",
+            targets: ["WarehouseService"]),
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
@@ -181,6 +193,16 @@ let package = Package(
             dependencies: [
                 "Product",
                 tagged,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "CartService",
+            dependencies: [
+                "DatabaseCartClient",
+                "SiteRouter",
+                tca,
+                vapor,
             ],
             swiftSettings: swiftSettings
         ),
@@ -420,11 +442,16 @@ let package = Package(
                 name: "Server",
                 dependencies: [
                     "DatabaseClientLive",
+                    "Database",
                     "CartModel",
+                    "CartService",
                     "JWT",
                     "Product",
+                    "BoardgameService",
                     "SiteRouter",
                     "UserModel",
+                    "UserService",
+                    "WarehouseService",
                     postgres,
                     tca,
                     vapor,
@@ -432,7 +459,16 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-        
+        .target(
+            name: "BoardgameService",
+            dependencies: [
+                "DatabaseBoardgameClient",
+                "SiteRouter",
+                tca,
+                vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
             .target(
                 name: "SignInFeature",
                 dependencies: [
@@ -530,6 +566,17 @@ let package = Package(
                 swiftSettings: swiftSettings
             ),
         .target(
+            name: "UserService",
+            dependencies: [
+                "DatabaseUserClient",
+                "SiteRouter",
+                "UserModel",
+                tca,
+                vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "UserLocalSettingsFeature",
             dependencies: [
                 "StyleGuide",
@@ -546,6 +593,17 @@ let package = Package(
             dependencies: [
                 "Product",
                 tagged,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "WarehouseService",
+            dependencies: [
+                "DatabaseWarehouseClient",
+                "SiteRouter",
+                "Product",
+                tca,
+                vapor,
             ],
             swiftSettings: swiftSettings
         ),

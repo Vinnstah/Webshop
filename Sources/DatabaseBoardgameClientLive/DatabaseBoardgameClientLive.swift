@@ -11,6 +11,11 @@ extension DatabaseBoardgameClient: DependencyKey {
         return Self.init(
             fetchBoardgames: {
                 try await database.fetchBoardgames($0)
+            }, connect: {
+                try await database.connect()
+            },
+            closeDatabaseEventLoop: {
+                database.closeDatabaseEventLoop()
             }
         )
     }()

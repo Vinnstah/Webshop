@@ -3,9 +3,15 @@ import SiteRouter
 import Foundation
 import JWT
 import UserModel
-import DatabaseClient
+import DatabaseUserClient
+import ComposableArchitecture
 
-public extension Server {
+public struct UserService: Sendable {
+    @Dependency(\.databaseUserClient) var databaseUserClient
+    public init() {}
+}
+
+public extension UserService {
     func usersHandler(
         route: UserRoute,
         request: Request
@@ -14,7 +20,7 @@ public extension Server {
         switch route {
             
         case let .create(user):
-            let db = try await databaseClient.connect()
+            let db = try await databaseUserClient.connect()
             
             let jwt = constructJWT(
                 secretKey: user.credentials.password,
@@ -22,15 +28,17 @@ public extension Server {
                 payload: JWT.Payload(name: user.credentials.email)
             )
             
-            try await databaseClient.createUser(db, user, jwt)
+            try await databaseUserClient.createUser(db, user, jwt)
             try await db.close()
             return ResultPayload(forAction: "create", payload: jwt)
             
         case let .login(user):
-            let db = try await databaseClient.connect()
-            let jwt = try await databaseClient.signInUser(db, user)
+            let db = try await databaseUserClient.connect()
+            let jwt = try await databaseUserClient.signInUser(db, user)
             try await db.close()
             return ResultPayload(forAction: "login", payload: jwt)
         }
     }
 }
+
+extension ResultPayload: Content {}

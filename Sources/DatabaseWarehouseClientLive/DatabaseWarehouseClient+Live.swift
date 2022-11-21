@@ -21,7 +21,11 @@ extension DatabaseWarehouseClient: DependencyKey {
                 
             }, updateWarehouse: { db, item in
                 try await database.updateWarehouse(with: item, db)
-                
+            }, connect: {
+                try await database.connect()
+            },
+            closeDatabaseEventLoop: {
+                database.closeDatabaseEventLoop()
             }
         )
     }()

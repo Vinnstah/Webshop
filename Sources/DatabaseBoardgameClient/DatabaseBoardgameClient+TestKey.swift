@@ -6,7 +6,9 @@ import Dependencies
 extension DatabaseBoardgameClient {
     
     static let test = Self(
-        fetchBoardgames: XCTUnimplemented("\(Self.self).fetchBoardgames")
+        fetchBoardgames: XCTUnimplemented("\(Self.self).fetchBoardgames"),
+        connect: XCTUnimplemented("\(Self.self).connect"),
+        closeDatabaseEventLoop: XCTUnimplemented("\(Self.self).closeDatabaseEventLoop")
     )
 }
 extension DatabaseBoardgameClient: TestDependencyKey {

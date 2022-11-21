@@ -9,6 +9,8 @@ extension DatabaseWarehouseClient {
         fetchWarehouse: XCTUnimplemented("\(Self.self).fetchWarehouse"),
         fetchWarehouseStatusForProduct: XCTUnimplemented("\(Self.self).fetchWarehouseStatusForProduct"),
         updateWarehouse: XCTUnimplemented("\(Self.self).updateWarehouse"),
+        connect: XCTUnimplemented("\(Self.self).connect"),
+        closeDatabaseEventLoop: XCTUnimplemented("\(Self.self).closeDatabaseEventLoop")
     )
 }
 extension DatabaseWarehouseClient: TestDependencyKey {

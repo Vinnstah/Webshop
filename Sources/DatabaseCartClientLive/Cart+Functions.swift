@@ -2,6 +2,7 @@ import CartModel
 import Foundation
 import PostgresNIO
 import Product
+import Database
 
 public extension Database {
     func decodeCartSession(

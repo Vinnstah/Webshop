@@ -22,6 +22,11 @@ extension DatabaseUserClient: DependencyKey {
                 
             }, signInUser: { db, user in
                 try await database.loginUser(in: db, with: user)
+            }, connect: {
+                try await database.connect()
+            },
+            closeDatabaseEventLoop: {
+                database.closeDatabaseEventLoop()
             }
         )
     }()

@@ -9,7 +9,9 @@ extension DatabaseCartClient {
         createCartSession: XCTUnimplemented("\(Self.self).createCartSession"),
         getAllItemsInCart: XCTUnimplemented("\(Self.self).getAllItemsInCart"),
         fetchCartSession: XCTUnimplemented("\(Self.self).fetchCartSession"),
-        insertItemsToCart: XCTUnimplemented("\(Self.self).insertItemsToCart")
+        insertItemsToCart: XCTUnimplemented("\(Self.self).insertItemsToCart"),
+        connect: XCTUnimplemented("\(Self.self).connect"),
+        closeDatabaseEventLoop: XCTUnimplemented("\(Self.self).closeDatabaseEventLoop")
     )
 }
 extension DatabaseCartClient: TestDependencyKey {

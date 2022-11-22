@@ -10,7 +10,6 @@ import UserService
 import WarehouseService
 
 public struct Server: Sendable {
-    public struct State : Sendable{
         public let boardgameService: BoardgameService
         public let cartService: CartService
         public let userService: UserService
@@ -27,13 +26,6 @@ public struct Server: Sendable {
             self.userService = userService
             self.warehouseService = warehouseService
         }
-    }
-    
-    let state: State
-    
-    public init(state: State = .init()) {
-        self.state = state
-    }
 }
 
 public extension Server {
@@ -52,16 +44,16 @@ public extension Server {
         switch route {
             
         case let .boardgame(route):
-            return try await state.boardgameService.boardgameHandler(route: route, request: request)
+            return try await boardgameService.boardgameHandler(route: route, request: request)
             
         case let .cart(route):
-            return try await state.cartService.cartHandler(route: route, request: request)
+            return try await cartService.cartHandler(route: route, request: request)
             
         case let .users(route):
-            return try await state.userService.usersHandler(route: route, request: request)
+            return try await userService.usersHandler(route: route, request: request)
             
         case let .warehouse(route):
-            return try await state.warehouseService.warehouseHandler(route: route, request: request)
+            return try await warehouseService.warehouseHandler(route: route, request: request)
         }
     }
     

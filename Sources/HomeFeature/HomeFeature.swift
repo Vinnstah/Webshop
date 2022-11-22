@@ -66,7 +66,7 @@ public extension Home {
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable, Sendable {
-            case userIsLoggedOut
+            case userIsSignedOut
             case addProductToCart(quantity: Int, product: Product)
         }
         
@@ -100,7 +100,7 @@ public extension Home {
             case .internal(.logOutUser):
                 return .run { [userDefaultsClient] send in
                     await userDefaultsClient.removeLoggedInUserJWT()
-                    await send(.delegate(.userIsLoggedOut))
+                    await send(.delegate(.userIsSignedOut))
                 }
                 
                 //MARK: On appear API calls

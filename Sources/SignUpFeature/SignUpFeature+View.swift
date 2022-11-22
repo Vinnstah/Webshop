@@ -82,7 +82,7 @@ public extension SignUp {
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                viewStore.send(.delegate(.goBackToLoginView), animation: .default)
+                                viewStore.send(.delegate(.goBackToSignInView), animation: .default)
                             }
                         }
                     }

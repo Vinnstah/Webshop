@@ -1,30 +1,22 @@
-import ComposableArchitecture
 import Foundation
+import ComposableArchitecture
 
 public extension Onboarding {
-    
-    func signUp(
+    func `internal`(
         into state: inout State,
         action: Action
     ) -> Effect<Action, Never> {
         
         switch action {
             
-        case let .signUp(.delegate(.goToNextStep(user))):
-            state.signUp = nil
-            state.userLocalSettings = .init(user: user)
-            return .none
-            
-        case .signUp(.delegate(.goToThePreviousStep)):
-            state.signUp = nil
+        case .internal(.goBackToSignInViewTapped):
             state.signIn = .init()
             return .none
             
-        case .signUp(.delegate(.goBackToSignInView)):
-            state.signUp = nil
-            return .run { send in
-                await send(.internal(.goBackToSignInViewTapped))
-            }
+        case .internal(.alertConfirmTapped):
+            state.alert = nil
+            return .none
+            
         case .delegate(_):
             return  .none
         case .internal(_):

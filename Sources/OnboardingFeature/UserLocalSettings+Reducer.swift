@@ -2,12 +2,18 @@ import ComposableArchitecture
 import Foundation
 
 public extension Onboarding {
-    func userLocalSettings(into state: inout State, action: Action) -> Effect<Action, Never> {
+    
+    func userLocalSettings(
+        into state: inout State,
+        action: Action
+    ) -> Effect<Action, Never> {
+        
         switch action {
-        case .userLocalSettings(.delegate(.goBackToLoginView)):
+            
+        case .userLocalSettings(.delegate(.goBackToSignInView)):
             state.userLocalSettings = nil
             return .run { send in
-                await send(.internal(.goBackToLoginViewTapped))
+                await send(.internal(.goBackToSignInViewTapped))
             }
             
         case let .userLocalSettings(.delegate(.nextStep(user))):
@@ -17,8 +23,14 @@ public extension Onboarding {
             
         case let .userLocalSettings(.delegate(.previousStep(user))):
             state.userLocalSettings = nil
-            state.signUp = .init(user: user, email: user.credentials.email, password: user.credentials.password)
+            
+            state.signUp = .init(
+                user: user,
+                email: user.credentials.email,
+                password: user.credentials.password
+            )
             return .none
+            
         case .delegate(_):
             return  .none
         case .internal(_):
@@ -27,7 +39,7 @@ public extension Onboarding {
             return .none
         case .signUp(_):
             return .none
-        case .userLocalSettings(.internal(_)):
+        case .userLocalSettings(_):
             return .none
         case .termsAndConditions(_):
             return .none

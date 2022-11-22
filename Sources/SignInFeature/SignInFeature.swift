@@ -73,7 +73,7 @@ public extension SignIn {
         }
         
         public enum DelegateAction: Equatable, Sendable {
-            case userLoggedIn(jwt: JWT)
+            case userLoggedIn(with: JWT)
             case userPressedSignUp
         }
     }
@@ -131,7 +131,7 @@ public extension SignIn {
                     /// Set `LoggedInUserJWT` in `userDefaults` to the `jwt` we received back from the server
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
                     /// Delegate the action `userLoggedIn` with the given `jwt`
-                    await send(.delegate(.userLoggedIn(jwt: jwt)))
+                    await send(.delegate(.userLoggedIn(with: jwt)))
                 }
                 
                 /// If login fails we show an alert.

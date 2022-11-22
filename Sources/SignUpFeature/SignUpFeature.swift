@@ -63,7 +63,7 @@ public extension SignUp {
         public enum DelegateAction: Equatable, Sendable {
             case goToNextStep(User)
             case goToThePreviousStep
-            case goBackToLoginView
+            case goBackToSignInView
         }
     }
     var body: some ReducerProtocol<State, Action> {

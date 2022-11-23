@@ -14,15 +14,16 @@ extension DatabaseUserClient: DependencyKey {
         let database = Database()
         
         return Self.init(
-            createUser: { db, user, jwt in
-                try await database.createUser(in: db, with: user, and: jwt, database.logger)
-                
-            }, fetchLoggedInUserJWT: { db, user in
-                try await database.fetchLoggedInUserJWT(db, user: user)
-                
-            }, signInUser: { db, user in
-                try await database.loginUser(in: db, with: user)
-            }, connect: {
+            createUser: {
+                try await database.createUser(request: $0)
+            },
+            fetchLoggedInUserJWT: {
+                try await database.fetchLoggedInUserJWT(request: $0)
+            },
+            signInUser: {
+                try await database.loginUser(request: $0)
+            },
+            connect: {
                 try await database.connect()
             },
             closeDatabaseEventLoop: {

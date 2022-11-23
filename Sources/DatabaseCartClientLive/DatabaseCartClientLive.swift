@@ -14,17 +14,17 @@ extension DatabaseCartClient: DependencyKey {
         let database = Database()
         
         return Self.init(
-           createCartSession: { db, cart in
-               try await database.createCartSession(db, from: cart, logger: database.logger)
+           createCartSession: {
+               try await database.createCartSession(request: $0)
                 
-            }, getAllItemsInCart: { db, session in
-                try await database.getAllItemsInCart(from: session, db, logger: database.logger)
+            }, getAllItemsInCart: {
+                try await database.getAllItemsInCart(request: $0)
                 
-            }, fetchCartSession: { db, jwt in
-                try await database.fetchCartSession(db, from: jwt, logger: database.logger)
+            }, fetchCartSession: {
+                try await database.fetchCartSession(request: $0)
                 
-            }, insertItemsToCart: { db, cart in
-                try await database.insertItemsToCart(from: cart, db, logger: database.logger)
+            }, insertItemsToCart: {
+                try await database.insertItemsToCart(request: $0)
             }, connect: {
                 try await database.connect()
             },

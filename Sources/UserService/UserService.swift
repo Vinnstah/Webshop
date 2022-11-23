@@ -28,13 +28,26 @@ public extension UserService {
                 payload: JWT.Payload(name: user.credentials.email)
             )
             
-            try await databaseUserClient.createUser(db, user, jwt)
+            try await databaseUserClient.createUser(
+                CreateUserRequest(
+                    db: db,
+                    user: user,
+                    jwt: jwt
+                )
+            )
+            
             try await db.close()
             return ResultPayload(forAction: "create", payload: jwt)
             
         case let .login(user):
             let db = try await databaseUserClient.connect()
-            let jwt = try await databaseUserClient.signInUser(db, user)
+            let jwt = try await databaseUserClient.signInUser(
+                SignInUserRequest(
+                    db: db,
+                    user: user
+                )
+            )
+            
             try await db.close()
             return ResultPayload(forAction: "login", payload: jwt)
         }

@@ -3,9 +3,9 @@ import Foundation
 import UserModel
 
 public struct DatabaseUserClient: Sendable {
-    public typealias CreateUser = @Sendable (PostgresConnection, User, String) async throws -> Void
-    public typealias FetchLoggedInUserJWT = @Sendable (PostgresConnection, User) async throws -> String
-    public typealias SignInUser = @Sendable (PostgresConnection, User) async throws -> String?
+    public typealias CreateUser = @Sendable (CreateUserRequest) async throws -> Void
+    public typealias FetchLoggedInUserJWT = @Sendable (FetchLoggedInUserJWTRequest) async throws -> String
+    public typealias SignInUser = @Sendable (SignInUserRequest) async throws -> String?
     public typealias Connect = @Sendable () async throws -> (PostgresConnection)
     public typealias CloseDatabaseEventLoop = @Sendable () -> Void
     
@@ -29,4 +29,36 @@ public struct DatabaseUserClient: Sendable {
         self.closeDatabaseEventLoop = closeDatabaseEventLoop
     }
     
+}
+
+public struct CreateUserRequest: Sendable {
+    public let db: PostgresConnection
+    public let user: User
+    public let jwt: String
+    
+    public init(db: PostgresConnection, user: User, jwt: String) {
+        self.db = db
+        self.user = user
+        self.jwt = jwt
+    }
+}
+
+public struct FetchLoggedInUserJWTRequest: Sendable {
+    public let db: PostgresConnection
+    public let user: User
+    
+    public init(db: PostgresConnection, user: User) {
+        self.db = db
+        self.user = user
+    }
+}
+
+public struct SignInUserRequest: Sendable {
+    public let db: PostgresConnection
+    public let user: User
+    
+    public init(db: PostgresConnection, user: User) {
+        self.db = db
+        self.user = user
+    }
 }

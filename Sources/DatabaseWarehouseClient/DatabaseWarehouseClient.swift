@@ -28,5 +28,9 @@ public struct DatabaseWarehouseClient: Sendable {
         self.connect = connect
         self.closeDatabaseEventLoop = closeDatabaseEventLoop
     }
-    
+}
+
+public struct FetchWarehouseStatusForProductRequest: Sendable {
+    public let db: PostgresConnection
+    public let
 }

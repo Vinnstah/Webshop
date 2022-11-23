@@ -2,30 +2,27 @@ import Foundation
 import UserModel
 import PostgresNIO
 import Database
+import DatabaseUserClient
 
 public extension Database {
      func createUser(
-        in db: PostgresConnection,
-        with user: User,
-        and jwt: String,
-        _ logger: Logger
+        request: CreateUserRequest
     ) async throws {
-        try await db.query("""
+        try await request.db.query("""
                         INSERT INTO users(user_name,password,jwt)
-                        VALUES (\(user.credentials.email),\(user.credentials.hashedPassword),\(jwt));
+                        VALUES (\(request.user.credentials.email),\(request.user.credentials.hashedPassword),\(request.jwt));
                         """,
-                           logger: logger
+                                   logger: logger
         )
     }
     
     func fetchLoggedInUserJWT(
-       _ db: PostgresConnection,
-       user: User
+        request: FetchLoggedInUserJWTRequest
     ) async throws -> String {
        
-       let rows = try await db.query(
+        let rows = try await request.db.query(
                    """
-                   SELECT jwt FROM users WHERE user_name=\(user.credentials.email);
+                   SELECT jwt FROM users WHERE user_name=\(request.user.credentials.email);
                    """,
                    logger: logger
        )
@@ -36,12 +33,11 @@ public extension Database {
     }
 
     func loginUser(
-        in db: PostgresConnection,
-        with user: User
+        request: SignInUserRequest
     ) async throws -> String? {
-        let rows = try await db.query(
+        let rows = try await request.db.query(
                     """
-                    SELECT user_name, password FROM users WHERE user_name=\(user.credentials.email);
+                    SELECT user_name, password FROM users WHERE user_name=\(request.user.credentials.email);
                     """,
                     logger: logger
         )
@@ -49,11 +45,11 @@ public extension Database {
             return nil
         }
         
-        guard databaseUser.credentials.password == user.credentials.hashedPassword else {
+        guard databaseUser.credentials.password == request.user.credentials.hashedPassword else {
             return nil
         }
         
-        let jwt = try await fetchLoggedInUserJWT(db, user: databaseUser)
+        let jwt = try await fetchLoggedInUserJWT(request: .init(db: request.db, user: request.user))
         return jwt
     }
 }

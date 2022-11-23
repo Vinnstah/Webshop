@@ -13,10 +13,6 @@ public extension Onboarding {
             state.signIn = .init()
             return .none
             
-        case .internal(.alertConfirmTapped):
-            state.alert = nil
-            return .none
-            
         default:
             return .none
         }

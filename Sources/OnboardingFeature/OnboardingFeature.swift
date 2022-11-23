@@ -7,9 +7,6 @@ import UserLocalSettingsFeature
 import TermsAndConditionsFeature
 import SignInFeature
 
-///Conforming AlertState to Sendable
-extension AlertState: @unchecked Sendable {}
-
 public struct Onboarding: ReducerProtocol {
     public init() {}
 }
@@ -21,21 +18,18 @@ public extension Onboarding {
         public var signUp: SignUp.State?
         public var userLocalSettings: UserLocalSettings.State?
         public var termsAndConditions: TermsAndConditions.State?
-        public var alert: AlertState<Action>?
-        
-        
+
+
         public init(
             signIn: SignIn.State? = .init(),
             signUp: SignUp.State? = nil,
             userLocalSettings: UserLocalSettings.State? = nil,
-            termsAndConditions: TermsAndConditions.State? = nil,
-            alert: AlertState<Action>? = nil
+            termsAndConditions: TermsAndConditions.State? = nil
         ) {
             self.signIn = signIn
             self.signUp = signUp
             self.userLocalSettings = userLocalSettings
             self.termsAndConditions = termsAndConditions
-            self.alert = alert
         }
     }
     
@@ -51,7 +45,6 @@ public extension Onboarding {
         case termsAndConditions(TermsAndConditions.Action)
         
         public enum InternalAction: Equatable, Sendable {
-            case alertConfirmTapped
             case goBackToSignInViewTapped
         }
         
@@ -65,7 +58,6 @@ public extension Onboarding {
         CombineReducers {
             
             Reduce(self.`internal`)
-            
             Reduce(self.signIn)
                 .ifLet(
                     \.signIn,
@@ -73,6 +65,7 @@ public extension Onboarding {
                 ) {
                     SignIn()
                 }
+            
             Reduce(self.signUp)
                 .ifLet(
                     \.signUp,

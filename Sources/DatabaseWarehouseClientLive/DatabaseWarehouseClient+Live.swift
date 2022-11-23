@@ -13,17 +13,23 @@ extension DatabaseWarehouseClient: DependencyKey {
     public static let liveValue: Self = {
         let database = Database()
         
-        return Self.init(fetchWarehouse: { db in
-                try await database.fetchWarehouse(db)
-                
-            }, fetchWarehouseStatusForProduct: { db, id in
-                try await database.fetchWarehouseStatusForProduct(from: id, db)
-                
-            }, updateWarehouse: { db, item in
-                try await database.updateWarehouse(with: item, db)
-            }, connect: {
+        return Self.init(
+            fetchWarehouse: {
+                try await database.fetchWarehouse($0)
+            },
+            
+            fetchWarehouseStatusForProduct: {
+                try await database.fetchWarehouseStatusForProduct(request: $0)
+            },
+            
+            updateWarehouse: {
+                try await database.updateWarehouse(request: $0)
+            },
+            
+            connect: {
                 try await database.connect()
             },
+            
             closeDatabaseEventLoop: {
                 database.closeDatabaseEventLoop()
             }

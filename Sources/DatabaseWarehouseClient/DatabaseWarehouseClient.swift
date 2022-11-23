@@ -4,8 +4,8 @@ import Warehouse
 
 public struct DatabaseWarehouseClient: Sendable {
     public typealias FetchWarehouse = @Sendable (PostgresConnection) async throws -> [Warehouse.Item]
-    public typealias FetchWarehouseStatusForProduct = @Sendable (PostgresConnection, String) async throws -> [Warehouse.Item]
-    public typealias UpdateWarehouse = @Sendable (PostgresConnection, Warehouse.Item) async throws -> String?
+    public typealias FetchWarehouseStatusForProduct = @Sendable (FetchWarehouseStatusForProductRequest) async throws -> [Warehouse.Item]
+    public typealias UpdateWarehouse = @Sendable (UpdateWarehouseRequest) async throws -> String?
     public typealias Connect = @Sendable () async throws -> (PostgresConnection)
     public typealias CloseDatabaseEventLoop = @Sendable () -> Void
     
@@ -32,5 +32,21 @@ public struct DatabaseWarehouseClient: Sendable {
 
 public struct FetchWarehouseStatusForProductRequest: Sendable {
     public let db: PostgresConnection
-    public let
+    public let id: String
+    
+    public init(db: PostgresConnection, id: String) {
+        self.db = db
+        self.id = id
+    }
 }
+
+public struct UpdateWarehouseRequest: Sendable {
+    public let db: PostgresConnection
+    public let item: Warehouse.Item
+    
+    public init(db: PostgresConnection, item: Warehouse.Item) {
+        self.db = db
+        self.item = item
+    }
+}
+

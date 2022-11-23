@@ -27,13 +27,16 @@ public extension WarehouseService {
             
         case let .update(product):
             let db = try await databaseWarehouseClient.connect()
-            let status = try await databaseWarehouseClient.updateWarehouse(db, product)
+            
+            let status =
+            try await databaseWarehouseClient.updateWarehouse(UpdateWarehouseRequest(db: db, item: product))
+            
             try await db.close()
             return ResultPayload(forAction: "update Warehouse Status", payload: status)
             
         case .get(id: let id):
             let db = try await databaseWarehouseClient.connect()
-            let warehouseStatus = try await databaseWarehouseClient.fetchWarehouseStatusForProduct(db, id)
+            let warehouseStatus = try await databaseWarehouseClient.fetchWarehouseStatusForProduct(FetchWarehouseStatusForProductRequest(db: db, id: id))
             try await db.close()
             return ResultPayload(forAction: "fetch Warehouse Status For Product", payload: warehouseStatus)
         }

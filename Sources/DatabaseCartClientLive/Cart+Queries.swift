@@ -2,30 +2,28 @@ import PostgresNIO
 import Foundation
 import CartModel
 import Product
+import Database
+import DatabaseCartClient
 
 public extension Database {
     func createCartSession(
-        _ db: PostgresConnection,
-        from cart: Cart,
-        logger: Logger
+        request: CreateCartSessionRequest
     ) async throws -> Cart.Session.ID {
-        try await db.query("""
+        try await request.db.query("""
             INSERT INTO cart
-            VALUES(\(cart.session.id.rawValue), \(cart.session.jwt.rawValue))
+            VALUES(\(request.cart.session.id.rawValue), \(request.cart.session.jwt.rawValue))
             ON CONFLICT (jwt)
             DO NOTHING;
             """, logger: logger)
-        return cart.session.id
+        return request.cart.session.id
     }
     
     func fetchCartSession(
-        _ db: PostgresConnection,
-        from jwt: String,
-        logger: Logger
+        request: FetchCartSessionRequest
     ) async throws -> Cart? {
-        let rows = try await db.query("""
+        let rows = try await request.db.query("""
                         SELECT * FROM cart
-                        WHERE jwt=\(jwt)
+                        WHERE jwt=\(request.jwt)
                         """, logger: logger
         )
         guard let session = try await decodeCartSession(from: rows) else {
@@ -34,19 +32,17 @@ public extension Database {
         
         var cart = Cart(session: session, item: [])
         
-        cart.item = try await getAllItemsInCart(from: cart.session, db, logger: logger)
+        cart.item = try await getAllItemsInCart(request: GetAllItemsInCartRequest(db: request.db, session: cart.session))
         
         return cart
     }
     
     func getAllItemsInCart(
-        from session: Cart.Session,
-        _ db: PostgresConnection,
-        logger: Logger
+        request: GetAllItemsInCartRequest
     ) async throws -> [Cart.Item] {
-        let itemRows = try await db.query("""
+        let itemRows = try await request.db.query("""
                             SELECT * FROM cart_items
-                            WHERE cart_id=\(session.id.rawValue))
+                            WHERE cart_id=\(request.session.id.rawValue))
                             """, logger: logger)
         
         let items = try await decodeItems(from: itemRows)
@@ -55,20 +51,18 @@ public extension Database {
     }
     
     func insertItemsToCart(
-        from cart: Cart,
-        _ db: PostgresConnection,
-        logger: Logger
+        request: InsertItemsToCartRequest
     ) async throws -> Cart.Session.ID? {
-        for item in cart.item {
-            try await db.query("""
+        for item in request.cart.item {
+            try await request.db.query("""
             INSERT INTO cart_items
-            VALUES(\(cart.session.id.rawValue), \(item.product.rawValue), \(item.quantity.rawValue))
+            VALUES(\(request.cart.session.id.rawValue), \(item.product.rawValue), \(item.quantity.rawValue))
             ON CONFLICT (cart_id, product_id)
             DO
             UPDATE SET quantity=\(item.quantity.rawValue);
             """, logger: logger)
         }
-        return cart.session.id
+        return request.cart.session.id
     }
 }
 

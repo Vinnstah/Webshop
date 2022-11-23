@@ -1,7 +1,6 @@
 import Foundation
 import Tagged
 import Product
-import PostgresNIO
 
 public struct Cart: Equatable, Codable, Sendable, Hashable {
     public var session: Session

@@ -31,7 +31,7 @@ public extension App {
         
         
         public enum InternalAction: Equatable, Sendable {
-            case logInUser
+            case signInUser
         }
     }
     
@@ -49,17 +49,17 @@ public extension App {
                 
                 return .run { send in
                     await send(
-                        .internal(.logInUser)
+                        .internal(.signInUser)
                     )
                 }
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
-            case .internal(.logInUser):
+            case .internal(.signInUser):
                 state = .main(.init())
                 return .none
                  
                 ///When a user logs out from `main` we initialize onboarding again.
-            case .main((.delegate(.userIsLoggedOut))):
+            case .main((.delegate(.userIsSignedOut))):
                 state = .onboarding(.init(signIn: .init()))
                 return .none
                 

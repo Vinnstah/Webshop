@@ -2,6 +2,8 @@ import Foundation
 import PostgresNIO
 import Warehouse
 import Product
+import Database
+import DatabaseWarehouseClient
 
 public extension Database {
      func fetchWarehouse(
@@ -18,13 +20,12 @@ public extension Database {
     }
     
      func fetchWarehouseStatusForProduct(
-        from id: String,
-        _ db: PostgresConnection
+        request: FetchWarehouseStatusForProductRequest
     ) async throws -> [Warehouse.Item] {
-        let rows = try await db.query(
+        let rows = try await request.db.query(
                     """
                     SELECT * FROM warehouse
-                    WHERE prod_id=\(id);
+                    WHERE prod_id=\(request.id);
                     """,
                     logger: logger
         )
@@ -33,20 +34,19 @@ public extension Database {
     }
     
      func updateWarehouse(
-        with item: Warehouse.Item,
-        _ db: PostgresConnection
+        request: UpdateWarehouseRequest
     ) async throws -> String? {
-        try await db.query(
+        try await request.db.query(
                     """
                     INSERT INTO warehouse
-                    VALUES(\(item.id.rawValue), \(item.product.rawValue), \(item.quantity.rawValue))
+                    VALUES(\(request.item.id.rawValue), \(request.item.product.rawValue), \(request.item.quantity.rawValue))
                     ON CONFLICT (warehouse_id)
                     DO UPDATE
-                    SET quantity=\(item.quantity.rawValue);
+                    SET quantity=\(request.item.quantity.rawValue);
                     """,
                     logger: logger
         )
-        return item.id.rawValue.uuidString
+        return request.item.id.rawValue.uuidString
     }
 }
 

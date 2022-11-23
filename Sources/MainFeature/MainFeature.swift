@@ -49,7 +49,7 @@ public extension Main {
         case checkout(Checkout.Action)
         
         public enum DelegateAction: Equatable, Sendable {
-            case userIsLoggedOut
+            case userIsSignedOut
         }
         
         public enum InternalAction: Equatable, Sendable {
@@ -62,9 +62,9 @@ public extension Main {
         Reduce { state, action in
             switch action {
                 
-            case .home(.delegate(.userIsLoggedOut)):
+            case .home(.delegate(.userIsSignedOut)):
                 return .run { send in
-                    await send(.delegate(.userIsLoggedOut))
+                    await send(.delegate(.userIsSignedOut))
                 }
                 
             case .internal(.tabSelected):

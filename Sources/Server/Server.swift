@@ -3,11 +3,29 @@ import VaporRouting
 import SiteRouter
 import UserModel
 import ComposableArchitecture
-import DatabaseLive
+import DatabaseClientLive
+import BoardgameService
+import CartService
+import UserService
+import WarehouseService
 
 public struct Server: Sendable {
-    @Dependency(\.databaseClient) var databaseClient
-    public init() {}
+        public let boardgameService: BoardgameService
+        public let cartService: CartService
+        public let userService: UserService
+        public let warehouseService: WarehouseService
+        
+        public init(
+            boardgameService: BoardgameService = .init(),
+            cartService: CartService = .init(),
+            userService: UserService = .init(),
+            warehouseService: WarehouseService = .init()
+        ) {
+            self.boardgameService = boardgameService
+            self.cartService = cartService
+            self.userService = userService
+            self.warehouseService = warehouseService
+        }
 }
 
 public extension Server {
@@ -26,18 +44,17 @@ public extension Server {
         switch route {
             
         case let .boardgame(route):
-            return try await boardgameHandler(route: route, request: request)
+            return try await boardgameService.boardgameHandler(route: route, request: request)
             
         case let .cart(route):
-            return try await cartHandler(route: route, request: request)
+            return try await cartService.cartHandler(route: route, request: request)
             
         case let .users(route):
-            return try await usersHandler(route: route, request: request)
+            return try await userService.usersHandler(route: route, request: request)
             
         case let .warehouse(route):
-            return try await warehouseHandler(route: route, request: request)
+            return try await warehouseService.warehouseHandler(route: route, request: request)
         }
     }
     
 }
-extension ResultPayload: Content {}

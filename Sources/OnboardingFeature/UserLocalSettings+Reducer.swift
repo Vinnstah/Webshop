@@ -31,17 +31,7 @@ public extension Onboarding {
             )
             return .none
             
-        case .delegate(_):
-            return  .none
-        case .internal(_):
-            return  .none
-        case .signIn(_):
-            return .none
-        case .signUp(_):
-            return .none
-        case .userLocalSettings(_):
-            return .none
-        case .termsAndConditions(_):
+        default:
             return .none
         }
     }

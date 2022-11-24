@@ -21,11 +21,11 @@ public struct Boardgame: Sendable, Codable, Hashable, Identifiable {
 public extension Boardgame {
     struct Details: Sendable, Codable, Hashable {
         public let publisher: String
-        public let releaseOn: Date
+        public let releaseOn: String
         public let playInfo: PlayInfo
         public let players: PlayersInfo
         
-        public init(publisher: String, releaseOn: Date, playInfo: PlayInfo, players: PlayersInfo) {
+        public init(publisher: String, releaseOn: String, playInfo: PlayInfo, players: PlayersInfo) {
             self.publisher = publisher
             self.releaseOn = releaseOn
             self.playInfo = playInfo

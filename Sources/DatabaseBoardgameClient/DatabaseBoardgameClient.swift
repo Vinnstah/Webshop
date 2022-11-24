@@ -1,8 +1,10 @@
 import PostgresNIO
 import Foundation
 import Boardgame
+import Dependencies
+import Database
 
-public struct DatabaseBoardgameClient: Sendable {
+public struct DatabaseBoardgameClient: Sendable, DependencyKey {
     public typealias FetchBoardgames = @Sendable (PostgresConnection) async throws -> [Boardgame]
     public typealias Connect = @Sendable () async throws -> (PostgresConnection)
     public typealias CloseDatabaseEventLoop = @Sendable () -> Void
@@ -11,14 +13,19 @@ public struct DatabaseBoardgameClient: Sendable {
     public var connect: Connect
     public var closeDatabaseEventLoop: CloseDatabaseEventLoop
     
-    public init(
-        fetchBoardgames: @escaping  FetchBoardgames,
-        connect: @escaping Connect,
-        closeDatabaseEventLoop: @escaping CloseDatabaseEventLoop
-    ) {
-        self.fetchBoardgames = fetchBoardgames
-        self.connect = connect
-        self.closeDatabaseEventLoop = closeDatabaseEventLoop
-    }
+    public static let liveValue: Self = {
+        let database = Database()
+        
+        return Self.init(
+            fetchBoardgames: {
+                try await database.fetchBoardgames($0)
+            }, connect: {
+                try await database.connect()
+            },
+            closeDatabaseEventLoop: {
+                database.closeDatabaseEventLoop()
+            }
+        )
+    }()
     
 }

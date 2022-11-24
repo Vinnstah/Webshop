@@ -25,7 +25,8 @@ public extension Onboarding {
             return .run { send in
                 await send(.internal(.goBackToSignInViewTapped))
             }
-        default:
+            
+        case .delegate, .signIn, .signUp, .userLocalSettings, .termsAndConditions, .internal:
             return .none
         }
     }

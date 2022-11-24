@@ -26,7 +26,7 @@ public extension Onboarding {
                 await send(.delegate(.userFinishedOnboarding(with: jwt)))
             }
             
-        default:
+        case .delegate, .signIn, .signUp, .userLocalSettings, .termsAndConditions, .internal:
             return .none
         }
     }

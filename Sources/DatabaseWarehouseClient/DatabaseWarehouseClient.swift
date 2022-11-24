@@ -1,8 +1,10 @@
 import PostgresNIO
 import Foundation
 import Warehouse
+import Database
+import Dependencies
 
-public struct DatabaseWarehouseClient: Sendable {
+public struct DatabaseWarehouseClient: Sendable, DependencyKey {
     public typealias FetchWarehouse = @Sendable (PostgresConnection) async throws -> [Warehouse.Item]
     public typealias FetchWarehouseStatusForProduct = @Sendable (FetchWarehouseStatusForProductRequest) async throws -> [Warehouse.Item]
     public typealias UpdateWarehouse = @Sendable (UpdateWarehouseRequest) async throws -> String?
@@ -15,38 +17,29 @@ public struct DatabaseWarehouseClient: Sendable {
     public var connect: Connect
     public var closeDatabaseEventLoop: CloseDatabaseEventLoop
     
-    public init(
-        fetchWarehouse: @escaping FetchWarehouse,
-        fetchWarehouseStatusForProduct: @escaping FetchWarehouseStatusForProduct,
-        updateWarehouse: @escaping UpdateWarehouse,
-        connect: @escaping Connect,
-        closeDatabaseEventLoop: @escaping CloseDatabaseEventLoop
-    ) {
-        self.fetchWarehouse = fetchWarehouse
-        self.fetchWarehouseStatusForProduct = fetchWarehouseStatusForProduct
-        self.updateWarehouse = updateWarehouse
-        self.connect = connect
-        self.closeDatabaseEventLoop = closeDatabaseEventLoop
-    }
+    public static let liveValue: Self = {
+        let database = Database()
+        
+        return Self.init(
+            fetchWarehouse: {
+                try await database.fetchWarehouse($0)
+            },
+            
+            fetchWarehouseStatusForProduct: {
+                try await database.fetchWarehouseStatusForProduct(request: $0)
+            },
+            
+            updateWarehouse: {
+                try await database.updateWarehouse(request: $0)
+            },
+            
+            connect: {
+                try await database.connect()
+            },
+            
+            closeDatabaseEventLoop: {
+                database.closeDatabaseEventLoop()
+            }
+        )
+    }()
 }
-
-public struct FetchWarehouseStatusForProductRequest: Sendable {
-    public let db: PostgresConnection
-    public let id: String
-    
-    public init(db: PostgresConnection, id: String) {
-        self.db = db
-        self.id = id
-    }
-}
-
-public struct UpdateWarehouseRequest: Sendable {
-    public let db: PostgresConnection
-    public let item: Warehouse.Item
-    
-    public init(db: PostgresConnection, item: Warehouse.Item) {
-        self.db = db
-        self.item = item
-    }
-}
-

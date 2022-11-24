@@ -13,7 +13,7 @@ public extension Onboarding {
             state.signIn = .init()
             return .none
             
-        default:
+        case .delegate, .signIn, .signUp, .userLocalSettings, .termsAndConditions:
             return .none
         }
     }

@@ -1,8 +1,10 @@
 import PostgresNIO
 import Foundation
 import UserModel
+import Dependencies
+import Database
 
-public struct DatabaseUserClient: Sendable {
+public struct DatabaseUserClient: Sendable, DependencyKey {
     public typealias CreateUser = @Sendable (CreateUserRequest) async throws -> Void
     public typealias FetchLoggedInUserJWT = @Sendable (FetchLoggedInUserJWTRequest) async throws -> String
     public typealias SignInUser = @Sendable (SignInUserRequest) async throws -> String?
@@ -15,50 +17,26 @@ public struct DatabaseUserClient: Sendable {
     public var connect: Connect
     public var closeDatabaseEventLoop: CloseDatabaseEventLoop
     
-    public init(
-        createUser: @escaping CreateUser,
-        fetchLoggedInUserJWT: @escaping FetchLoggedInUserJWT,
-        signInUser: @escaping SignInUser,
-        connect: @escaping Connect,
-        closeDatabaseEventLoop: @escaping CloseDatabaseEventLoop
-    ) {
-        self.createUser = createUser
-        self.fetchLoggedInUserJWT = fetchLoggedInUserJWT
-        self.signInUser = signInUser
-        self.connect = connect
-        self.closeDatabaseEventLoop = closeDatabaseEventLoop
-    }
-    
+    public static let liveValue: Self = {
+        let database = Database()
+        
+        return Self.init(
+            createUser: {
+                try await database.createUser(request: $0)
+            },
+            fetchLoggedInUserJWT: {
+                try await database.fetchLoggedInUserJWT(request: $0)
+            },
+            signInUser: {
+                try await database.loginUser(request: $0)
+            },
+            connect: {
+                try await database.connect()
+            },
+            closeDatabaseEventLoop: {
+                database.closeDatabaseEventLoop()
+            }
+        )
+    }()
 }
 
-public struct CreateUserRequest: Sendable {
-    public let db: PostgresConnection
-    public let user: User
-    public let jwt: String
-    
-    public init(db: PostgresConnection, user: User, jwt: String) {
-        self.db = db
-        self.user = user
-        self.jwt = jwt
-    }
-}
-
-public struct FetchLoggedInUserJWTRequest: Sendable {
-    public let db: PostgresConnection
-    public let user: User
-    
-    public init(db: PostgresConnection, user: User) {
-        self.db = db
-        self.user = user
-    }
-}
-
-public struct SignInUserRequest: Sendable {
-    public let db: PostgresConnection
-    public let user: User
-    
-    public init(db: PostgresConnection, user: User) {
-        self.db = db
-        self.user = user
-    }
-}

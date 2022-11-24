@@ -1,7 +1,8 @@
 import Foundation
-import ComposableArchitecture
-import XCTestDynamicOverlay
 import Dependencies
+
+#if DEBUG
+import XCTestDynamicOverlay
 
 extension DatabaseCartClient {
     
@@ -17,6 +18,7 @@ extension DatabaseCartClient {
 extension DatabaseCartClient: TestDependencyKey {
     public static let testValue = DatabaseCartClient.test
 }
+#endif // DEBUG
 
 public extension DependencyValues {
     var databaseCartClient: DatabaseCartClient {

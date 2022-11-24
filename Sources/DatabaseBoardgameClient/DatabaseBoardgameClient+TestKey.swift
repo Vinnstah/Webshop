@@ -1,9 +1,9 @@
 import Foundation
-import ComposableArchitecture
-import XCTestDynamicOverlay
 import Dependencies
 
 #if DEBUG
+import XCTestDynamicOverlay
+
 extension DatabaseBoardgameClient {
     
     public static let test = Self(

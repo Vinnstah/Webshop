@@ -179,7 +179,7 @@ let package = Package(
             dependencies: [
                 "DatabaseBoardgameClient",
                 "SiteRouter",
-                tca,
+                dependencies,
                 vapor,
             ],
             swiftSettings: swiftSettings
@@ -197,7 +197,7 @@ let package = Package(
             dependencies: [
                 "DatabaseCartClient",
                 "SiteRouter",
-                tca,
+                dependencies,
                 vapor,
             ],
             swiftSettings: swiftSettings
@@ -329,6 +329,8 @@ let package = Package(
         .target(
             name: "JWT",
             dependencies: [
+                "JSONClients",
+                dependencies,
             ],
             swiftSettings: swiftSettings
         ),
@@ -502,7 +504,7 @@ let package = Package(
                 "DatabaseUserClient",
                 "SiteRouter",
                 "UserModel",
-                tca,
+                dependencies,
                 vapor,
             ],
             swiftSettings: swiftSettings
@@ -533,7 +535,7 @@ let package = Package(
                 "DatabaseWarehouseClient",
                 "SiteRouter",
                 "Product",
-                tca,
+                dependencies,
                 vapor,
             ],
             swiftSettings: swiftSettings

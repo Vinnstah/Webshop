@@ -1,5 +1,4 @@
 import Foundation
-import CryptoKit
 
 public struct JWT: Codable, Sendable, Equatable {
     
@@ -25,7 +24,6 @@ public extension JWT {
             self.alg = alg
             self.typ = typ
         }
-        
     }
 }
     
@@ -47,30 +45,3 @@ public extension JWT {
     }
 }
 
-public func constructJWT(secretKey: String, header: JWT.Header, payload: JWT.Payload) -> String {
-    let secret = secretKey
-    let privateKey = SymmetricKey(data: Data(secret.utf8))
-    let headerJSONData = try! JSONEncoder().encode(header)
-    let headerBase64String = headerJSONData.urlSafeBase64EncodedString()
-    
-    let payloadJSONData = try! JSONEncoder().encode(payload)
-    let payloadBase64String = payloadJSONData.urlSafeBase64EncodedString()
-    
-    let toSign = Data((headerBase64String + "." + payloadBase64String).utf8)
-    
-    let signature = HMAC<SHA256>.authenticationCode(for: toSign, using: privateKey)
-    let signatureBase64String = Data(signature).urlSafeBase64EncodedString()
-    
-    let token = [headerBase64String, payloadBase64String, signatureBase64String].joined(separator: ".")
-    return token
-}
-
-
-extension Data {
-    func urlSafeBase64EncodedString() -> String {
-        return base64EncodedString()
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
-    }
-}

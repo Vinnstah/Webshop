@@ -4,7 +4,7 @@ import Foundation
 import JWT
 import UserModel
 import DatabaseUserClient
-import ComposableArchitecture
+import Dependencies
 
 public struct UserService: Sendable {
     @Dependency(\.databaseUserClient) var databaseUserClient

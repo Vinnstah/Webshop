@@ -2,7 +2,6 @@ import Vapor
 import SiteRouter
 import Foundation
 import DatabaseBoardgameClient
-import ComposableArchitecture
 import Dependencies
 
 public struct BoardgameService: Sendable {

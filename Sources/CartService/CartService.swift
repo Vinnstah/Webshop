@@ -2,7 +2,7 @@ import Vapor
 import SiteRouter
 import Foundation
 import DatabaseCartClient
-import ComposableArchitecture
+import Dependencies
 
 public struct CartService: Sendable {
     @Dependency(\.databaseCartClient) var databaseCartClient

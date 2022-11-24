@@ -4,7 +4,7 @@ import Foundation
 import Warehouse
 import Product
 import DatabaseWarehouseClient
-import ComposableArchitecture
+import Dependencies
 
 public struct WarehouseService: Sendable {
     @Dependency(\.databaseWarehouseClient) var databaseWarehouseClient

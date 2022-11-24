@@ -1,9 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Viktor Jansson on 2022-09-25.
-//
 
 import Foundation
 import ComposableArchitecture
@@ -18,12 +12,15 @@ public extension Onboarding {
         
         public let store: StoreOf<Onboarding>
         
-        public init(store: StoreOf<Onboarding>) {
+        public init(
+            store: StoreOf<Onboarding>
+        ) {
             self.store = store
         }
         
         public var body: some SwiftUI.View {
             Group {
+                
                 IfLetStore(self.store.scope(
                     state: \.signIn,
                     action:  Action.signIn),

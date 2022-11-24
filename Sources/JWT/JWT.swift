@@ -10,8 +10,11 @@ public struct JWT: Codable, Sendable, Equatable {
         self.header = header
         self.payload = payload
     }
+}
+
+public extension JWT {
     
-    public struct Header: Codable, Equatable, Sendable {
+    struct Header: Codable, Equatable, Sendable {
         public var alg: String
         public var typ: String
         
@@ -24,8 +27,10 @@ public struct JWT: Codable, Sendable, Equatable {
         }
         
     }
+}
     
-    public struct Payload: Codable, Equatable, Sendable {
+public extension JWT {
+     struct Payload: Codable, Equatable, Sendable {
         public var sub: String
         public let name: String
         public var iat: Double

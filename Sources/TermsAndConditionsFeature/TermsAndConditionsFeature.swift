@@ -53,7 +53,7 @@ public extension TermsAndConditions {
         public enum DelegateAction: Equatable, Sendable {
             case userFinishedOnboarding(JWT)
             case previousStep(User)
-            case goBackToLoginView
+            case goBackToSignInView
         }
     }
     
@@ -74,7 +74,7 @@ public extension TermsAndConditions {
                 
             case .internal(.cancelButtonPressed):
                 return .run { send in
-                    await send(.delegate(.goBackToLoginView))
+                    await send(.delegate(.goBackToSignInView))
                 }
                 
             case .internal(.termsAndConditionsBoxPressed):
@@ -100,7 +100,7 @@ public extension TermsAndConditions {
                         .createUserResponse(
                             TaskResult {
                                 try await apiClient.decodedResponse(
-                                    for: .create(user),
+                                    for: .users(.create(user)),
                                     as: ResultPayload<JWT>.self
                                 ).value.status.get()
                             }

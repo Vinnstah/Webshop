@@ -63,7 +63,7 @@ public extension SignUp {
         public enum DelegateAction: Equatable, Sendable {
             case goToNextStep(User)
             case goToThePreviousStep
-            case goBackToLoginView
+            case goBackToSignInView
         }
     }
     var body: some ReducerProtocol<State, Action> {
@@ -80,10 +80,20 @@ public extension SignUp {
                 return .none
                 
             case .internal(.nextStep):
-                state.user = User(email: state.email, password: state.password, jwt: "")
-//                
-                return .run { [user = state.user] send in
-                    await send(.delegate(.goToNextStep(user!)))
+                state.user = User(
+                    credentials: .init(
+                        email: state.email,
+                        password: state.password
+                    )
+                )
+
+                return .run { [email = state.email, password = state.password] send in
+                    await send(.delegate(.goToNextStep(
+                        User(
+                            credentials: User.Credentials(
+                                email: email, password: password)
+                        )
+                    )))
                 }
                 
             case .delegate(_):

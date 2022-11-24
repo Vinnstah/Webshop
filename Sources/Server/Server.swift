@@ -2,91 +2,59 @@ import Vapor
 import VaporRouting
 import SiteRouter
 import UserModel
+import ComposableArchitecture
+import DatabaseClientLive
+import BoardgameService
+import CartService
+import UserService
+import WarehouseService
 
-
-// configures your application
-public func configure(_ app: Application) throws {
-    
-    app.mount(router, use: siteHandler)
-    
+public struct Server: Sendable {
+        public let boardgameService: BoardgameService
+        public let cartService: CartService
+        public let userService: UserService
+        public let warehouseService: WarehouseService
+        
+        public init(
+            boardgameService: BoardgameService = .init(),
+            cartService: CartService = .init(),
+            userService: UserService = .init(),
+            warehouseService: WarehouseService = .init()
+        ) {
+            self.boardgameService = boardgameService
+            self.cartService = cartService
+            self.userService = userService
+            self.warehouseService = warehouseService
+        }
 }
 
-/// Handles all the actions for each route
-func siteHandler(
-    request: Request,
-    route: SiteRoute
-) async throws -> any AsyncResponseEncodable {
-    switch route {
-    case let .create(request):
-        let db = try await connectDatabase()
-        
-        let jwt = constructJWT(
-            secretKey: request.password,
-            header: JWT.Header.init(),
-            payload: JWT.Payload(name: request.email)
-        )
-        
-        let user = User(
-            email: request.email,
-            password: request.hexedPassword,
-            jwt: jwt
-        )
-        
-        try await insertUser(db, logger: logger, user: user)
-        try await db.close()
-        return ResultPayload(forAction: "create", payload: user.jwt)
-        
-    case let .login(request):
-        let db = try await connectDatabase()
-        let jwt = try await loginUser(db, request.email, request.hexedPassword)
-        try await db.close()
-        return ResultPayload(forAction: "login", payload: jwt)
-        
-    case .getProducts:
-        let db = try await connectDatabase()
-        let products = try await getAllProducts(db)
-        try await db.close()
-        return ResultPayload(forAction: "getProducts", payload: products)
-        
-    case .getCategories:
-        let db = try await connectDatabase()
-        let categories = try await getAllCategories(db)
-        try await db.close()
-        return ResultPayload(forAction: "getCategories", payload: categories)
-        
-    case .getSubCategories:
-        let db = try await connectDatabase()
-        let categories = try await getAllSubCategories(db)
-        try await db.close()
-        return ResultPayload(forAction: "getSubCategories", payload: categories)
-        
-    case let .addCartSession(cart):
-        let db = try await connectDatabase()
-        try await addShoppingCartSession(db, logger: logger, cart: cart)
-        try await db.close()
-        return ResultPayload(forAction: "addCartSession", payload: "dbID")
-        
-    case let .addShoppingCartItems(cart):
-        let db = try await connectDatabase()
-        try await addShoppingCartProducts(db, logger: logger, cart: cart)
-        try await db.close()
-        return ResultPayload(forAction: "addShoppingCartItems", payload: cart.id)
-        
-    case .shoppingSessionDatabaseID:
-        let db = try await connectDatabase()
-        let sessions = try await getCartSessions(db)
-        try await db.close()
-        return ResultPayload(forAction: "shoppingSessionDatabaseID", payload: sessions)
+public extension Server {
     
-    case let .shoppingCartSessionProducts(id):
-        let db = try await connectDatabase()
-        let cart = try await getShoppingCartProducts(db, logger: logger, sessionID: id)
-        try await db.close()
-        return ResultPayload(forAction: "shoppingCartSessionProducts", payload: cart)
+     func configure(_ app: Application) throws {
+        
+        app.mount(router, use: siteHandler)
+        
     }
     
+    func siteHandler(
+        request: Request,
+        route: SiteRoute
+    ) async throws -> any AsyncResponseEncodable {
+        
+        switch route {
+            
+        case let .boardgame(route):
+            return try await boardgameService.boardgameHandler(route: route, request: request)
+            
+        case let .cart(route):
+            return try await cartService.cartHandler(route: route, request: request)
+            
+        case let .users(route):
+            return try await userService.usersHandler(route: route, request: request)
+            
+        case let .warehouse(route):
+            return try await warehouseService.warehouseHandler(route: route, request: request)
+        }
+    }
     
 }
-
-
-extension ResultPayload: Content {}

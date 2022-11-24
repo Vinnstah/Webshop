@@ -2,21 +2,36 @@ import Foundation
 import SwiftUI
 import Tagged
 
-public struct Boardgame: Sendable, Codable, Hashable, CustomStringConvertible, Identifiable {
+public struct Boardgame: Sendable, Codable, Hashable, Identifiable {
     public let id: ID
     public let title: String
     public let imageURL: String
     public let details: Details
     public let category: Category
-    public var description: String
+    
+    public init(id: ID, title: String, imageURL: String, details: Details, category: Category) {
+        self.id = id
+        self.title = title
+        self.imageURL = imageURL
+        self.details = details
+        self.category = category
+    }
 }
 
 public extension Boardgame {
     struct Details: Sendable, Codable, Hashable {
         public let publisher: String
-        public let releaseOn: Date
+        public let releaseOn: String
         public let playInfo: PlayInfo
         public let players: PlayersInfo
+        
+        public init(publisher: String, releaseOn: String, playInfo: PlayInfo, players: PlayersInfo) {
+            self.publisher = publisher
+            self.releaseOn = releaseOn
+            self.playInfo = playInfo
+            self.players = players
+        }
+        
     }
 }
 
@@ -24,13 +39,23 @@ public extension Boardgame.Details {
     struct PlayInfo: Sendable, Codable, Hashable {
         public let duration: Int
         public let descriptionText: String
+        
+        public init(duration: Int, descriptionText: String) {
+            self.duration = duration
+            self.descriptionText = descriptionText
+        }
     }
 }
 
 public extension Boardgame.Details {
     struct PlayersInfo: Sendable, Codable, Hashable {
-        public let count: PlayerCount
         public let age: Int
+        public let count: PlayerCount
+        
+        public init(age: Int, count: PlayerCount) {
+            self.age = age
+            self.count = count
+        }
     }
 }
 
@@ -38,8 +63,14 @@ public extension Boardgame.Details.PlayersInfo {
     struct PlayerCount: Sendable, Codable, Hashable {
         public let min: Int
         public let max: Int
+        
+        public init(min: Int, max: Int) {
+            self.min = min
+            self.max = max
+        }
     }
 }
+
 
 public extension Boardgame {
     typealias ID = Tagged<Self, UUID>
@@ -64,7 +95,6 @@ public extension Boardgame {
                 self = .scifi
             }
         }
-
-        
     }
 }
+

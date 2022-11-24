@@ -8,6 +8,7 @@ import SiteRouter
 import CartModel
 import FavoritesClient
 import Boardgame
+import Warehouse
 
 public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -65,7 +66,7 @@ public extension Home {
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable, Sendable {
-            case userIsLoggedOut
+            case userIsSignedOut
             case addProductToCart(quantity: Int, product: Product)
         }
         
@@ -87,6 +88,8 @@ public extension Home {
             case decreaseNumberOfColumns
             case toggleDetailView(Product?)
             case toggleCheckoutQuickView
+            case getFetchBoardgamesResponse(TaskResult<[Boardgame]>)
+            case createCartSession(TaskResult<String>)
         }
     }
     
@@ -97,22 +100,44 @@ public extension Home {
             case .internal(.logOutUser):
                 return .run { [userDefaultsClient] send in
                     await userDefaultsClient.removeLoggedInUserJWT()
-                    await send(.delegate(.userIsLoggedOut))
+                    await send(.delegate(.userIsSignedOut))
                 }
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
+//                let cart: Cart = Cart(id: Cart.ID.init(rawValue: .init()), item: [Cart.Item(product: Product.ID(rawValue: .init()), quantity: Cart.Quantity(rawValue: 4))], jwt: Cart.JWT(rawValue: "TEST124fafaffaf34"))
                 return .run { [apiClient] send in
-                    await send(.internal(.getProductResponse(
+                    await send(.internal(.getFetchBoardgamesResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(
-                                for: .getProducts,
-                                as: ResultPayload<[Product]>.self).value.status.get()
+                                for: .boardgame(.fetch),
+                                as: ResultPayload<[Boardgame]>.self).value.status.get()
                         }
                     )))
                     
-                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
+//                    await send(.internal(.createCartSession(
+//                        TaskResult {
+//                            try await self.apiClient.decodedResponse(
+//                                for: .cart(.create(cart)),
+//                                as: ResultPayload<String>.self).value.status.get()
+//                        }
+//                    )))
                 }
+                //
+                //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
+                //                }
+            case let .internal(.createCartSession(.success(test))):
+                return .none
+                
+            case let .internal(.getFetchBoardgamesResponse(.success(boardgames))):
+                print(boardgames)
+                //                    state.productList = products
+                return .none
+                
+            case let .internal(.getFetchBoardgamesResponse(.failure(error))):
+                print(error)
+                return .none
+                
                 
             case let .internal(.getProductResponse(.success(products))):
                 state.productList = products
@@ -158,9 +183,9 @@ public extension Home {
                 //MARK: Favourite interaction
             case let .internal(.loadFavoriteProducts(products)):
                 guard let products else {
-                        return .none
-                    }
-                    
+                    return .none
+                }
+                
                 state.favoriteProducts.sku = products
                 return .none
                 
@@ -213,7 +238,7 @@ public extension Home {
             case .internal(.increaseNumberOfColumns):
                 state.columnsInGrid += 1
                 return .none
-
+                
             case .internal(.decreaseNumberOfColumns):
                 guard state.columnsInGrid > 1 else {
                     return .none
@@ -234,7 +259,10 @@ public extension Home {
             case .internal(.toggleCheckoutQuickView):
                 state.showCheckoutQuickView.toggle()
                 return .none
-            }
+            case .internal(.createCartSession(.failure(_))):
+                print("ERROR")
+                return .none
             }
         }
     }
+}

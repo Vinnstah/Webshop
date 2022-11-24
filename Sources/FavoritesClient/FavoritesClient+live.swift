@@ -3,18 +3,22 @@ import Foundation
 import UserDefaultsClient
 import ComposableArchitecture
 import Product
+import JSONClients
 
 public extension FavoritesClient {
     
     static let live: Self = {
-        let userDefaults = UserDefaults()
+        
+        @Dependency(\.userDefaultsClient) var userDefaultsClient
+        @Dependency(\.jsonDecoder) var jsonDecoder
+        @Dependency(\.jsonEncoder) var jsonEncoder
         
         let favouritesKey = "favouritesKey"
         
-        @Sendable func mutatingFavourites(_ mutate: ( inout [Product.ID]) throws -> Void) throws -> Product.ID? {
-            var currentUserDefaultsData: Data? = userDefaults.data(forKey: favouritesKey)
+        @Sendable func mutatingFavourites(_ mutate: ( inout [Product.ID]) throws -> Void) async throws -> Product.ID? {
+            var currentUserDefaultsData: Data? = await userDefaultsClient.dataForKey(favouritesKey)
             
-            var decodedData: Favourites = try currentUserDefaultsData.map { try JSONDecoder().decode(Favourites.self, from: $0) } ?? .init(favourites: [])
+            var decodedData: Favourites = try currentUserDefaultsData.map { try jsonDecoder().decode(Favourites.self, from: $0) } ?? .init(favourites: [])
             
             var favourites = decodedData
             
@@ -24,30 +28,30 @@ public extension FavoritesClient {
                 return nil
             }
             
-            let encodedFavourites = try JSONEncoder().encode(favourites)
-            userDefaults.set(encodedFavourites, forKey: favouritesKey)
+            let encodedFavourites = try jsonEncoder().encode(favourites)
+            await userDefaultsClient.setData(encodedFavourites, favouritesKey)
             
             return difference.first
         }
         
         
         return Self.init(addFavorite: { sku in
-            try mutatingFavourites { favourites in
+            try await mutatingFavourites { favourites in
                 favourites.append(sku)
             }
         },
                          removeFavorite: { sku in
-            try mutatingFavourites { favourites in
+            try await mutatingFavourites { favourites in
                 favourites.removeAll(where: { $0 == sku })
             }
             
         },
                          getFavourites: {
-            var currentUserDefaultsData: Data? = userDefaults.data(forKey: favouritesKey)
+            var currentUserDefaultsData: Data? = await userDefaultsClient.dataForKey(favouritesKey)
             guard let currentUserDefaultsData else {
                 return []
             }
-            var decodedData = try JSONDecoder().decode(Favourites.self, from: currentUserDefaultsData)
+            var decodedData = try jsonDecoder().decode(Favourites.self, from: currentUserDefaultsData)
             return decodedData.favourites
         }
         )

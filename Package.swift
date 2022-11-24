@@ -10,6 +10,7 @@ let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "v
 let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift-url-routing")
 let tagged: Target.Dependency = .product(name: "Tagged", package: "swift-tagged")
 let kingfisher: Target.Dependency = .product(name: "Kingfisher", package: "Kingfisher")
+let dependencies: Target.Dependency = .product(name: "Dependencies", package: "swift-composable-architecture")
 
 var swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
@@ -51,9 +52,6 @@ let package = Package(
             name: "DatabaseBoardgameClient",
             targets: ["DatabaseBoardgameClient"]),
         .library(
-            name: "DatabaseBoardgameClientLive",
-            targets: ["DatabaseBoardgameClientLive"]),
-        .library(
             name: "DatabaseCartClient",
             targets: ["DatabaseCartClient"]),
         .library(
@@ -83,6 +81,9 @@ let package = Package(
         .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]),
+        .library(
+            name: "JSONClients",
+            targets: ["JSONClients"]),
         .library(
             name: "JWT",
             targets: ["JWT"]),
@@ -146,7 +147,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.47.1"),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.66.1"),
         .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
         .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
@@ -189,6 +190,16 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "BoardgameService",
+            dependencies: [
+                "DatabaseBoardgameClient",
+                "SiteRouter",
+                tca,
+                vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "CartModel",
             dependencies: [
                 "Product",
@@ -227,18 +238,9 @@ let package = Package(
             name: "DatabaseBoardgameClient",
             dependencies: [
                 "Boardgame",
-                postgres,
-            ],
-            swiftSettings: swiftSettings
-        ),
-        .target(
-            name: "DatabaseBoardgameClientLive",
-            dependencies: [
-                "Boardgame",
                 "Database",
-                "DatabaseBoardgameClient",
+                tca,
                 postgres,
-                tca
             ],
             swiftSettings: swiftSettings
         ),
@@ -329,6 +331,7 @@ let package = Package(
             name: "FavoritesClient",
             dependencies: [
                 tca,
+                "JSONClients",
                 "Product",
                 "UserDefaultsClient",
             ],
@@ -384,6 +387,13 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
+        .target(
+            name: "JSONClients",
+            dependencies: [
+                dependencies
+            ],
+            swiftSettings: swiftSettings
+        ),
         .target(
             name: "JWT",
             dependencies: [
@@ -459,16 +469,6 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-        .target(
-            name: "BoardgameService",
-            dependencies: [
-                "DatabaseBoardgameClient",
-                "SiteRouter",
-                tca,
-                vapor,
-            ],
-            swiftSettings: swiftSettings
-        ),
             .target(
                 name: "SignInFeature",
                 dependencies: [

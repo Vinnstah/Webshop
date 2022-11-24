@@ -3,12 +3,12 @@ import SiteRouter
 import Foundation
 import DatabaseBoardgameClient
 import ComposableArchitecture
+import Dependencies
 
 public struct BoardgameService: Sendable {
     @Dependency(\.databaseBoardgameClient) var databaseBoardgameClient
     public init() {}
 }
-
 
 public extension BoardgameService {
     func boardgameHandler(
@@ -19,8 +19,8 @@ public extension BoardgameService {
         switch route {
             
         case .fetch:
-            let db = try await databaseBoardgameClient.connect()
-            let boardgames = try await databaseBoardgameClient.fetchBoardgames(db)
+            let db = try await self.databaseBoardgameClient.connect()
+            let boardgames = try await self.databaseBoardgameClient.fetchBoardgames(db)
             try await db.close()
             return ResultPayload(forAction: "fetch Boardgames", payload: boardgames)
         }

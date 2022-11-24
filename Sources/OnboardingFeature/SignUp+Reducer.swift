@@ -25,7 +25,6 @@ public extension Onboarding {
             return .run { send in
                 await send(.internal(.goBackToSignInViewTapped))
             }
-            
         default:
             return .none
         }

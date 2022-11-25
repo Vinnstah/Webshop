@@ -7,12 +7,12 @@ import XCTestDynamicOverlay
 extension DatabaseCartClient {
     
     static let test = Self(
-        createCartSession: XCTUnimplemented("\(Self.self).createCartSession"),
-        getAllItemsInCart: XCTUnimplemented("\(Self.self).getAllItemsInCart"),
-        fetchCartSession: XCTUnimplemented("\(Self.self).fetchCartSession"),
-        insertItemsToCart: XCTUnimplemented("\(Self.self).insertItemsToCart"),
-        connect: XCTUnimplemented("\(Self.self).connect"),
-        closeDatabaseEventLoop: XCTUnimplemented("\(Self.self).closeDatabaseEventLoop")
+        createCartSession: unimplemented("\(Self.self).createCartSession"),
+        getAllItemsInCart: unimplemented("\(Self.self).getAllItemsInCart"),
+        fetchCartSession: unimplemented("\(Self.self).fetchCartSession"),
+        insertItemsToCart: unimplemented("\(Self.self).insertItemsToCart"),
+        connect: unimplemented("\(Self.self).connect"),
+        closeDatabaseEventLoop: unimplemented("\(Self.self).closeDatabaseEventLoop")
     )
 }
 extension DatabaseCartClient: TestDependencyKey {

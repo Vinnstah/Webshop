@@ -7,9 +7,9 @@ import XCTestDynamicOverlay
 extension DatabaseBoardgameClient {
     
     public static let test = Self(
-        fetchBoardgames: XCTUnimplemented("\(Self.self).fetchBoardgames"),
-        connect: XCTUnimplemented("\(Self.self).connect"),
-        closeDatabaseEventLoop: XCTUnimplemented("\(Self.self).closeDatabaseEventLoop")
+        fetchBoardgames: unimplemented("\(Self.self).fetchBoardgames"),
+        connect: unimplemented("\(Self.self).connect"),
+        closeDatabaseEventLoop: unimplemented("\(Self.self).closeDatabaseEventLoop")
     )
 }
 extension DatabaseBoardgameClient: TestDependencyKey {

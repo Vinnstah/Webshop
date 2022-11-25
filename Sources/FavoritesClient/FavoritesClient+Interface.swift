@@ -19,19 +19,6 @@ public struct FavoritesClient: Sendable {
     public var addFavorite: AddFavorite
     public var removeFavorite: RemoveFavorite
     public var getFavourites: GetFavourites
-    
-    public init(
-        addFavorite: @escaping AddFavorite,
-        removeFavorite: @escaping RemoveFavorite,
-        getFavourites: @escaping GetFavourites
-    ) {
-        self.addFavorite = addFavorite
-        self.removeFavorite = removeFavorite
-        self.getFavourites = getFavourites
-    }
-    
-    
-    
 }
 
 

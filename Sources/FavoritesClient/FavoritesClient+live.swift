@@ -1,12 +1,12 @@
 import Foundation
 import UserDefaultsClient
-import ComposableArchitecture
+import Dependencies
 import Product
 import JSONClients
 
-public extension FavoritesClient {
+extension FavoritesClient: DependencyKey {
     
-    static let live: Self = {
+    public static let liveValue: Self = {
         
         @Dependency(\.userDefaultsClient) var userDefaultsClient
         @Dependency(\.jsonDecoder) var jsonDecoder
@@ -55,32 +55,4 @@ public extension FavoritesClient {
         }
         )
     }()
-}
-
-extension FavoritesClient {
-    public static let unimplemented = Self(
-        addFavorite: { _ in return nil },
-        removeFavorite: { _ in return nil},
-        getFavourites: {  return nil }
-    )
-}
-
-extension Array where Element: Hashable {
-    func difference(from other: [Element]) -> [Element] {
-        let thisSet = Set(self)
-        let otherSet = Set(other)
-        return Array(thisSet.symmetricDifference(otherSet))
-    }
-}
-
-private enum FavoritesClientKey: DependencyKey {
-    typealias Value = FavoritesClient
-    static let liveValue = FavoritesClient.live
-    static let testValue = FavoritesClient.unimplemented
-}
-public extension DependencyValues {
-    var favouritesClient: FavoritesClient {
-        get { self[FavoritesClientKey.self] }
-        set { self[FavoritesClientKey.self] = newValue }
-    }
 }

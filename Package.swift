@@ -152,28 +152,28 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         
-        .target(
-            name: "AppFeature",
-            dependencies: [
-                tca,
-                "MainFeature",
-                "OnboardingFeature",
-                "SplashFeature",
-                "UserModel",
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "AppFeature",
+                dependencies: [
+                    tca,
+                    "MainFeature",
+                    "OnboardingFeature",
+                    "SplashFeature",
+                    "UserModel",
+                ],
+                swiftSettings: swiftSettings
+            ),
         .testTarget(
             name: "AppFeatureTests",
             dependencies: ["AppFeature"]),
         
-        .target(
-            name: "Boardgame",
-            dependencies: [
-                tagged,
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "Boardgame",
+                dependencies: [
+                    tagged,
+                ],
+                swiftSettings: swiftSettings
+            ),
         .target(
             name: "BoardgameService",
             dependencies: [
@@ -262,7 +262,7 @@ let package = Package(
         .target(
             name: "FavoritesClient",
             dependencies: [
-                tca,
+                dependencies,
                 "JSONClients",
                 "Product",
                 "UserDefaultsClient",
@@ -364,14 +364,14 @@ let package = Package(
         
             .executableTarget(name: "runner", dependencies: [.target(name: "Server")]),
         
-        .target(
-            name: "Product",
-            dependencies: [
-                "Boardgame",
-                tagged,
-            ],
-            swiftSettings: swiftSettings
-        ),
+            .target(
+                name: "Product",
+                dependencies: [
+                    "Boardgame",
+                    tagged,
+                ],
+                swiftSettings: swiftSettings
+            ),
         .target(
             name: "ProductViews",
             dependencies: [
@@ -382,68 +382,68 @@ let package = Package(
             ],
             swiftSettings: swiftSettings
         ),
-            .target(
-                name: "Server",
-                dependencies: [
-                    "Database",
-                    "CartModel",
-                    "CartService",
-                    "JWT",
-                    "Product",
-                    "BoardgameService",
-                    "SiteRouter",
-                    "UserModel",
-                    "UserService",
-                    "WarehouseService",
-                    postgres,
-                    tca,
-                    vapor,
-                    vaporRouting,
-                ],
-                swiftSettings: swiftSettings
-            ),
-            .target(
-                name: "SignInFeature",
-                dependencies: [
-                    "StyleGuide",
-                    "SiteRouter",
-                    "ApiClient",
-                    "UserDefaultsClient",
-                    "UserModel",
-                    tca,
-                    urlRouting,
-                ],
-                swiftSettings: swiftSettings
-            ),
-        .testTarget(
-            name: "SignInFeatureTests",
-            dependencies: ["SignInFeature"]),
-        
         .target(
-            name: "SignUpFeature",
+            name: "Server",
             dependencies: [
-                "StyleGuide",
+                "Database",
+                "CartModel",
+                "CartService",
+                "JWT",
+                "Product",
+                "BoardgameService",
+                "SiteRouter",
                 "UserModel",
+                "UserService",
+                "WarehouseService",
+                postgres,
                 tca,
+                vapor,
+                vaporRouting,
             ],
             swiftSettings: swiftSettings
         ),
-        .testTarget(
-            name: "SignUpFeatureTests",
-            dependencies: ["SignUpFeature"]),
-        
         .target(
-            name: "SiteRouter",
+            name: "SignInFeature",
             dependencies: [
-                "Boardgame",
-                "CartModel",
+                "StyleGuide",
+                "SiteRouter",
+                "ApiClient",
+                "UserDefaultsClient",
                 "UserModel",
-                "Warehouse",
                 tca,
                 urlRouting,
             ],
             swiftSettings: swiftSettings
         ),
+        .testTarget(
+            name: "SignInFeatureTests",
+            dependencies: ["SignInFeature"]),
+        
+            .target(
+                name: "SignUpFeature",
+                dependencies: [
+                    "StyleGuide",
+                    "UserModel",
+                    tca,
+                ],
+                swiftSettings: swiftSettings
+            ),
+        .testTarget(
+            name: "SignUpFeatureTests",
+            dependencies: ["SignUpFeature"]),
+        
+            .target(
+                name: "SiteRouter",
+                dependencies: [
+                    "Boardgame",
+                    "CartModel",
+                    "UserModel",
+                    "Warehouse",
+                    tca,
+                    urlRouting,
+                ],
+                swiftSettings: swiftSettings
+            ),
         
         
             .target(
@@ -464,30 +464,30 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-            .target(
-                name: "TermsAndConditionsFeature",
-                dependencies: [
-                    "SiteRouter",
-                    "StyleGuide",
-                    "ApiClient",
-                    "UserDefaultsClient",
-                    "UserModel",
-                    tca,
-                ],
-                swiftSettings: swiftSettings
-            ),
+        .target(
+            name: "TermsAndConditionsFeature",
+            dependencies: [
+                "SiteRouter",
+                "StyleGuide",
+                "ApiClient",
+                "UserDefaultsClient",
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "TermsAndConditionsFeatureTests",
             dependencies: ["TermsAndConditionsFeature"]),
-            .target(
-                name: "UserDefaultsClient",
-                dependencies: [
-                    "Product",
-                    "UserModel",
-                    tca,
-                ],
-                swiftSettings: swiftSettings
-            ),
+        .target(
+            name: "UserDefaultsClient",
+            dependencies: [
+                "Product",
+                "UserModel",
+                tca,
+            ],
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "UserDefaultsClientTests",
             dependencies: ["UserDefaultsClient"]),
@@ -495,7 +495,7 @@ let package = Package(
             .target(
                 name: "UserModel",
                 dependencies: [
-                              ],
+                ],
                 swiftSettings: swiftSettings
             ),
         .target(

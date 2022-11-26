@@ -450,6 +450,7 @@ let package = Package(
                 name: "SplashFeature",
                 dependencies: [
                     tca,
+                    "StyleGuide",
                     "UserDefaultsClient",
                 ],
                 swiftSettings: swiftSettings

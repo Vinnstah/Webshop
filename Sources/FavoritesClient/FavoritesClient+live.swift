@@ -34,25 +34,26 @@ extension FavoritesClient: DependencyKey {
         }
         
         
-        return Self.init(addFavorite: { sku in
-            try await mutatingFavourites { favourites in
-                favourites.append(sku)
+        return Self.init(
+            addFavorite: { sku in
+                try await mutatingFavourites { favourites in
+                    favourites.append(sku)
+                }
+            },
+            removeFavorite: { sku in
+                try await mutatingFavourites { favourites in
+                    favourites.removeAll(where: { $0 == sku })
+                }
+                
+            },
+            getFavourites: {
+                var currentUserDefaultsData: Data? = await userDefaultsClient.dataForKey(favouritesKey)
+                guard let currentUserDefaultsData else {
+                    return []
+                }
+                var decodedData = try jsonDecoder().decode(Favourites.self, from: currentUserDefaultsData)
+                return decodedData.favourites
             }
-        },
-                         removeFavorite: { sku in
-            try await mutatingFavourites { favourites in
-                favourites.removeAll(where: { $0 == sku })
-            }
-            
-        },
-                         getFavourites: {
-            var currentUserDefaultsData: Data? = await userDefaultsClient.dataForKey(favouritesKey)
-            guard let currentUserDefaultsData else {
-                return []
-            }
-            var decodedData = try jsonDecoder().decode(Favourites.self, from: currentUserDefaultsData)
-            return decodedData.favourites
-        }
         )
     }()
 }

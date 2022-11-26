@@ -15,7 +15,12 @@ public struct Splash: ReducerProtocol {
 
 public extension Splash {
     struct State: Equatable {
-        public init(){}
+        public var isAnimating: Bool
+        
+        public init(isAnimating: Bool = false
+        ){
+            self.isAnimating = isAnimating
+        }
     }
     
     enum Action: Equatable, Sendable {
@@ -40,8 +45,9 @@ public extension Splash {
                 
                 // On appear send action to userDefaultsClient to check if user is logged in
             case .internal(.onAppear):
+                state.isAnimating.toggle()
                 return .run { [userDefaultsClient, mainQueue] send in
-                    try await mainQueue.sleep(for: .milliseconds(700))
+                    try await mainQueue.sleep(for: .milliseconds(3000))
                     await send(
                         .delegate(
                             .loadIsLoggedInResult(userDefaultsClient.getLoggedInUserJWT())

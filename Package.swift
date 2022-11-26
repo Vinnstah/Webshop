@@ -146,7 +146,7 @@ let package = Package(
             name: "ApiClient",
             dependencies: [
                 "SiteRouter",
-                tca,
+                dependencies,
                 urlRouting,
             ],
             swiftSettings: swiftSettings

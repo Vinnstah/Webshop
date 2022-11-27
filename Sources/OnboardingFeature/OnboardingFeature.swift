@@ -12,24 +12,19 @@ public struct Onboarding: ReducerProtocol {
 }
 
 public extension Onboarding {
-    
     struct State: Equatable, Sendable {
-        public var signIn: SignIn.State?
-        public var signUp: SignUp.State?
-        public var userLocalSettings: UserLocalSettings.State?
-        public var termsAndConditions: TermsAndConditions.State?
-
-
-        public init(
-            signIn: SignIn.State? = .init(),
-            signUp: SignUp.State? = nil,
-            userLocalSettings: UserLocalSettings.State? = nil,
-            termsAndConditions: TermsAndConditions.State? = nil
-        ) {
-            self.signIn = signIn
-            self.signUp = signUp
-            self.userLocalSettings = userLocalSettings
-            self.termsAndConditions = termsAndConditions
+        
+        var route: Route?
+        
+        public init(route: Route? = .signIn(SignIn.State())) {
+            self.route = route
+        }
+        
+        public enum Route: Equatable, Sendable {
+            case signIn(SignIn.State)
+            case signUp(SignUp.State)
+            case userLocalSettings(UserLocalSettings.State)
+            case termsAndConditions(TermsAndConditions.State)
         }
     }
     
@@ -39,10 +34,15 @@ public extension Onboarding {
         
         case delegate(DelegateAction)
         case `internal`(InternalAction)
-        case signIn(SignIn.Action)
-        case signUp(SignUp.Action)
-        case userLocalSettings(UserLocalSettings.Action)
-        case termsAndConditions(TermsAndConditions.Action)
+        
+        case route(Route)
+        
+        public enum Route: Equatable, Sendable{
+            case signIn(SignIn.Action)
+            case signUp(SignUp.Action)
+            case userLocalSettings(UserLocalSettings.Action)
+            case termsAndConditions(TermsAndConditions.Action)
+        }
         
         public enum InternalAction: Equatable, Sendable {
             case goBackToSignInViewTapped
@@ -56,39 +56,27 @@ public extension Onboarding {
     
     var body: some ReducerProtocol<State, Action> {
         CombineReducers {
-            
             Reduce(self.`internal`)
             Reduce(self.signIn)
-                .ifLet(
-                    \.signIn,
-                     action: /Action.signIn
-                ) {
-                    SignIn()
-                }
-            
             Reduce(self.signUp)
-                .ifLet(
-                    \.signUp,
-                     action: /Action.signUp
-                ) {
-                    SignUp()
-                }
-            
             Reduce(self.userLocalSettings)
-                .ifLet(
-                    \.userLocalSettings,
-                     action: /Action.userLocalSettings
-                ) {
-                    UserLocalSettings()
-                }
-            
             Reduce(self.termsAndConditions)
-                .ifLet(
-                    \.termsAndConditions,
-                     action: /Action.termsAndConditions
-                ) {
-                    TermsAndConditions()
-                }
+            
+        }
+        .ifLet(\.route, action: /Action.route) {
+            EmptyReducer()
+            .ifCaseLet(/State.Route.signIn, action: /Action.Route.signIn) {
+                SignIn()
+            }
+            .ifCaseLet(/State.Route.signUp, action: /Action.Route.signUp) {
+                SignUp()
+            }
+            .ifCaseLet(/State.Route.userLocalSettings, action: /Action.Route.userLocalSettings) {
+                UserLocalSettings()
+            }
+            .ifCaseLet(/State.Route.termsAndConditions, action: /Action.Route.termsAndConditions) {
+                TermsAndConditions()
+            }
         }
     }
 }

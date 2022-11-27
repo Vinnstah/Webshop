@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import SignUpFeature
 import Foundation
 
 public extension Onboarding {
@@ -10,23 +11,20 @@ public extension Onboarding {
         
         switch action {
             
-        case let .signUp(.delegate(.goToNextStep(user))):
-            state.signUp = nil
-            state.userLocalSettings = .init(user: user)
+        case let .route(.signUp(.delegate(.goToNextStep(user)))):
+            state.route = .userLocalSettings(.init(user: user))
             return .none
             
-        case .signUp(.delegate(.goToThePreviousStep)):
-            state.signUp = nil
-            state.signIn = .init()
+        case .route(.signUp(.delegate(.goToThePreviousStep))):
+            state.route = .signIn(.init())
             return .none
             
-        case .signUp(.delegate(.goBackToSignInView)):
-            state.signUp = nil
+        case .route(.signUp(.delegate(.goBackToSignInView))):
             return .run { send in
                 await send(.internal(.goBackToSignInViewTapped))
             }
             
-        case .delegate, .signIn, .signUp, .userLocalSettings, .termsAndConditions, .internal:
+        case .delegate, .route, .internal:
             return .none
         }
     }

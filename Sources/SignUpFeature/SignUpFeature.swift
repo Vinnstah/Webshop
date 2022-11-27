@@ -14,10 +14,10 @@ public struct SignUp: ReducerProtocol {
 public extension SignUp {
     
     struct State: Equatable, Sendable {
-        public var user: User?
         public var alert: AlertState<Action>?
         public var email: String
         public var password: String
+        public var user: User
         
         ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
         public var passwordFulfillsRequirements: Bool {
@@ -34,7 +34,7 @@ public extension SignUp {
         }
         
         public init(
-            user: User? = nil,
+            user: User,
             alert: AlertState<Action>? = nil,
             email: String = "",
             password: String = ""
@@ -72,20 +72,22 @@ public extension SignUp {
                 ///Set `email` when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.email = text
+                state.user.credentials.email = state.email
                 return .none
                 
                 ///Set  `password` when passwordField receives input.
             case let .internal(.passwordFieldReceivingInput(text: text)):
                 state.password = text
+                state.user.credentials.password = state.password
                 return .none
                 
             case .internal(.nextStep):
-                state.user = User(
-                    credentials: .init(
-                        email: state.email,
-                        password: state.password
-                    )
-                )
+//                state.user = User(
+//                    credentials: .init(
+//                        email: state.email,
+//                        password: state.password
+//                    )
+//                )
 
                 return .run { [email = state.email, password = state.password] send in
                     await send(.delegate(.goToNextStep(

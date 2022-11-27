@@ -1,5 +1,7 @@
 import ComposableArchitecture
+import SignInFeature
 import Foundation
+import UserModel
 
 public extension Onboarding {
     
@@ -10,17 +12,16 @@ public extension Onboarding {
         
         switch action {
             
-        case .signIn(.delegate(.userPressedSignUp)):
-            state.signIn = nil
-            state.signUp = .init()
+        case .route(.signIn(.delegate(.userPressedSignUp))):
+            state.route = .signUp(.init(user: User(credentials: User.Credentials(email: "", password: ""))))
             return .none
             
-        case let .signIn(.delegate(.userLoggedIn(with: jwt))):
+        case let .route(.signIn(.delegate(.userLoggedIn(with: jwt)))):
             return .run { send in
                 await send(.delegate(.userLoggedIn(with: jwt)))
             }
             
-        case .delegate, .signIn, .signUp, .userLocalSettings, .termsAndConditions, .internal:
+        case .delegate, .route, .internal:
             return .none
         }
     }

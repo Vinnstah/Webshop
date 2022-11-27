@@ -19,11 +19,13 @@ public extension App {
                 action: App.Action.splash),
                        then:Splash.View.init(store:)
             )
+            .transition(.move(edge: .bottom))
             IfLetStore(self.store.scope(
                 state: /App.State.onboarding,
                 action: App.Action.onboarding),
                        then:Onboarding.View.init(store:)
             )
+            .transition(.move(edge: .top))
             IfLetStore(self.store.scope(
                 state: /App.State.main,
                 action: App.Action.main),

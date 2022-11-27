@@ -43,7 +43,7 @@ public extension App {
                 
             case let .splash(.delegate(.loadIsLoggedInResult(jwt))):
                 guard jwt != nil else {
-                    state = .onboarding(.init(signIn: .init()))
+                    state = .onboarding(.init())
                     return .none
                 }
                 
@@ -60,7 +60,7 @@ public extension App {
                  
                 ///When a user logs out from `main` we initialize onboarding again.
             case .main((.delegate(.userIsSignedOut))):
-                state = .onboarding(.init(signIn: .init()))
+                state = .onboarding(.init())
                 return .none
                 
                 ///After a user have finished onboarding and received the jwt we will send them through to `main`
@@ -85,13 +85,7 @@ public extension App {
             case .internal(_):
                 return .none
 //
-            case .onboarding(.signIn(_)):
-                return .none
-            case .onboarding(.signUp(_)):
-                return .none
-            case .onboarding(.userLocalSettings(_)):
-                return .none
-            case .onboarding(.termsAndConditions(_)):
+            case .onboarding(_):
                 return .none
             case .main(.home(.internal(_))):
                 return .none

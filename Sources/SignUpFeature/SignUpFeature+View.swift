@@ -37,7 +37,7 @@ public extension SignUp {
                             
                             Image(systemName: viewStore.state.emailFulfillsRequirements ? "checkmark" : "xmark")
                                 .padding(.bottom)
-                                .foregroundColor(Color("Complementary"))
+                                .foregroundColor(viewStore.state.emailFulfillsRequirements ? .green : .red)
                         }
                         
                         HStack {
@@ -61,29 +61,22 @@ public extension SignUp {
                             
                             Image(systemName: viewStore.state.passwordFulfillsRequirements ? "checkmark" : "xmark")
                                 .padding(.bottom)
-                                .foregroundColor(Color("Complementary"))
+                                .foregroundColor(viewStore.state.passwordFulfillsRequirements ? .green : .red)
                             
                         }
                         
                         VStack {
                             Button("Next step") {
-                                viewStore.send(.internal(.nextStep), animation: .default)
+                                viewStore.send(.delegate(.goToNextStep(viewStore.state.user)), animation: .default)
                             }
                             .buttonStyle(.primary(isDisabled: viewStore.disableButton, cornerRadius: 25))
                             .disabled(viewStore.state.disableButton)
+                            .transition(.move(edge: .leading))
                             
                             Button("Go Back") { viewStore.send(.delegate(.goToThePreviousStep), animation: .default)}
                                 .foregroundColor(Color("Secondary"))
                                 .bold()
                                 .padding()
-                        }
-                    }
-                    
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                viewStore.send(.delegate(.goBackToSignInView), animation: .default)
-                            }
                         }
                     }
                 }

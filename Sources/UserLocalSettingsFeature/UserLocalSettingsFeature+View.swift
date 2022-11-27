@@ -31,11 +31,13 @@ public extension UserLocalSettings {
                         
                         VStack {
                             Button("Next step") {
-                                viewStore.send(.internal(.nextStep), animation: .default)
+                                viewStore.send(.delegate(.nextStep(viewStore.state.user)), animation: .default)
                             }
                             .buttonStyle(.primary(cornerRadius: 25))
                             
-                            Button("Go Back") { viewStore.send(.internal(.previousStep), animation: .default)}
+                            Button("Go Back") {
+                                viewStore.send(.delegate(.previousStep(viewStore.state.user)),
+                                               animation: .default)}
                                 .foregroundColor(Color("Secondary"))
                                 .bold()
                                 .padding()

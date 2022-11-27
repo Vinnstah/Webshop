@@ -61,8 +61,9 @@ public extension SignIn {
                         .cornerRadius(25)
                         
                         Button("Sign Up") {
-                            viewStore.send(.internal(.signUpButtonPressed), animation: .default)
+                            viewStore.send(.delegate(.userPressedSignUp), animation: .default)
                         }
+                        .transition(.move(edge: .leading))
                         .foregroundColor(Color("Secondary"))
                         .bold()
                         .padding()

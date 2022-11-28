@@ -28,7 +28,7 @@ public extension SignIn {
         public var password: String
         
         public var disableButton: Bool {
-            !checkIfPasswordFulfillsRequirements(password) || !checkIfEmailFullfillRequirements(email) || isLoginInFlight
+            checkIfPasswordFulfillsRequirements(password) != .valid || checkIfEmailFullfillRequirements(email) != .valid || isLoginInFlight
         }
         
         public init(

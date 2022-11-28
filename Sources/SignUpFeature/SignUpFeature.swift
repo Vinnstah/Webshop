@@ -19,18 +19,16 @@ public extension SignUp {
         public var password: String
         public var user: User
         
-        ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
-        public var passwordFulfillsRequirements: Bool {
+        public var passwordFulfillsRequirements: PasswordChecker {
             checkIfPasswordFulfillsRequirements(password)
         }
-        ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
-        public var emailFulfillsRequirements: Bool {
+        
+        public var emailFulfillsRequirements: EmailCheckerResult {
             checkIfEmailFullfillRequirements(email)
         }
         
-        ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
         public var disableButton: Bool {
-             !passwordFulfillsRequirements || !emailFulfillsRequirements
+            passwordFulfillsRequirements != .valid || emailFulfillsRequirements != .valid
         }
         
         public init(
@@ -97,7 +95,6 @@ public extension SignUp {
                         )
                     )))
                 }
-                
             case .delegate(_):
                 return .none
             case .internal(_):

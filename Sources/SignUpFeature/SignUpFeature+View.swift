@@ -22,6 +22,10 @@ public extension SignUp {
                         
                         Spacer()
                         
+                        Text(viewStore.state.emailFulfillsRequirements.rawValue)
+                            .font(.footnote)
+                            .foregroundColor(Color.gray.opacity(50))
+                        
                         HStack {
                             emailTextField(
                                 text: viewStore.binding(
@@ -30,10 +34,14 @@ public extension SignUp {
                                 )
                             )
                             
-                            Image(systemName: viewStore.state.emailFulfillsRequirements ? "checkmark" : "xmark")
-                                .foregroundColor(viewStore.state.emailFulfillsRequirements ? .green : .red)
+                            Image(systemName: viewStore.state.emailFulfillsRequirements == .valid ? "checkmark" : "xmark")
+                                .foregroundColor(viewStore.state.emailFulfillsRequirements == .valid ? .green : .red)
                         }
                         .padding(.bottom)
+                        
+                        Text(viewStore.state.passwordFulfillsRequirements.rawValue)
+                            .font(.footnote)
+                            .foregroundColor(Color.gray.opacity(50))
                         
                         HStack {
                             passwordTextField(
@@ -43,8 +51,8 @@ public extension SignUp {
                                 )
                             )
                             
-                            Image(systemName: viewStore.state.passwordFulfillsRequirements ? "checkmark" : "xmark")
-                                .foregroundColor(viewStore.state.passwordFulfillsRequirements ? .green : .red)
+                            Image(systemName: viewStore.state.passwordFulfillsRequirements == .valid ? "checkmark" : "xmark")
+                                .foregroundColor(viewStore.state.passwordFulfillsRequirements == .valid ? .green : .red)
                             
                         }
                         .padding(.bottom)

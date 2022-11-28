@@ -41,7 +41,9 @@ public extension TermsAndConditions {
                         .buttonStyle(.primary(isDisabled: !viewStore.areTermsAndConditionsAccepted, cornerRadius: 25))
                         .disabled(!viewStore.areTermsAndConditionsAccepted)
                         
-                        Button("Previous Step") { viewStore.send(.delegate(.previousStep(viewStore.state.user))) }
+                        Button("Previous Step") {
+                            viewStore.send(.delegate(.previousStep(viewStore.state.user)), animation: .default)
+                        }
                             .foregroundColor(Color("Secondary"))
                             .bold()
                             .padding()

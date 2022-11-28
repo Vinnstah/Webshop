@@ -40,6 +40,7 @@ public extension Main {
                         Checkout.View(
                             store: self.store.scope(state: \.checkout!, action: Main.Action.checkout)
                         )
+                        
                         .tag(Main.State.Tab.checkout)
                         .tabItem {
                             Label("Checkout", systemImage: "cart")

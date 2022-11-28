@@ -1,12 +1,10 @@
-
 import Foundation
 import ComposableArchitecture
 import SwiftUI
 import UserDefaultsClient
 
-
 /// Determine if user should be onboarded or not and reporting the result back to AppFeature
-public struct Splash: ReducerProtocol {
+public struct Splash: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
     
@@ -46,12 +44,12 @@ public extension Splash {
                 // On appear send action to userDefaultsClient to check if user is logged in
             case .internal(.onAppear):
                 state.isAnimating.toggle()
-                return .run { [userDefaultsClient, mainQueue] send in
-                    try await mainQueue.sleep(for: .milliseconds(3000))
+                return .run { send in
+                    try await self.mainQueue.sleep(for: .milliseconds(1000))
                     await send(
                         .delegate(
-                            .loadIsLoggedInResult(userDefaultsClient.getLoggedInUserJWT())
-                        )
+                            .loadIsLoggedInResult(self.userDefaultsClient.getLoggedInUserJWT())
+                        ), animation: .default
                     )
                 }
             }
@@ -59,3 +57,4 @@ public extension Splash {
     }
 }
 
+extension Animation : @unchecked Sendable {}

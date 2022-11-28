@@ -47,11 +47,13 @@ public extension App {
                     return .none
                 }
                 
-                return .run { send in
-                    await send(
-                        .internal(.signInUser)
-                    )
-                }
+                state = .main(.init())
+                return .none
+//                return .run { send in
+//                    await send(
+//                        .internal(.signInUser)
+//                    )
+//                }
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
             case .internal(.signInUser):

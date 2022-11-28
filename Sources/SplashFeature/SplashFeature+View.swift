@@ -15,7 +15,7 @@ public extension Splash {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 ForceFullScreen {
                     
-                    animatedTitle(animate: { viewStore.state.isAnimating })
+                    animatedTitle(animate: { viewStore.state.isAnimating } )
                         .onAppear {
                             viewStore.send(.internal(.onAppear))
                         }

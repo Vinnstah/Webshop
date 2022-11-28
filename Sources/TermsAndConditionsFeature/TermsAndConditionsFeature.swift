@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import ComposableArchitecture
 import UserModel
 import UserDefaultsClient
@@ -114,7 +115,7 @@ public extension TermsAndConditions {
                 return .run { [mainQueue, userDefaultsClient] send in
                     try await mainQueue.sleep(for: .milliseconds(700))
                     await userDefaultsClient.setLoggedInUserJWT(jwt)
-                    await send(.delegate(.userFinishedOnboarding(jwt)))
+                    await send(.delegate(.userFinishedOnboarding(jwt)), animation: .default)
                 }
                 
             case let .internal(.createUserResponse(.failure(error))):
@@ -136,3 +137,5 @@ public extension TermsAndConditions {
         }
     }
 }
+
+extension Animation: @unchecked Sendable {}

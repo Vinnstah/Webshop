@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import SwiftUI
 import SignInFeature
 import Foundation
 import UserModel
@@ -18,7 +19,7 @@ public extension Onboarding {
             
         case let .route(.signIn(.delegate(.userLoggedIn(with: jwt)))):
             return .run { send in
-                await send(.delegate(.userLoggedIn(with: jwt)))
+                await send(.delegate(.userLoggedIn(with: jwt)), animation: .easeIn)
             }
             
         case .delegate, .route, .internal:
@@ -26,3 +27,5 @@ public extension Onboarding {
         }
     }
 }
+
+extension Animation : @unchecked Sendable {}

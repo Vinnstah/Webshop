@@ -15,52 +15,36 @@ public extension SignIn {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 ForceFullScreen {
                     VStack {
+                        
+                        signInPersonImage()
+                        
+                        VStack {
+                            Text("Login")
+                        }
+                        
                         Spacer()
-                        HStack {
-                            Text("Email")
-                                .font(.subheadline)
-                            
-                            Spacer()
-                        }
                         
-                        TextField("",
-                                  text: viewStore.binding(
-                                    get: { $0.email},
-                                    send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
-                                  )
+                        emailTextField(
+                            text: viewStore.binding(
+                                get: { $0.email},
+                                send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
+                            )
                         )
-                        .textFieldStyle(.roundedBorder)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .foregroundColor(Color("Secondary"))
-                        .padding(.bottom)
                         
-                        HStack {
-                            Text("Password")
-                                .font(.subheadline)
-                            
-                            Spacer()
-                        }
-                        
-                        SecureField("",
-                                    text: viewStore.binding(
-                                        get: { $0.password },
-                                        send: { .internal(.passwordFieldReceivingInput(text: $0)) }
-                                    )
+                        passwordTextField(
+                            text: viewStore.binding(
+                                get: { $0.password },
+                                send: { .internal(.passwordFieldReceivingInput(text: $0)) }
+                            )
                         )
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                        .textFieldStyle(.roundedBorder)
-                        .foregroundColor(Color("Secondary"))
-                        .padding(.bottom)
                         
-                        Button("Log in") {
+                        Button("Login") {
                             viewStore.send(.internal(.loginButtonPressed), animation: .default)
                         }
                         .buttonStyle(.primary(isDisabled: viewStore.state.isLoginInFlight))
                         .cornerRadius(25)
                         
-                        Button("Sign Up") {
+                        Button("Create Account") {
                             viewStore.send(.delegate(.userPressedSignUp), animation: .default)
                         }
                         .transition(.move(edge: .leading))
@@ -83,4 +67,7 @@ public extension SignIn {
         
     }
 }
+
+
+
 

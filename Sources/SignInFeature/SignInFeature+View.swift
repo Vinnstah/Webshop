@@ -38,13 +38,13 @@ public extension SignIn {
                         
                         actionButton(
                             text: "Login",
-                            action: { viewStore.send(.internal(.loginButtonPressed), animation: .default) },
+                            action: { viewStore.send(.login(.loginButtonTapped), animation: .default) },
                             isDisabled: { viewStore.state.disableButton }
                         )
                         
                         secondaryActionButton(
                             text: "Create Account",
-                            action: { viewStore.send(.delegate(.userPressedSignUp), animation: .default) }
+                            action: { viewStore.send(.delegate(.signUpButtonTapped), animation: .default) }
                         )
                         
                     }

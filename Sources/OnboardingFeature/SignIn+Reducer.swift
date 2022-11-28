@@ -13,7 +13,7 @@ public extension Onboarding {
         
         switch action {
             
-        case .route(.signIn(.delegate(.userPressedSignUp))):
+        case .route(.signIn(.delegate(.signUpButtonTapped))):
             state.route = .signUp(.init(user: User(credentials: User.Credentials(email: "", password: ""))))
             return .none
             

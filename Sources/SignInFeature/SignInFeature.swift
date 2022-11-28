@@ -27,18 +27,8 @@ public extension SignIn {
         public var email: String
         public var password: String
         
-        ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
-        public var passwordFulfillsRequirements: Bool {
-            password.count > 5
-        }
-        ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
-        public var emailFulfillsRequirements: Bool {
-            email.count > 5 && email.contains("@")
-        }
-        
-        ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
         public var disableButton: Bool {
-            !passwordFulfillsRequirements || !emailFulfillsRequirements || isLoginInFlight
+            !checkIfPasswordFulfillsRequirements(password) || !checkIfEmailFullfillRequirements(email) || isLoginInFlight
         }
         
         public init(
@@ -165,5 +155,3 @@ public extension SignIn {
         }
     }
 }
-
-

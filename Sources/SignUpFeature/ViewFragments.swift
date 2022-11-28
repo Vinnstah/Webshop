@@ -1,19 +1,18 @@
 import Foundation
 import SwiftUI
 
-extension SignIn.View {
+extension SignUp.View {
     @ViewBuilder
-    func signInPersonImage() -> some View {
+    func signUpPersonImage() -> some View {
         VStack {
-            Image(systemName: "person.crop.circle")
+            Image(systemName: "person.crop.circle.badge.plus")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 200, alignment: .center)
                 .foregroundColor(Color("ButtonColor"))
             
-            Text("Login")
+            Text("Create User")
                 .font(.system(size: 32))
-                .foregroundColor(Color("Secondary"))
         }
     }
 }

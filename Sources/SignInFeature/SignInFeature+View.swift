@@ -15,12 +15,9 @@ public extension SignIn {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 ForceFullScreen {
                     VStack {
+                        Spacer()
                         
                         signInPersonImage()
-                        
-                        VStack {
-                            Text("Login")
-                        }
                         
                         Spacer()
                         
@@ -37,26 +34,23 @@ public extension SignIn {
                                 send: { .internal(.passwordFieldReceivingInput(text: $0)) }
                             )
                         )
+                        .padding(.bottom)
                         
-                        Button("Login") {
-                            viewStore.send(.internal(.loginButtonPressed), animation: .default)
-                        }
-                        .buttonStyle(.primary(isDisabled: viewStore.state.isLoginInFlight))
-                        .cornerRadius(25)
+                        actionButton(
+                            text: "Login",
+                            action: { viewStore.send(.internal(.loginButtonPressed), animation: .default) },
+                            isDisabled: { viewStore.state.disableButton }
+                        )
                         
-                        Button("Create Account") {
-                            viewStore.send(.delegate(.userPressedSignUp), animation: .default)
-                        }
-                        .transition(.move(edge: .leading))
-                        .foregroundColor(Color("Secondary"))
-                        .bold()
-                        .padding()
+                        secondaryActionButton(
+                            text: "Create Account",
+                            action: { viewStore.send(.delegate(.userPressedSignUp), animation: .default) }
+                        )
+                        
                     }
                     
                     .alert(
-                        self
-                            .store
-                            .scope(
+                        self.store.scope(
                                 state: \.alert
                             ),
                         dismiss: .internal(.alertConfirmTapped)
@@ -67,7 +61,3 @@ public extension SignIn {
         
     }
 }
-
-
-
-

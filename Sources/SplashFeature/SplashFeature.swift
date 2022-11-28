@@ -45,7 +45,7 @@ public extension Splash {
             case .internal(.onAppear):
                 state.isAnimating.toggle()
                 return .run { send in
-                    try await self.mainQueue.sleep(for: .milliseconds(1000))
+                    try await self.mainQueue.sleep(for: .milliseconds(3000))
                     await send(
                         .delegate(
                             .loadIsLoggedInResult(self.userDefaultsClient.getLoggedInUserJWT())

@@ -5,7 +5,7 @@ import UserModel
 import SignUpFeature
 import UserLocalSettingsFeature
 import TermsAndConditionsFeature
-import SignInFeature
+import LoginFeature
 
 public struct Onboarding: ReducerProtocol {
     public init() {}
@@ -16,12 +16,12 @@ public extension Onboarding {
         
         var route: Route?
         
-        public init(route: Route? = .signIn(SignIn.State())) {
+        public init(route: Route? = .login(Login.State())) {
             self.route = route
         }
         
         public enum Route: Equatable, Sendable {
-            case signIn(SignIn.State)
+            case login(Login.State)
             case signUp(SignUp.State)
             case userLocalSettings(UserLocalSettings.State)
             case termsAndConditions(TermsAndConditions.State)
@@ -38,7 +38,7 @@ public extension Onboarding {
         case route(Route)
         
         public enum Route: Equatable, Sendable{
-            case signIn(SignIn.Action)
+            case login(Login.Action)
             case signUp(SignUp.Action)
             case userLocalSettings(UserLocalSettings.Action)
             case termsAndConditions(TermsAndConditions.Action)
@@ -57,7 +57,7 @@ public extension Onboarding {
     var body: some ReducerProtocol<State, Action> {
         CombineReducers {
             Reduce(self.`internal`)
-            Reduce(self.signIn)
+            Reduce(self.login)
             Reduce(self.signUp)
             Reduce(self.userLocalSettings)
             Reduce(self.termsAndConditions)
@@ -65,8 +65,8 @@ public extension Onboarding {
         }
         .ifLet(\.route, action: /Action.route) {
             EmptyReducer()
-            .ifCaseLet(/State.Route.signIn, action: /Action.Route.signIn) {
-                SignIn()
+            .ifCaseLet(/State.Route.login, action: /Action.Route.login) {
+                Login()
             }
             .ifCaseLet(/State.Route.signUp, action: /Action.Route.signUp) {
                 SignUp()

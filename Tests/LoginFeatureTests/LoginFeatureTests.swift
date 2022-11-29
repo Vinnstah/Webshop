@@ -1,5 +1,5 @@
 import XCTest
-@testable import SignInFeature
+@testable import LoginFeature
 import ComposableArchitecture
 import ApiClient
 import UserModel
@@ -27,7 +27,7 @@ final class SignInFeatureTests: XCTestCase {
         
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
-            reducer: SignIn())
+            reducer: Login())
         
         //         WHEN emailAddressFieldReceivingInput
         //        // THEN state.email is updated
@@ -40,7 +40,7 @@ final class SignInFeatureTests: XCTestCase {
         
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
-            reducer: SignIn())
+            reducer: Login())
         
         //         WHEN passwordFieldReceivingInput
         //         THEN state.password is updated
@@ -53,7 +53,7 @@ final class SignInFeatureTests: XCTestCase {
         
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
-            reducer: SignIn())
+            reducer: Login())
         
         let user = User(email: "test@test", password: "test123", jwt: "")
         store.dependencies.mainQueue = mainQueue.eraseToAnyScheduler()
@@ -100,7 +100,7 @@ final class SignInFeatureTests: XCTestCase {
         
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
-            reducer: SignIn())
+            reducer: Login())
         
         let user = User(email: "test@test", password: "test123", jwt: "")
         store.dependencies.mainQueue = mainQueue.eraseToAnyScheduler()
@@ -149,7 +149,7 @@ final class SignInFeatureTests: XCTestCase {
         
         let store = TestStore(
             initialState: .init(), //GIVEN initial state
-            reducer: SignIn())
+            reducer: Login())
         //WHEN signUpButtonPressed
         _ = await store.send(.internal(.signUpButtonPressed))
         //THEN do nothing and delegate
@@ -160,7 +160,7 @@ final class SignInFeatureTests: XCTestCase {
         
         let store = TestStore(
             initialState: .init(alert: .init(title: TextState("Error"), message: TextState("The operation couldn’t be completed. (UserModel.ClientError error 0.)"), dismissButton: .cancel(TextState("Dismiss"), action: .none))), //GIVEN alert state
-                                reducer: SignIn())
+                                reducer: Login())
         //WHEN alertConfirmTapped
         //THEN state.alert = nil
         _ = await store.send(.internal(.alertConfirmTapped)) {

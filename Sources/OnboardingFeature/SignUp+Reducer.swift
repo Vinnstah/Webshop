@@ -16,7 +16,7 @@ public extension Onboarding {
             return .none
             
         case .route(.signUp(.delegate(.goToThePreviousStep))):
-            state.route = .signIn(.init())
+            state.route = .login(.init())
             return .none
             
         case .route(.signUp(.delegate(.goBackToSignInView))):

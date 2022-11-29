@@ -10,7 +10,7 @@ import UserModel
 ///Conforming AlertState to Sendable
 extension AlertState: @unchecked Sendable {}
 
-public struct SignIn: ReducerProtocol, Sendable {
+public struct Login: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.apiClient) var apiClient
@@ -18,7 +18,7 @@ public struct SignIn: ReducerProtocol, Sendable {
     public init() {}
 }
 
-public extension SignIn {
+public extension Login {
     
     struct State: Equatable, Sendable {
         public var user: User?

@@ -5,7 +5,7 @@ import SwiftUI
 import SignUpFeature
 import UserLocalSettingsFeature
 import TermsAndConditionsFeature
-import SignInFeature
+import LoginFeature
 
 public extension Onboarding {
     struct View: SwiftUI.View {
@@ -22,9 +22,9 @@ public extension Onboarding {
             IfLetStore(store.scope(state: \.route, action: Onboarding.Action.route)) { routeStore in
                 SwitchStore(routeStore) {
                     
-                    CaseLet(state: /State.Route.signIn,
-                            action: Action.Route.signIn) {
-                        SignIn.View.init(store: $0)
+                    CaseLet(state: /State.Route.login,
+                            action: Action.Route.login) {
+                        Login.View.init(store: $0)
                             .transition(.push(from: .leading))
                     }
                     

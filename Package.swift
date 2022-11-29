@@ -73,6 +73,9 @@ let package = Package(
             name: "JWT",
             targets: ["JWT"]),
         .library(
+            name: "LoginFeature",
+            targets: ["LoginFeature"]),
+        .library(
             name: "MainFeature",
             targets: ["MainFeature"]),
         .library(
@@ -90,9 +93,6 @@ let package = Package(
         .library(
             name: "ProductViews",
             targets: ["ProductViews"]),
-        .library(
-            name: "SignInFeature",
-            targets: ["SignInFeature"]),
         .library(
             name: "SignUpFeature",
             targets: ["SignUpFeature"]),
@@ -341,7 +341,7 @@ let package = Package(
             .target(
                 name: "OnboardingFeature",
                 dependencies: [
-                    "SignInFeature",
+                    "LoginFeature",
                     "SignUpFeature",
                     "TermsAndConditionsFeature",
                     "UserLocalSettingsFeature",
@@ -403,7 +403,7 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
-            name: "SignInFeature",
+            name: "LoginFeature",
             dependencies: [
                 "StyleGuide",
                 "SiteRouter",
@@ -416,8 +416,8 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .testTarget(
-            name: "SignInFeatureTests",
-            dependencies: ["SignInFeature"]),
+            name: "LoginFeatureTests",
+            dependencies: ["LoginFeature"]),
         
             .target(
                 name: "SignUpFeature",

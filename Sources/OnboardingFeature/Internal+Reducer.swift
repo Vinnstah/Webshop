@@ -10,7 +10,7 @@ public extension Onboarding {
         switch action {
             
         case .internal(.goBackToSignInViewTapped):
-            state.route = .signIn(.init())
+            state.route = .login(.init())
             return .none
             
         case .delegate, .route, .internal:

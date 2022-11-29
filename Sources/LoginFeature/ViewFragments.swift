@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-extension SignIn.View {
+extension Login.View {
     @ViewBuilder
     func signInPersonImage() -> some View {
         VStack {

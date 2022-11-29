@@ -3,7 +3,7 @@ import Foundation
 import UserModel
 import SiteRouter
 
-public extension SignIn {
+public extension Login {
     func login(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
             

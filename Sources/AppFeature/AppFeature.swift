@@ -29,7 +29,6 @@ public extension App {
         case onboarding(Onboarding.Action)
         case main(Main.Action)
         
-        
         public enum InternalAction: Equatable, Sendable {
             case signInUser
         }
@@ -48,12 +47,8 @@ public extension App {
                 }
                 
                 state = .main(.init())
+                
                 return .none
-//                return .run { send in
-//                    await send(
-//                        .internal(.signInUser)
-//                    )
-//                }
                 
                 /// When we're retrieved the JWT we will change state to `main` and send the JWT through.
             case .internal(.signInUser):
@@ -75,31 +70,10 @@ public extension App {
                 state = .main(.init())
                 return .none
                 
-            case .splash(.internal(_)):
-                return .none
-                
-            case .onboarding(.internal(_)):
-                return .none
-                
-            case .main(.internal(_)):
-                return .none
-                
-            case .internal(_):
-                return .none
-//
-            case .onboarding(_):
-                return .none
-            case .main(.home(.internal(_))):
-                return .none
-            case .main(.home(.delegate(_))):
-                return .none
-            case .main(.favorites(_)):
-                return .none
-            case .main(.checkout(_)):
+            case .splash, .onboarding, .main, .internal:
                 return .none
             }
         }
-        ///Changing View depending on which state is initialized.
         .ifCaseLet(
             /State.splash,
              action: /Action.splash

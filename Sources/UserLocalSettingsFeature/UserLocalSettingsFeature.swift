@@ -31,16 +31,13 @@ public extension UserLocalSettings {
         case `internal`(InternalAction)
         
         public enum InternalAction: Equatable, Sendable {
-            case nextStep
-            case previousStep
-            case cancelButtonPressed
             case alertConfirmTapped
         }
         
         public enum DelegateAction: Equatable, Sendable {
-            case nextStep(User)
-            case previousStep(User)
-            case goBackToSignInView
+            case nextStepTapped(delegating: User)
+            case previousStepTapped(delegating: User)
+            case goBackToSignInViewTapped
         }
     }
     
@@ -49,21 +46,6 @@ public extension UserLocalSettings {
             
             switch action {
                 
-            case .internal(.nextStep):
-                return .run { [user = state.user] send in
-                    await send(.delegate(.nextStep(user)))
-                }
-                
-            case .internal(.previousStep):
-                return .run { [user = state.user] send in
-                    await send(.delegate(.previousStep(user)))
-                }
-            
-            case .internal(.cancelButtonPressed):
-                return .run { send in
-                    await send(.delegate(.goBackToSignInView))
-                }
-
             case .internal(.alertConfirmTapped):
                 state.alert = nil
                 return .none

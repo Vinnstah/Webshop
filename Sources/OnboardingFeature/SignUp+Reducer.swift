@@ -11,15 +11,15 @@ public extension Onboarding {
         
         switch action {
             
-        case let .route(.signUp(.delegate(.goToNextStep(user)))):
+        case let .route(.signUp(.delegate(.goToNextStepTapped(delegating: user)))):
             state.route = .userLocalSettings(.init(user: user))
             return .none
             
-        case .route(.signUp(.delegate(.goToThePreviousStep))):
+        case .route(.signUp(.delegate(.goToThePreviousStepTapped))):
             state.route = .login(.init())
             return .none
             
-        case .route(.signUp(.delegate(.goBackToSignInView))):
+        case .route(.signUp(.delegate(.goBackToSignInViewTapped))):
             return .run { send in
                 await send(.internal(.goBackToSignInViewTapped))
             }

@@ -10,18 +10,18 @@ public extension Onboarding {
         
         switch action {
             
-        case let .route(.termsAndConditions(.delegate(.previousStep(user)))):
+        case let .route(.termsAndConditions(.delegate(.previousStepTapped(delegating: user)))):
             state.route = .userLocalSettings(.init(user: user))
             return .none
             
-        case .route(.termsAndConditions(.delegate(.goBackToSignInView))):
+        case .route(.termsAndConditions(.delegate(.goBackToSignInViewTapped))):
             return .run { send in
                 await send(.internal(.goBackToSignInViewTapped))
             }
             
         case let .route(.termsAndConditions(.delegate(.userFinishedOnboarding(jwt)))):
             return .run { send in
-                await send(.delegate(.userFinishedOnboarding(with: jwt)))
+                await send(.delegate(.userFinishedOnboarding(with: jwt)), animation: .default)
             }
             
         case .delegate, .route, .internal:

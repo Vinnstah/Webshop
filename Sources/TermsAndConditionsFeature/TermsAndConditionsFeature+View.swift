@@ -28,31 +28,31 @@ public extension TermsAndConditions {
                         HStack {
                             Text("Accept Terms and Conditions")
                             
-                            /// This variable should be in a ViewState instead?
                             Image(systemName: viewStore.state.areTermsAndConditionsAccepted ? "checkmark.square" : "square")
                                 .onTapGesture {
-                                    viewStore.send(.internal(.termsAndConditionsBoxPressed))
+                                    viewStore.send(.internal(.termsAndConditionsBoxTapped))
                                 }
                         }
                         
                         Button("Finish Sign Up") {
-                            viewStore.send(.internal(.finishSignUpButtonPressed))
+                            viewStore.send(.internal(.finishSignUpButtonTapped))
                         }
                         .buttonStyle(.primary(isDisabled: !viewStore.areTermsAndConditionsAccepted, cornerRadius: 25))
                         .disabled(!viewStore.areTermsAndConditionsAccepted)
                         
                         Button("Previous Step") {
-                            viewStore.send(.delegate(.previousStep(viewStore.state.user)), animation: .default)
+                            viewStore.send(.delegate(.previousStepTapped(delegating: viewStore.state.user)),
+                                           animation: .default)
                         }
-                            .foregroundColor(Color("Secondary"))
-                            .bold()
-                            .padding()
+                        .foregroundColor(Color("Secondary"))
+                        .bold()
+                        .padding()
                         
                     }
                     .toolbar {
                         ToolbarItem(placement: .destructiveAction) {
                             Button("Cancel") {
-                                viewStore.send(.internal(.cancelButtonPressed))
+                                viewStore.send(.delegate(.goBackToSignInViewTapped))
                             }
                         }
                     }

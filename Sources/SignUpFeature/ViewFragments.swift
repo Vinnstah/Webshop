@@ -2,8 +2,7 @@ import Foundation
 import SwiftUI
 
 extension SignUp.View {
-    @ViewBuilder
-    func signUpPersonImage() -> some View {
+    func signUpImage() -> some View {
         VStack {
             Image(systemName: "person.crop.circle.badge.plus")
                 .resizable()
@@ -14,5 +13,12 @@ extension SignUp.View {
             Text("Create User")
                 .font(.system(size: 32))
         }
+    }
+}
+
+extension SignUp.View {
+    public func credentialCheckerIndicator(action: @escaping () -> Bool) -> some View {
+        return Image(systemName: action() ? "checkmark" : "xmark")
+            .foregroundColor(action() ? .green : .red)
     }
 }

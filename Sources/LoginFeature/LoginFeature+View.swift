@@ -17,7 +17,7 @@ public extension Login {
                     VStack {
                         Spacer()
                         
-                        loginPersonImage()
+                        loginImage()
                         
                         Spacer()
                         

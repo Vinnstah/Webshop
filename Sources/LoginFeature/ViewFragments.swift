@@ -2,8 +2,7 @@ import Foundation
 import SwiftUI
 
 extension Login.View {
-    @ViewBuilder
-    func loginPersonImage() -> some View {
+    func loginImage() -> some View {
         VStack {
             Image(systemName: "person.crop.circle")
                 .resizable()

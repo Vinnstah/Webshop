@@ -15,28 +15,18 @@ public extension UserLocalSettings {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 ForceFullScreen {
                     VStack {
-                        Text("User Settings")
-                        Text("Currency disabled")
-//                        Picker("Default Currency", selection: viewStore.binding(
-//                            get: { $0.userSettings.defaultCurrency },
-//                            send: { .internal(.defaultCurrencyChosen($0)) }
-//                        )
-//                        ) {
-//                            ForEach(Currency.allCases, id: \.self) {
-//                                Text($0.rawValue)
-//                            }
-//                        }
-//                        .pickerStyle(.inline)
-//                        .padding()
+                        Text("TBD -- IMPLEMENT COLOR THEME?")
                         
                         VStack {
                             Button("Next step") {
-                                viewStore.send(.delegate(.nextStep(viewStore.state.user)), animation: .default)
+                                viewStore.send(.delegate(.nextStepTapped(
+                                    delegating: viewStore.state.user)),
+                                               animation: .default)
                             }
                             .buttonStyle(.primary(cornerRadius: 25))
                             
                             Button("Go Back") {
-                                viewStore.send(.delegate(.previousStep(viewStore.state.user)),
+                                viewStore.send(.delegate(.previousStepTapped(delegating: viewStore.state.user)),
                                                animation: .default)}
                                 .foregroundColor(Color("Secondary"))
                                 .bold()
@@ -45,7 +35,7 @@ public extension UserLocalSettings {
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
-                                    viewStore.send(.internal(.cancelButtonPressed))
+                                    viewStore.send(.delegate(.goBackToSignInViewTapped), animation: .default)
                                 }
                             }
                         }

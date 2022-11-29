@@ -18,7 +18,7 @@ public extension SignUp {
                     VStack {
                         Spacer()
                         
-                        signUpPersonImage()
+                        signUpImage()
                         
                         Spacer()
                         
@@ -34,8 +34,8 @@ public extension SignUp {
                                 )
                             )
                             
-                            Image(systemName: viewStore.state.emailFulfillsRequirements == .valid ? "checkmark" : "xmark")
-                                .foregroundColor(viewStore.state.emailFulfillsRequirements == .valid ? .green : .red)
+                            credentialCheckerIndicator(action: { viewStore.state.emailFulfillsRequirements == .valid })
+                            
                         }
                         .padding(.bottom)
                         
@@ -51,8 +51,7 @@ public extension SignUp {
                                 )
                             )
                             
-                            Image(systemName: viewStore.state.passwordFulfillsRequirements == .valid ? "checkmark" : "xmark")
-                                .foregroundColor(viewStore.state.passwordFulfillsRequirements == .valid ? .green : .red)
+                            credentialCheckerIndicator(action: { viewStore.state.passwordFulfillsRequirements == .valid })
                             
                         }
                         .padding(.bottom)
@@ -60,11 +59,17 @@ public extension SignUp {
                         VStack {
                             actionButton(
                                 text: "Next Step",
-                                action: { viewStore.send(.delegate(.goToNextStep(viewStore.state.user)), animation: .default) },
+                                action: { viewStore.send(.delegate(
+                                    .goToNextStepTapped(
+                                        delegating: viewStore.state.user
+                                    )
+                                ), animation: .default) },
                                 isDisabled: { viewStore.state.disableButton })
                             
-                            secondaryActionButton(text: "Go Back") {
-                                viewStore.send(.delegate(.goToThePreviousStep), animation: .default)
+                            secondaryActionButton(
+                                text: "Go Back"
+                            ) {
+                                viewStore.send(.delegate(.goToThePreviousStepTapped), animation: .default)
                             }
                             
                         }

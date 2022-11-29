@@ -3,7 +3,7 @@ import SwiftUI
 
 extension Login.View {
     @ViewBuilder
-    func signInPersonImage() -> some View {
+    func loginPersonImage() -> some View {
         VStack {
             Image(systemName: "person.crop.circle")
                 .resizable()

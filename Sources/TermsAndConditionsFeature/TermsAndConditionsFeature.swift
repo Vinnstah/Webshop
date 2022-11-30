@@ -12,7 +12,6 @@ public struct TermsAndConditions: ReducerProtocol, Sendable {
     public init() {}
 }
 
-
 public extension TermsAndConditions {
     typealias JWT = String
     struct State: Equatable, Sendable {
@@ -41,7 +40,6 @@ public extension TermsAndConditions {
             case alertConfirmTapped
             case finishSignUpButtonTapped
             case termsAndConditionsBoxTapped
-            case createUserRequest(User)
             case createUserResponse(TaskResult<JWT>)
         }
         
@@ -68,13 +66,7 @@ public extension TermsAndConditions {
             case .internal(.finishSignUpButtonTapped):
                 return .run { [user = state.user] send in
                     
-                    await send(.internal(.createUserRequest(user)))
-                }
-                
-            case let .internal(.createUserRequest(user)):
-                
-                return .run { send in
-                    return await send(.internal(
+                     await send(.internal(
                         .createUserResponse(
                             TaskResult {
                                 try await self.apiClient.decodedResponse(
@@ -83,9 +75,7 @@ public extension TermsAndConditions {
                                 ).value.status.get()
                             }
                         )
-                    )
-                    )
-                    
+                    ))
                 }
                 
             case let .internal(.createUserResponse(.success(jwt))):

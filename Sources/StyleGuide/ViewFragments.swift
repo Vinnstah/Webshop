@@ -16,5 +16,6 @@ public func actionButton(text: String, action: @escaping () -> (), isDisabled: @
         action()
     }
     .buttonStyle(.primary(isDisabled: isDisabled()))
+    .disabled(isDisabled())
     .cornerRadius(25)
 }

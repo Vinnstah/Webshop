@@ -16,45 +16,26 @@ public extension TermsAndConditions {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
                 ForceFullScreen {
                     VStack {
-                        ScrollView(.vertical) {
-                            Text("""
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        """)
-                        }
-                        .frame(width: 300, height: 200)
+                        
+                        termsAndConditionsScrollView()
                         
                         Spacer()
                         
-                        HStack {
-                            Text("Accept Terms and Conditions")
-                            
-                            Image(systemName: viewStore.state.areTermsAndConditionsAccepted ? "checkmark.square" : "square")
-                                .onTapGesture {
-                                    viewStore.send(.internal(.termsAndConditionsBoxTapped))
-                                }
-                        }
+                        acceptTermsAndConditionsCheckbox(
+                            toggleAction: { viewStore.state.areTermsAndConditionsAccepted },
+                            tapAction: { viewStore.send(.internal(.termsAndConditionsBoxTapped)) })
                         
-                        Button("Finish Sign Up") {
-                            viewStore.send(.internal(.finishSignUpButtonTapped))
-                        }
-                        .buttonStyle(.primary(isDisabled: !viewStore.areTermsAndConditionsAccepted, cornerRadius: 25))
-                        .disabled(!viewStore.areTermsAndConditionsAccepted)
+                        actionButton(
+                            text: "Sign Up",
+                            action: { viewStore.send(.internal(.finishSignUpButtonTapped)) },
+                            isDisabled: { !viewStore.areTermsAndConditionsAccepted })
                         
-                        Button("Previous Step") {
-                            viewStore.send(.delegate(.previousStepTapped(delegating: viewStore.state.user)),
-                                           animation: .default)
-                        }
-                        .foregroundColor(Color("Secondary"))
-                        .bold()
-                        .padding()
-                        
-                    }
-                    .toolbar {
-                        ToolbarItem(placement: .destructiveAction) {
-                            Button("Cancel") {
-                                viewStore.send(.delegate(.goBackToSignInViewTapped))
-                            }
-                        }
+                        secondaryActionButton(
+                            text: "Previous Step", action: {
+                                viewStore.send(.delegate(.previousStepTapped(delegating: viewStore.state.user)),
+                                               animation: .default)
+                                
+                            })
                     }
                 }
             }

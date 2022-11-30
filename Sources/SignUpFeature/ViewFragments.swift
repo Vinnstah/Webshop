@@ -8,7 +8,7 @@ extension SignUp.View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 200, alignment: .center)
-                .foregroundColor(Color("ButtonColor"))
+                .foregroundColor(Color("Primary"))
             
             Text("Create User")
                 .font(.system(size: 32))

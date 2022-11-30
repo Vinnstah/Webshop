@@ -46,7 +46,7 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                     
                     HStack {
                         Text("\(product.price.brutto)"+" kr")
-                            .foregroundColor(Color("ButtonColor"))
+                            .foregroundColor(Color("Primary"))
                             .scaledToFit()
                             .minimumScaleFactor(0.01)
                             .bold()
@@ -70,7 +70,7 @@ public func favoriteButton(action: @escaping ()-> Void, isFavorite: Bool?, bgCol
             action()
         }, label: {
             Image(systemName: isFavorite! ? "heart.fill" : "heart")
-                .foregroundColor(Color("ButtonColor"))
+                .foregroundColor(Color("Primary"))
                 .background {
                     bgColor
                         .clipShape(Circle())

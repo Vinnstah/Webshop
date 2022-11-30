@@ -91,7 +91,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                                 
                                 if isCartPopulated() {
                                     Circle()
-                                        .foregroundColor(Color("ButtonColor"))
+                                        .foregroundColor(Color("Primary"))
                                         .scaledToFill()
                                         .frame(width: 10, height: 10, alignment: .topTrailing)
                                         .offset(x: 8, y: -10)

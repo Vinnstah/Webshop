@@ -46,7 +46,7 @@ public extension Main {
                             Label("Checkout", systemImage: "cart")
                         }
                     }
-                    .accentColor(Color("ButtonColor"))
+                    .accentColor(Color("Primary"))
                 }
                 .onAppear {
                     viewStore.send(.internal(.onAppear), animation: .default)

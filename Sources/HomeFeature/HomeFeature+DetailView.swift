@@ -68,7 +68,7 @@ public extension Home {
                                     Text("\(product.price.brutto) kr")
                                         .font(.title)
                                         .bold()
-                                        .foregroundColor(Color("ButtonColor"))
+                                        .foregroundColor(Color("Primary"))
                                         .frame(alignment: .center)
                                         .padding(.trailing, 50)
                                 }

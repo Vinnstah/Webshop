@@ -24,7 +24,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
             }
         .frame(maxWidth: .infinity, idealHeight: 50)
             .padding()
-            .background(isDisabled ? .gray : Color("ButtonColor"))
+            .background(isDisabled ? .gray : Color("Primary"))
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
@@ -47,7 +47,7 @@ public struct SecondaryButtonStyle: ButtonStyle {
             .font(.body)
             .frame(maxWidth: .infinity, idealHeight: 50)
             .padding()
-            .background(isDisabled ? Color("ButtonColor") : .gray)
+            .background(isDisabled ? Color("Primary") : .gray)
             .foregroundColor(isDisabled ? Color.white : .gray)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }

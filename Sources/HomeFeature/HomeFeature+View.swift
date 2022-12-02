@@ -33,7 +33,7 @@ public extension Home {
                         guard (viewStore.state.product != nil) else {
                             return
                         }
-                        viewStore.send(.internal(.favoriteButtonClicked((viewStore.state.product!)))) },
+                        viewStore.send(.favorite(.favoriteButtonClicked((viewStore.state.product!)))) },
                     showSettingsSymbol: { viewStore.send(.internal(.toggleSettingsSheet)) },
                     searchableBinding: viewStore.binding(
                         get: { $0.searchText },
@@ -99,7 +99,7 @@ public extension Home {
                                         ProductCardView<Home>(
                                             store: store,
                                             product: prod,
-                                            action:{ viewStore.send(.internal(.favoriteButtonClicked(prod))) },
+                                            action:{ viewStore.send(.favorite(.favoriteButtonClicked(prod))) },
                                             isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.id) }
                                         )
                                         .matchedGeometryEffect(id: prod.boardgame.imageURL, in: animation)
@@ -114,7 +114,7 @@ public extension Home {
                                 store: store,
                                 product: viewStore.state.product!,
                                 isFavourite: { viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.id) },
-                                toggleFavourite: {viewStore.send(.internal(.favoriteButtonClicked(viewStore.state.product!)))},
+                                toggleFavourite: {viewStore.send(.favorite(.favoriteButtonClicked(viewStore.state.product!)))},
                                 animation: animation
                             )
                         }

@@ -10,6 +10,8 @@ import FavoritesClient
 import Boardgame
 import Warehouse
 
+extension IdentifiedArrayOf: @unchecked  Sendable {}
+
 public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.apiClient) var apiClient
@@ -19,6 +21,9 @@ public struct Home: ReducerProtocol, Sendable {
 
 public extension Home {
     struct State: Equatable, Sendable {
+        public var products: IdentifiedArrayOf<Product>
+        public var boardgames: IdentifiedArrayOf<Boardgame>
+        
         public var productList: [Product]
         public var product: Product?
         public var catergories: Boardgame.Category?
@@ -33,6 +38,8 @@ public extension Home {
         public var showCheckoutQuickView: Bool
         
         public init(
+            products: IdentifiedArrayOf<Product> = [],
+            boardgames: IdentifiedArrayOf<Boardgame> = [],
             productList: [Product] = [],
             product: Product? = nil,
             catergories: Boardgame.Category? = nil,
@@ -46,6 +53,8 @@ public extension Home {
             showDetailView: Bool = false,
             showCheckoutQuickView: Bool = false
         ) {
+            self.products = products
+            self.boardgames = boardgames
             self.productList = productList
             self.product = product
             self.catergories = catergories
@@ -64,10 +73,23 @@ public extension Home {
     enum Action: Equatable, Sendable {
         case `internal`(InternalAction)
         case delegate(DelegateAction)
+        case favorite(FavoriteAction)
+        case boardgame(BoardgameAction)
         
         public enum DelegateAction: Equatable, Sendable {
             case userIsSignedOut
             case addProductToCart(quantity: Int, product: Product)
+        }
+        
+        public enum FavoriteAction: Equatable, Sendable {
+            case favoriteButtonClicked(Product)
+            case loadFavoriteProducts([Product.ID]?)
+            case removeFavouriteProduct(Product.ID?)
+            case addFavouriteProduct(Product.ID?)
+        }
+        
+        public enum BoardgameAction: Equatable, Sendable {
+            case getFetchBoardgamesResponse(TaskResult<[Boardgame]>)
         }
         
         public enum InternalAction: Equatable, Sendable {
@@ -78,17 +100,13 @@ public extension Home {
             case increaseQuantityButtonPressed
             case decreaseQuantityButtonPressed
             case searchTextReceivesInput(String)
-            case favoriteButtonClicked(Product)
-            case loadFavoriteProducts([Product.ID]?)
-            case removeFavouriteProduct(Product.ID?)
-            case addFavouriteProduct(Product.ID?)
             case cancelSearchClicked
             case categoryButtonPressed(Boardgame.Category)
             case increaseNumberOfColumns
             case decreaseNumberOfColumns
             case toggleDetailView(Product?)
             case toggleCheckoutQuickView
-            case getFetchBoardgamesResponse(TaskResult<[Boardgame]>)
+            
             case createCartSession(TaskResult<String>)
         }
     }
@@ -105,9 +123,8 @@ public extension Home {
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
-//                let cart: Cart = Cart(id: Cart.ID.init(rawValue: .init()), item: [Cart.Item(product: Product.ID(rawValue: .init()), quantity: Cart.Quantity(rawValue: 4))], jwt: Cart.JWT(rawValue: "TEST124fafaffaf34"))
                 return .run { [apiClient] send in
-                    await send(.internal(.getFetchBoardgamesResponse(
+                    await send(.boardgame(.getFetchBoardgamesResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(
                                 for: .boardgame(.fetch),
@@ -129,12 +146,14 @@ public extension Home {
             case let .internal(.createCartSession(.success(test))):
                 return .none
                 
-            case let .internal(.getFetchBoardgamesResponse(.success(boardgames))):
+            case let .boardgame(.getFetchBoardgamesResponse(.success(boardgames))):
                 print(boardgames)
+                state.boardgames = IdentifiedArray(uniqueElements: boardgames)
+                state.products = IdentifiedArray(uniqueElements: Product(boardgame: boardgames.first!, price: .init(brutto: 1, currency: .sek), id: Product.ID(rawValue: UUID()) ?? UUID()))
                 //                    state.productList = products
                 return .none
                 
-            case let .internal(.getFetchBoardgamesResponse(.failure(error))):
+            case let .boardgame(.getFetchBoardgamesResponse(.failure(error))):
                 print(error)
                 return .none
                 
@@ -181,7 +200,7 @@ public extension Home {
                 return .none
                 
                 //MARK: Favourite interaction
-            case let .internal(.loadFavoriteProducts(products)):
+            case let .favorite(.loadFavoriteProducts(products)):
                 guard let products else {
                     return .none
                 }
@@ -189,26 +208,26 @@ public extension Home {
                 state.favoriteProducts.sku = products
                 return .none
                 
-            case let .internal(.favoriteButtonClicked(product)):
+            case let .favorite(.favoriteButtonClicked(product)):
                 
                 if state.favoriteProducts.sku.contains(product.id) {
                     return .run { send in
-                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.id))))
+                        await send(.favorite(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.id))))
                         
                     }
                 }
                 return .run { send in
-                    await send(.internal(.addFavouriteProduct(try favouritesClient.addFavorite(product.id))))
+                    await send(.favorite(.addFavouriteProduct(try favouritesClient.addFavorite(product.id))))
                 }
                 
-            case let .internal(.removeFavouriteProduct(sku)):
+            case let .favorite(.removeFavouriteProduct(sku)):
                 guard let sku else {
                     return .none
                 }
                 state.favoriteProducts.sku.removeAll(where: { $0 == sku })
                 return .none
                 
-            case let .internal(.addFavouriteProduct(sku)):
+            case let .favorite(.addFavouriteProduct(sku)):
                 guard let sku else {
                     return .none
                 }

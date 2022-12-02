@@ -10,6 +10,7 @@ public enum SiteRoute: Equatable {
     case cart(CartRoute)
     case warehouse(WarehouseRoute)
     case boardgame(BoardgameRoute)
+    case products(ProductRoute)
 }
 
 public enum UserRoute: Equatable {
@@ -33,4 +34,7 @@ public enum BoardgameRoute: Equatable {
     case fetch
 }
 
+public enum ProductRoute: Equatable {
+    case fetch
+}
 

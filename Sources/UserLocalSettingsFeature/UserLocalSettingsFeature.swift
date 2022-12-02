@@ -2,6 +2,7 @@ import Foundation
 import ComposableArchitecture
 import SwiftUI
 import UserModel
+import Boardgame
 
 extension AlertState: @unchecked Sendable {}
 
@@ -14,17 +15,21 @@ public extension UserLocalSettings {
     struct State: Equatable, Sendable {
         public var alert: AlertState<Action>?
         public var user: User
+        public var categories: IdentifiedArrayOf<Boardgame.Category>
         
         
         public init(
             alert: AlertState<Action>? = nil,
-            user: User
+            user: User,
+            categories: IdentifiedArrayOf<Boardgame.Category> = IdentifiedArray(uniqueElements: Boardgame.Category.allCases)
+            
         ) {
             self.alert = alert
             self.user = user
+            self.categories = categories
         }
+        
     }
-    
     enum Action: Equatable, Sendable {
         
         case delegate(DelegateAction)
@@ -45,7 +50,6 @@ public extension UserLocalSettings {
         Reduce { state, action in
             
             switch action {
-                
             case .internal(.alertConfirmTapped):
                 state.alert = nil
                 return .none

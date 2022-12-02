@@ -22,6 +22,9 @@ public let router = OneOf {
     Route(.case(SiteRoute.warehouse)) {
         warehouseRouter
     }
+    Route(.case(SiteRoute.products)) {
+        productRouter
+    }
 }
 
 public let userRouter = OneOf {
@@ -76,5 +79,11 @@ public let warehouseRouter = OneOf {
         Query {
             Field("id")
         }
+    }
+}
+
+public let productRouter = OneOf {
+    Route(.case(ProductRoute.fetch)) {
+        Path { "products" }
     }
 }

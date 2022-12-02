@@ -22,11 +22,9 @@ public extension Main {
         public var favorites: Favorites.State?
         public var checkout: Checkout.State?
         
-        
         public init(
             selectedTab: Tab = .home
         ) {
-            
             self.selectedTab = selectedTab
             self.home = .init()
             self.favorites = .init()
@@ -76,17 +74,8 @@ public extension Main {
                 }
                 return .none
                 
-            case .delegate(_):
+            case .delegate, .home, .internal, .favorites, .checkout:
                 return .none
-            case .home(_):
-                return .none
-            case .internal(_):
-                return .none
-            case .favorites(_):
-                return .none
-            case .checkout(_):
-                return .none
-                
             }
         }
         .ifLet(

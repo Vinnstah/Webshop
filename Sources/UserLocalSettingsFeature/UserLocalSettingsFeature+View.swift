@@ -6,6 +6,10 @@ import StyleGuide
 public extension UserLocalSettings {
     struct View: SwiftUI.View {
         public let store: StoreOf<UserLocalSettings>
+        let columns = [
+            GridItem(.fixed(100)),
+            GridItem(.flexible()),
+        ]
         
         public init(store: StoreOf<UserLocalSettings>) {
             self.store = store
@@ -16,33 +20,39 @@ public extension UserLocalSettings {
                 ForceFullScreen {
                     VStack {
                         Text("TBD -- IMPLEMENT COLOR THEME?")
-                        
-                        VStack {
-                            Button("Next step") {
-                                viewStore.send(.delegate(.nextStepTapped(
-                                    delegating: viewStore.state.user)),
-                                               animation: .default)
-                            }
-                            .buttonStyle(.primary(cornerRadius: 25))
-                            
-                            Button("Go Back") {
-                                viewStore.send(.delegate(.previousStepTapped(delegating: viewStore.state.user)),
-                                               animation: .default)}
-                                .foregroundColor(Color("Secondary"))
-                                .bold()
-                                .padding()
-                        }
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    viewStore.send(.delegate(.goBackToSignInViewTapped), animation: .default)
+                        Text("Choose your favourite category")
+                        ScrollView(.vertical) {
+                            LazyVGrid(columns: columns, content: {
+                                ForEach(viewStore.state.categories) { cat in
+                                    CardView(category: cat)
                                 }
                             }
+                            )
                         }
+                        
+                        actionButton(
+                            text: "Next Step",
+                            action: { viewStore.send(.delegate(.nextStepTapped(
+                                delegating: viewStore.state.user)),
+                                                     animation: .default)},
+                            isDisabled: { false })
+                        
+                        secondaryActionButton(
+                            text: "Go Back",
+                            action: {viewStore.send(.delegate(.previousStepTapped(
+                                delegating: viewStore.state.user)),
+                                                    animation: .default)})
                     }
                 }
             }
         }
     }
-    
+}
+
+//}
+
+struct SwiftUIView_Previews: PreviewProvider {
+    static var previews: some View {
+        UserLocalSettings.View(store: Store(initialState: UserLocalSettings.State(user: .init(credentials: .init(email: "Tester", password: "test"))), reducer: UserLocalSettings()))
+    }
 }

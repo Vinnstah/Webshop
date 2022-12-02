@@ -55,6 +55,9 @@ let package = Package(
             name: "DatabaseCartClient",
             targets: ["DatabaseCartClient"]),
         .library(
+            name: "DatabaseProductClient",
+            targets: ["DatabaseProductClient"]),
+        .library(
             name: "DatabaseUserClient",
             targets: ["DatabaseUserClient"]),
         .library(
@@ -93,6 +96,9 @@ let package = Package(
         .library(
             name: "ProductViews",
             targets: ["ProductViews"]),
+        .library(
+            name: "ProductService",
+            targets: ["ProductService"]),
         .library(
             name: "SignUpFeature",
             targets: ["SignUpFeature"]),
@@ -250,6 +256,16 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "DatabaseProductClient",
+            dependencies: [
+                "Product",
+                "Database",
+                dependencies,
+                postgres,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "DatabaseWarehouseClient",
             dependencies: [
                 "Database",
@@ -383,6 +399,17 @@ let package = Package(
             swiftSettings: swiftSettings
         ),
         .target(
+            name: "ProductService",
+            dependencies: [
+                "DatabaseProductClient",
+                "SiteRouter",
+                "Product",
+                dependencies,
+                vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
             name: "Server",
             dependencies: [
                 "Database",
@@ -392,6 +419,7 @@ let package = Package(
                 "Product",
                 "BoardgameService",
                 "SiteRouter",
+                "ProductService",
                 "UserModel",
                 "UserService",
                 "WarehouseService",
@@ -513,6 +541,7 @@ let package = Package(
         .target(
             name: "UserLocalSettingsFeature",
             dependencies: [
+                "Boardgame",
                 "StyleGuide",
                 "UserModel",
                 tca,

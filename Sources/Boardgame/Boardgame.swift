@@ -77,7 +77,7 @@ public extension Boardgame {
 }
 
 public extension Boardgame {
-    enum Category: String, Sendable, Hashable, Codable, CaseIterable {
+    enum Category: String, Sendable, Hashable, Codable, CaseIterable, Identifiable {
         public typealias RawValue = String
         
         case strategy = "Strategy"
@@ -95,6 +95,9 @@ public extension Boardgame {
                 self = .scifi
             }
         }
+        
+        public var id: ID { .init(rawValue: UUID() )}
+        
+        public typealias ID = Tagged<Self, UUID>
+        }
     }
-}
-

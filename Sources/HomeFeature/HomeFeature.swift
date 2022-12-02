@@ -93,6 +93,7 @@ public extension Home {
         }
         
         public enum InternalAction: Equatable, Sendable {
+            case getAllProductsResponse(TaskResult<[Product]>)
             case logOutUser
             case onAppear
             case getProductResponse(TaskResult<[Product]>)
@@ -124,13 +125,22 @@ public extension Home {
                 //MARK: On appear API calls
             case .internal(.onAppear):
                 return .run { [apiClient] send in
-                    await send(.boardgame(.getFetchBoardgamesResponse(
+                    await send(.internal(.getAllProductsResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(
-                                for: .boardgame(.fetch),
-                                as: ResultPayload<[Boardgame]>.self).value.status.get()
+                                for: .products(.fetch),
+                                as: ResultPayload<[Product]>.self).value.status.get()
                         }
                     )))
+                    
+//                    return .run { [apiClient] send in
+//                        await send(.boardgame(.getFetchBoardgamesResponse(
+//                            TaskResult {
+//                                try await apiClient.decodedResponse(
+//                                    for: .boardgame(.fetch),
+//                                    as: ResultPayload<[Boardgame]>.self).value.status.get()
+//                            }
+//                        )))
                     
 //                    await send(.internal(.createCartSession(
 //                        TaskResult {
@@ -143,13 +153,19 @@ public extension Home {
                 //
                 //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 //                }
+                
+            case let .internal(.getAllProductsResponse(.success(products))):
+                state.products = IdentifiedArray(uniqueElements: products)
+                return .none
+            case .internal(.getAllProductsResponse(.failure(_))):
+print("FAIL")
+                return .none
             case let .internal(.createCartSession(.success(test))):
                 return .none
                 
             case let .boardgame(.getFetchBoardgamesResponse(.success(boardgames))):
                 print(boardgames)
                 state.boardgames = IdentifiedArray(uniqueElements: boardgames)
-                state.products = IdentifiedArray(uniqueElements: Product(boardgame: boardgames.first!, price: .init(brutto: 1, currency: .sek), id: Product.ID(rawValue: UUID()) ?? UUID()))
                 //                    state.productList = products
                 return .none
                 

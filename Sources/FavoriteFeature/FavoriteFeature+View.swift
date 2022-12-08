@@ -32,21 +32,19 @@ public extension Favorites {
                 NavigationView {
                     ForceFullScreen {
                         VStack {
-                            
-                            StaggeredGrid(list: (viewStore.state.searchResults == []) ?
-                                          viewStore.state.productList :
-                                            viewStore.state.searchResults, columns: 2, content: { prod in
-                                ProductCardView<Favorites>(store: store, product: prod, action: {
-                                    viewStore.send(.internal(.favoriteButtonClicked(prod)))
-                                }, isFavorite: {
-                                    viewStore.favoriteProducts.sku.contains(prod.id)
-                                })
-                                .padding(.horizontal)
-                                .onTapGesture {
-                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-                                }
-                                
-                            })
+                            Text("WIP")
+//                            StaggeredGrid(list: viewStore.state.products, columns: 2, content: { prod in
+//                                ProductCardView<Favorites>(store: store, product: prod, action: {
+//                                    viewStore.send(.internal(.favoriteButtonClicked(prod)))
+//                                }, isFavorite: {
+//                                    viewStore.favoriteProducts.sku.contains(prod.id)
+//                                })
+//                                .padding(.horizontal)
+//                                .onTapGesture {
+//                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+//                                }
+//
+//                            })
                         }
                     }
                     

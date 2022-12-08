@@ -12,8 +12,8 @@ extension FavoritesClient {
     )
 }
 
-private enum FavoritesClientKey: TestDependencyKey {
-    static let testValue = FavoritesClient.test
+extension FavoritesClient: TestDependencyKey {
+    public static let testValue = FavoritesClient.test
 }
 #endif // DEBUG
 
@@ -27,7 +27,7 @@ extension Array where Element: Hashable {
 
 public extension DependencyValues {
     var favouritesClient: FavoritesClient {
-        get { self[FavoritesClientKey.self] }
-        set { self[FavoritesClientKey.self] = newValue }
+        get { self[FavoritesClient.self] }
+        set { self[FavoritesClient.self] = newValue }
     }
 }

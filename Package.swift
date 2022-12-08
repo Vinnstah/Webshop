@@ -307,7 +307,6 @@ let package = Package(
                 "Boardgame",
                 "CartModel",
                 "FavoritesClient",
-                "NavigationBar",
                 "ProductViews",
                 "SiteRouter",
                 "StyleGuide",
@@ -328,6 +327,7 @@ let package = Package(
                     "CartModel",
                     "CheckoutFeature",
                     "HomeFeature",
+                    "NavigationBar",
                     "SiteRouter",
                     "FavoriteFeature",
                     "Product",
@@ -369,6 +369,7 @@ let package = Package(
         .target(
             name: "NavigationBar",
             dependencies: [
+                "HomeFeature",
                 "ProductViews",
                 "StyleGuide",
             ],

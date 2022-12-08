@@ -4,7 +4,6 @@ import Product
 import ProductViews
 import ComposableArchitecture
 import CartModel
-import NavigationBar
 import Kingfisher
 
 public extension Home {
@@ -88,7 +87,7 @@ public extension Home {
                         
                         HStack {
                             HStack {
-                                Button(action: { viewStore.send(.internal(.decreaseQuantityButtonPressed)) },
+                                Button(action: { viewStore.send(.detailView(.decreaseQuantityButtonTapped)) },
                                        label: {
                                     Image(systemName: "minus")
                                         .foregroundColor(Color("Secondary"))
@@ -104,7 +103,7 @@ public extension Home {
                                         .bold()
                                         .foregroundColor(Color("Secondary"))
                                 }
-                                Button(action: { viewStore.send(.internal(.increaseQuantityButtonPressed)) },
+                                Button(action: { viewStore.send(.detailView(.increaseQuantityButtonTapped)) },
                                        label: {
                                     Image(systemName: "plus")
                                         .foregroundColor(Color("Secondary"))

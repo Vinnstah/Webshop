@@ -1,15 +1,15 @@
-
+import IdentifiedCollections
 import Foundation
 import SwiftUI
 
 public struct StaggeredGrid<Content: View,T: Identifiable>: View where T: Hashable {
     
-    public var list: [T]
+    public var list: IdentifiedArrayOf<T>
     public let columns: Int
     public let content: (T) -> Content
     
     public init(
-        list: [T],
+        list: IdentifiedArrayOf<T>,
         columns: Int,
         @ViewBuilder content: @escaping (T) -> Content
     ) {
@@ -18,8 +18,8 @@ public struct StaggeredGrid<Content: View,T: Identifiable>: View where T: Hashab
         self.content = content
     }
     
-    func setupGrid() -> [[T]] {
-        var gridArray: [[T]] = Array(repeating: [], count: columns)
+    func setupGrid() -> [IdentifiedArrayOf<T>] {
+        var gridArray: [IdentifiedArrayOf<T>] = Array(repeating: [], count: columns)
         var currentIndex = 0
         
         for object in list {

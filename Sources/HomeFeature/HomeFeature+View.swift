@@ -5,7 +5,6 @@ import Product
 import StyleGuide
 import ProductViews
 import CheckoutFeature
-import NavigationBar
 import CartModel
 
 public extension Home {
@@ -20,27 +19,27 @@ public extension Home {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
-                NavigationBar(
-                    isRoot: !viewStore.state.showDetailView,
-                    isCartPopulated: { viewStore.state.cart == nil },
-                    showCartQuickView: { viewStore.send(.internal(.toggleCheckoutQuickView), animation: .default)},
-                    isFavourite: {
-                        guard (viewStore.state.product != nil) else {
-                            return nil
-                        }
-                        return viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.id) },
-                    showFavouriteSymbol: {
-                        guard (viewStore.state.product != nil) else {
-                            return
-                        }
-                        viewStore.send(.favorite(.favoriteButtonClicked((viewStore.state.product!)))) },
-                    showSettingsSymbol: { viewStore.send(.internal(.toggleSettingsSheet)) },
-                    searchableBinding: viewStore.binding(
-                        get: { $0.searchText },
-                        send: { .internal(.searchTextReceivesInput($0)) }).animation(),
-                    cancelSearch: { viewStore.send(.internal(.cancelSearchClicked)) },
-                    previousScreenAction: { viewStore.send(.internal(.toggleDetailView(nil)), animation: .easeOut) }
-                ) {
+//                NavigationBar(
+//                    isRoot: !viewStore.state.showDetailView,
+//                    isCartPopulated: { viewStore.state.cart == nil },
+//                    showCartQuickView: { viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .default)},
+//                    isFavourite: {
+//                        guard (viewStore.state.product != nil) else {
+//                            return nil
+//                        }
+//                        return viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.id) },
+//                    showFavouriteSymbol: {
+//                        guard (viewStore.state.product != nil) else {
+//                            return
+//                        }
+//                        viewStore.send(.favorite(.favoriteButtonClicked((viewStore.state.product!)))) },
+//                    showSettingsSymbol: { viewStore.send(.internal(.settingsButtonTapped)) },
+//                    searchableBinding: viewStore.binding(
+//                        get: { $0.searchText },
+//                        send: { .internal(.searchTextReceivingInput(text: $0)) }).animation(),
+//                    cancelSearch: { viewStore.send(.internal(.cancelSearchTapped)) },
+//                    previousScreenAction: { viewStore.send(.detailView(.toggleDetailView(nil)), animation: .easeOut) }
+//                ) {
                     ZStack {
                         VStack {
                             VStack {
@@ -53,7 +52,7 @@ public extension Home {
                                         .foregroundColor(.gray)
                                         .frame(alignment: .trailing)
                                     
-                                    Button(action: { viewStore.send(.internal(.decreaseNumberOfColumns), animation: .default)  },
+                                    Button(action: { viewStore.send(.view(.decreaseNumberOfColumnsTapped), animation: .default)  },
                                            label: {
                                         Image(systemName: "minus")
                                             .font(.footnote)
@@ -63,7 +62,7 @@ public extension Home {
                                         .font(.subheadline)
                                         .foregroundColor(Color("Secondary"))
                                     
-                                    Button(action: { viewStore.send(.internal(.increaseNumberOfColumns), animation: .default) },
+                                    Button(action: { viewStore.send(.view(.increaseNumberOfColumnsTapped), animation: .default) },
                                            label: {
                                         Image(systemName: "plus")
                                             .font(.footnote)
@@ -90,11 +89,11 @@ public extension Home {
 //                                }
                             }
                             StaggeredGrid(
-                                list: (viewStore.state.filteredProducts == []) ? viewStore.state.productList : viewStore.state.filteredProducts,
+                                list: viewStore.state.products,
                                 columns: viewStore.state.columnsInGrid,
                                 content: { prod in
                                     Button(action: {
-                                        viewStore.send(.internal(.toggleDetailView(prod)), animation: .easeIn)
+                                        viewStore.send(.detailView(.toggleDetailView(prod)), animation: .easeIn)
                                     }, label: {
                                         ProductCardView<Home>(
                                             store: store,
@@ -130,19 +129,19 @@ public extension Home {
                     .sheet(isPresented:
                             viewStore.binding(
                                 get: \.isSettingsSheetPresented,
-                                send: .internal(.toggleSettingsSheet))
+                                send: .internal(.settingsButtonTapped))
                     ) {
                         Settings() {
-                            viewStore.send(.internal(.logOutUser))
+                            viewStore.send(.internal(.signOutTapped))
                         }
                         .presentationDetents([.fraction(0.1)])
                     }
                     .sheet(isPresented: viewStore.binding(
                         get: \.showCheckoutQuickView,
-                        send: .internal(.toggleCheckoutQuickView))) {
+                        send: .internal(.toggleCheckoutQuickViewTapped))) {
                             EmptyView()
 //                            CheckoutQuickView(cart: viewStore.state.cart ?? .init(id: "TEST", userJWT: "TEST"))
-                        }
+//                        }
                 }
                 
             }

@@ -49,7 +49,7 @@ public extension Home {
             filteredProducts: [Product] = [],
             favoriteProducts: FavoriteProducts = .init(),
             isSettingsSheetPresented: Bool = false,
-            columnsInGrid: Int = 2,
+            columnsInGrid: Int = 2, // ViewState
             showDetailView: Bool = false,
             showCheckoutQuickView: Bool = false
         ) {
@@ -74,7 +74,8 @@ public extension Home {
         case `internal`(InternalAction)
         case delegate(DelegateAction)
         case favorite(FavoriteAction)
-        case boardgame(BoardgameAction)
+        case view(ViewAction)
+        case detailView(DetailViewAction)
         
         public enum DelegateAction: Equatable, Sendable {
             case userIsSignedOut
@@ -88,35 +89,38 @@ public extension Home {
             case addFavouriteProduct(Product.ID?)
         }
         
-        public enum BoardgameAction: Equatable, Sendable {
-            case getFetchBoardgamesResponse(TaskResult<[Boardgame]>)
-        }
-        
         public enum InternalAction: Equatable, Sendable {
             case getAllProductsResponse(TaskResult<[Product]>)
-            case logOutUser
+            case signOutTapped
             case onAppear
-            case getProductResponse(TaskResult<[Product]>)
-            case toggleSettingsSheet
-            case increaseQuantityButtonPressed
-            case decreaseQuantityButtonPressed
-            case searchTextReceivesInput(String)
-            case cancelSearchClicked
-            case categoryButtonPressed(Boardgame.Category)
-            case increaseNumberOfColumns
-            case decreaseNumberOfColumns
-            case toggleDetailView(Product?)
-            case toggleCheckoutQuickView
-            
+            case settingsButtonTapped
+            case searchTextReceivingInput(text: String)
+            case cancelSearchTapped
+            case categoryButtonTapped(Boardgame.Category)
+            case toggleCheckoutQuickViewTapped
             case createCartSession(TaskResult<String>)
+        }
+        
+        public enum DetailViewAction: Equatable, Sendable {
+            case toggleDetailView(Product?)
+            case increaseQuantityButtonTapped
+            case decreaseQuantityButtonTapped
+        }
+        
+        public enum ViewAction: Equatable, Sendable {
+            case increaseNumberOfColumnsTapped
+            case decreaseNumberOfColumnsTapped
         }
     }
     
     var body: some ReducerProtocol<State, Action> {
+        CombineReducers {
+            Reduce(favorite.self)
+            
         Reduce { state, action in
             switch action {
                 
-            case .internal(.logOutUser):
+            case .internal(.signOutTapped):
                 return .run { [userDefaultsClient] send in
                     await userDefaultsClient.removeLoggedInUserJWT()
                     await send(.delegate(.userIsSignedOut))
@@ -133,22 +137,14 @@ public extension Home {
                         }
                     )))
                     
-//                    return .run { [apiClient] send in
-//                        await send(.boardgame(.getFetchBoardgamesResponse(
-//                            TaskResult {
-//                                try await apiClient.decodedResponse(
-//                                    for: .boardgame(.fetch),
-//                                    as: ResultPayload<[Boardgame]>.self).value.status.get()
-//                            }
-//                        )))
                     
-//                    await send(.internal(.createCartSession(
-//                        TaskResult {
-//                            try await self.apiClient.decodedResponse(
-//                                for: .cart(.create(cart)),
-//                                as: ResultPayload<String>.self).value.status.get()
-//                        }
-//                    )))
+                    //                    await send(.internal(.createCartSession(
+                    //                        TaskResult {
+                    //                            try await self.apiClient.decodedResponse(
+                    //                                for: .cart(.create(cart)),
+                    //                                as: ResultPayload<String>.self).value.status.get()
+                    //                        }
+                    //                    )))
                 }
                 //
                 //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
@@ -158,33 +154,13 @@ public extension Home {
                 state.products = IdentifiedArray(uniqueElements: products)
                 return .none
             case .internal(.getAllProductsResponse(.failure(_))):
-print("FAIL")
+                print("FAIL")
                 return .none
             case let .internal(.createCartSession(.success(test))):
                 return .none
                 
-            case let .boardgame(.getFetchBoardgamesResponse(.success(boardgames))):
-                print(boardgames)
-                state.boardgames = IdentifiedArray(uniqueElements: boardgames)
-                //                    state.productList = products
-                return .none
-                
-            case let .boardgame(.getFetchBoardgamesResponse(.failure(error))):
-                print(error)
-                return .none
-                
-                
-            case let .internal(.getProductResponse(.success(products))):
-                state.productList = products
-                return .none
-                
-            case let .internal(.getProductResponse(.failure(error))):
-                print(error)
-                return .none
-                
-                
                 //MARK: Search function
-            case let .internal(.searchTextReceivesInput(text)):
+            case let .internal(.searchTextReceivingInput(text: text)):
                 state.searchText = text
                 
                 state.filteredProducts = state.productList.filter { $0.boardgame.title.contains(text) }
@@ -194,21 +170,20 @@ print("FAIL")
                 }
                 return .none
                 
-            case .internal(.cancelSearchClicked):
+            case .internal(.cancelSearchTapped):
                 state.searchText = ""
                 state.filteredProducts = []
                 return .none
                 
-                //MARK: Misc actions
-            case .internal(.toggleSettingsSheet):
+            case .internal(.settingsButtonTapped):
                 state.isSettingsSheetPresented.toggle()
                 return .none
                 
-            case .internal(.increaseQuantityButtonPressed):
+            case .detailView(.increaseQuantityButtonTapped):
                 state.quantity += 1
                 return .none
                 
-            case .internal(.decreaseQuantityButtonPressed):
+            case .detailView(.decreaseQuantityButtonTapped):
                 guard state.quantity != 0 else {
                     return .none
                 }
@@ -216,45 +191,13 @@ print("FAIL")
                 return .none
                 
                 //MARK: Favourite interaction
-            case let .favorite(.loadFavoriteProducts(products)):
-                guard let products else {
-                    return .none
-                }
                 
-                state.favoriteProducts.sku = products
-                return .none
-                
-            case let .favorite(.favoriteButtonClicked(product)):
-                
-                if state.favoriteProducts.sku.contains(product.id) {
-                    return .run { send in
-                        await send(.favorite(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.id))))
-                        
-                    }
-                }
-                return .run { send in
-                    await send(.favorite(.addFavouriteProduct(try favouritesClient.addFavorite(product.id))))
-                }
-                
-            case let .favorite(.removeFavouriteProduct(sku)):
-                guard let sku else {
-                    return .none
-                }
-                state.favoriteProducts.sku.removeAll(where: { $0 == sku })
-                return .none
-                
-            case let .favorite(.addFavouriteProduct(sku)):
-                guard let sku else {
-                    return .none
-                }
-                state.favoriteProducts.sku.append(sku)
-                return .none
                 
                 
             case .delegate(_):
                 return .none
                 
-            case let .internal(.categoryButtonPressed(category)):
+            case let .internal(.categoryButtonTapped(category)):
                 switch category {
                 case .strategy:
                     state.filteredProducts = state.productList.filter(
@@ -270,18 +213,18 @@ print("FAIL")
                 return .none
                 
                 //MARK: StaggeredGrid column actions
-            case .internal(.increaseNumberOfColumns):
+            case .view(.increaseNumberOfColumnsTapped):
                 state.columnsInGrid += 1
                 return .none
                 
-            case .internal(.decreaseNumberOfColumns):
+            case .view(.decreaseNumberOfColumnsTapped):
                 guard state.columnsInGrid > 1 else {
                     return .none
                 }
                 state.columnsInGrid -= 1
                 return .none
                 
-            case let .internal(.toggleDetailView(prod)):
+            case let .detailView(.toggleDetailView(prod)):
                 guard prod != nil else {
                     state.product =  nil
                     state.showDetailView.toggle()
@@ -291,12 +234,16 @@ print("FAIL")
                 state.showDetailView.toggle()
                 return .none
                 
-            case .internal(.toggleCheckoutQuickView):
+            case .internal(.toggleCheckoutQuickViewTapped):
                 state.showCheckoutQuickView.toggle()
                 return .none
             case .internal(.createCartSession(.failure(_))):
                 print("ERROR")
                 return .none
+                
+            case .favorite:
+                return .none
+            }
             }
         }
     }

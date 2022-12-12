@@ -5,6 +5,8 @@ import ApiClient
 import SiteRouter
 import FavoritesClient
 
+extension IdentifiedArrayOf: @unchecked Sendable {}
+
 public struct Favorites: ReducerProtocol, Sendable {
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.favouritesClient) var favouritesClient
@@ -13,7 +15,7 @@ public struct Favorites: ReducerProtocol, Sendable {
 
 public extension Favorites {
     struct State: Equatable, Sendable {
-        public var productList: [Product]
+        public var productList: IdentifiedArrayOf<Product>
         public var searchText: String
         public var searchResults: [Product]
         public var isProductDetailSheetPresented: Bool
@@ -22,7 +24,7 @@ public extension Favorites {
         public var favoriteProducts: FavoriteProducts
         
         public init(
-            productList: [Product] = [],
+            productList: IdentifiedArrayOf<Product> = [],
             searchText: String = "",
             searchResults: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
@@ -65,19 +67,21 @@ public extension Favorites {
             switch action {
                 
             case .internal(.onAppear):
-                return .none
-//                return .run { [apiClient] send in
-//                    return await send(.internal(.getProductResponse(
-//                        TaskResult {
-//                            try await apiClient.decodedResponse(
-//                                for: .getProducts,
-//                                as: ResultPayload<[Product]>.self).value.status.get()
-//                        }
-//                    )))
+//                return .run { send in
+//                    await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
 //                }
+                return .run { [apiClient] send in
+                    return await send(.internal(.getProductResponse(
+                        TaskResult {
+                            try await apiClient.decodedResponse(
+                                for: .products(.fetch),
+                                as: ResultPayload<[Product]>.self).value.status.get()
+                        }
+                    )))
+                }
                 
             case let .internal(.getProductResponse(.success(products))):
-                state.productList = products
+                state.productList = IdentifiedArray(uniqueElements: products)
                 return .run { send in
                     await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 }

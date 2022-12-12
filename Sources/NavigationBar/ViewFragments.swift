@@ -1,7 +1,8 @@
 import SwiftUI
 import Foundation
+import StyleGuide
 
-public func backButton(action: @escaping () -> (), detailViewShown: @escaping () -> Bool) -> some View {
+public func backButton(action: @escaping () -> ()) -> some View {
     Button(action: {
         action()
     }, label: {
@@ -9,7 +10,6 @@ public func backButton(action: @escaping () -> (), detailViewShown: @escaping ()
             .bold()
             .padding()
             .foregroundColor(Color("Secondary"))
-            .opacity(detailViewShown() ? 1 : 0)
     })
 }
 

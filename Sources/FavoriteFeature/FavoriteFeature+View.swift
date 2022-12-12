@@ -13,7 +13,7 @@ public extension Favorites {
         @Namespace var animation
         
         struct ViewState: Equatable {
-            var productList: [Product]
+            var productList: IdentifiedArrayOf<Product>
             
             init(state: Favorites.State) {
                 self.productList = state.productList
@@ -33,18 +33,18 @@ public extension Favorites {
                     ForceFullScreen {
                         VStack {
                             Text("WIP")
-//                            StaggeredGrid(list: viewStore.state.products, columns: 2, content: { prod in
-//                                ProductCardView<Favorites>(store: store, product: prod, action: {
-//                                    viewStore.send(.internal(.favoriteButtonClicked(prod)))
-//                                }, isFavorite: {
-//                                    viewStore.favoriteProducts.sku.contains(prod.id)
-//                                })
-//                                .padding(.horizontal)
-//                                .onTapGesture {
-//                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
-//                                }
-//
-//                            })
+                            StaggeredGrid(list: viewStore.state.productList, columns: 2, content: { prod in
+                                ProductCardView<Favorites>(store: store, product: prod, action: {
+                                    viewStore.send(.internal(.favoriteButtonClicked(prod)))
+                                }, isFavorite: {
+                                    viewStore.favoriteProducts.sku.contains(prod.id)
+                                })
+                                .padding(.horizontal)
+                                .onTapGesture {
+                                    viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
+                                }
+
+                            })
                         }
                     }
                     

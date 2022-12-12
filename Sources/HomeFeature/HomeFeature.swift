@@ -10,7 +10,7 @@ import FavoritesClient
 import Boardgame
 import Warehouse
 
-extension IdentifiedArrayOf: @unchecked  Sendable {}
+extension IdentifiedArrayOf: @unchecked Sendable {}
 
 public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient

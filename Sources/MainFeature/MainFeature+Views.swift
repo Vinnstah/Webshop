@@ -23,37 +23,25 @@ public extension Main {
                     
                     TabView(selection: viewStore.binding(send: Main.Action.internal(.tabSelected))
                     ) {
-                        VStack {
-                            NavigationBar(store: self.store) {
-                                Home.View(
-                                    store: self.store.scope(state: \.home!, action: Main.Action.home)
-                                )
-                            }
-                        }
+                        Home.View(
+                            store: self.store.scope(state: \.home!, action: Main.Action.home)
+                        )
                         .tag(Main.State.Tab.home)
                         .tabItem {
                             Label("Home", systemImage: "house")
                         }
                         
-                        VStack {
-                            NavigationBar(store: self.store) {
-                                Favorites.View(
-                                    store: self.store.scope(state: \.favorites!, action: Main.Action.favorites)
-                                )
-                            }
-                        }
+                        Favorites.View(
+                            store: self.store.scope(state: \.favorites!, action: Main.Action.favorites)
+                        )
                         .tag(Main.State.Tab.favorites)
                         .tabItem {
                             Label("Favorites", systemImage: "heart")
                         }
                         
-                        VStack {
-                            NavigationBar(store: self.store) {
-                                Checkout.View(
-                                    store: self.store.scope(state: \.checkout!, action: Main.Action.checkout)
-                                )
-                            }
-                        }
+                        Checkout.View(
+                            store: self.store.scope(state: \.checkout!, action: Main.Action.checkout)
+                        )
                         .tag(Main.State.Tab.checkout)
                         .tabItem {
                             Label("Checkout", systemImage: "cart")

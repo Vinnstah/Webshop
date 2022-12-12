@@ -323,12 +323,9 @@ let package = Package(
             .target(
                 name: "MainFeature",
                 dependencies: [
-                    "ApiClient",
                     "CartModel",
                     "CheckoutFeature",
                     "HomeFeature",
-                    "NavigationBar",
-                    "SiteRouter",
                     "FavoriteFeature",
                     "Product",
                     tca,
@@ -369,7 +366,6 @@ let package = Package(
         .target(
             name: "NavigationBar",
             dependencies: [
-                "HomeFeature",
                 "ProductViews",
                 "StyleGuide",
             ],

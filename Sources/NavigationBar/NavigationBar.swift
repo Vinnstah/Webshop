@@ -76,7 +76,7 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                                 bgColor: Color("Background")
                             )
                             
-                            cartButton(buttonAction: {showCartQuickView()}, isCartEmpty: { isCartPopulated() } )
+                            cartButton(buttonAction: { showCartQuickView() }, isCartEmpty: { isCartPopulated() } )
                             
                             
                         }

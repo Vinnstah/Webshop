@@ -33,7 +33,7 @@ public extension Favorites {
                     ForceFullScreen {
                         VStack {
                             Text("WIP")
-                            StaggeredGrid(list: viewStore.state.productList, columns: 2, content: { prod in
+                            StaggeredGrid(list: { viewStore.state.productList }, columns: 2, content: { prod in
                                 ProductCardView<Favorites>(store: store, product: prod, action: {
                                     viewStore.send(.internal(.favoriteButtonClicked(prod)))
                                 }, isFavorite: {

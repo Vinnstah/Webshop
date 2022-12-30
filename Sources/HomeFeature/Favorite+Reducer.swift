@@ -17,14 +17,14 @@ public extension Home {
             state.favoriteProducts.sku = products
             return .none
             
-        case let .favorite(.favoriteButtonClicked(product)):
+        case let .favorite(.favoriteButtonTapped(product)):
             
             if state.favoriteProducts.sku.contains(product.id) {
                 return .run { send in
                     await send(.favorite(.removeFavouriteProduct(try self.favouritesClient.removeFavorite(product.id))))
-                    
                 }
             }
+            
             return .run { send in
                 await send(.favorite(.addFavouriteProduct(try self.favouritesClient.addFavorite(product.id))))
             }
@@ -43,7 +43,7 @@ public extension Home {
             state.favoriteProducts.sku.append(sku)
             return .none
             
-        case .internal, .delegate, .view, .detailView:
+        case .internal, .delegate, .view, .detailView, .cart:
             return .none
         }
     }

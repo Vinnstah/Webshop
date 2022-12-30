@@ -24,13 +24,12 @@ public extension Home {
         public var products: IdentifiedArrayOf<Product>
         public var boardgames: IdentifiedArrayOf<Boardgame>
         
-        public var productList: [Product]
         public var product: Product?
         public var catergories: Boardgame.Category?
         public var cart: Cart?
         public var quantity: Int
         public var searchText: String
-        public var filteredProducts: [Product]
+        public var filteredProducts: IdentifiedArrayOf<Product>
         public var favoriteProducts: FavoriteProducts
         public var isSettingsSheetPresented: Bool
         public var columnsInGrid: Int
@@ -40,13 +39,12 @@ public extension Home {
         public init(
             products: IdentifiedArrayOf<Product> = [],
             boardgames: IdentifiedArrayOf<Boardgame> = [],
-            productList: [Product] = [],
             product: Product? = nil,
             catergories: Boardgame.Category? = nil,
             cart: Cart? = nil,
-            quantity: Int = 0,
+            quantity: Int = 0, //ViewState
             searchText: String = "",
-            filteredProducts: [Product] = [],
+            filteredProducts: IdentifiedArrayOf<Product> = [],
             favoriteProducts: FavoriteProducts = .init(),
             isSettingsSheetPresented: Bool = false,
             columnsInGrid: Int = 2, // ViewState
@@ -55,7 +53,6 @@ public extension Home {
         ) {
             self.products = products
             self.boardgames = boardgames
-            self.productList = productList
             self.product = product
             self.catergories = catergories
             self.cart = cart
@@ -76,6 +73,12 @@ public extension Home {
         case favorite(FavoriteAction)
         case view(ViewAction)
         case detailView(DetailViewAction)
+        case cart(CartAction)
+        
+        public enum CartAction: Equatable, Sendable {
+            case cartSessionResponse(TaskResult<Cart>)
+            case cartItemsResponse(TaskResult<[Cart.Item]>)
+        }
         
         public enum DelegateAction: Equatable, Sendable {
             case userIsSignedOut
@@ -83,7 +86,7 @@ public extension Home {
         }
         
         public enum FavoriteAction: Equatable, Sendable {
-            case favoriteButtonClicked(Product)
+            case favoriteButtonTapped(Product)
             case loadFavoriteProducts([Product.ID]?)
             case removeFavouriteProduct(Product.ID?)
             case addFavouriteProduct(Product.ID?)
@@ -128,34 +131,60 @@ public extension Home {
                 
                 //MARK: On appear API calls
             case .internal(.onAppear):
-                return .run { [apiClient] send in
+                return .run { send in
                     await send(.internal(.getAllProductsResponse(
                         TaskResult {
-                            try await apiClient.decodedResponse(
+                            try await self.apiClient.decodedResponse(
                                 for: .products(.fetch),
                                 as: ResultPayload<[Product]>.self).value.status.get()
                         }
                     )))
                     
+                    await send(.favorite(.loadFavoriteProducts(try self.favouritesClient.getFavourites())))
                     
-                    //                    await send(.internal(.createCartSession(
-                    //                        TaskResult {
-                    //                            try await self.apiClient.decodedResponse(
-                    //                                for: .cart(.create(cart)),
-                    //                                as: ResultPayload<String>.self).value.status.get()
-                    //                        }
-                    //                    )))
+                    await send(.cart(.cartSessionResponse(
+                        TaskResult {
+                            try await self.apiClient.decodedResponse(
+                                for: .cart(.fetch(jwt: await self.userDefaultsClient.getLoggedInUserJWT() ?? "")),
+                                as: ResultPayload<Cart>.self).value.status.get()
+                    }
+                                                         )))
                 }
-                //
-                //                        await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
-                //                }
                 
+            case let .cart(.cartSessionResponse(.success(cart))):
+                state.cart = cart
+                print("cart")
+                return .run { send in
+                    await send(.cart(.cartItemsResponse(
+                        TaskResult {
+                            try await self.apiClient.decodedResponse(
+                                for: .cart(.fetchAllItems(session: cart.session.id.rawValue)),
+                                           as: ResultPayload<[Cart.Item]>.self).value.status.get()
+                        }
+                    )))
+                }
+                
+            case let .cart(.cartItemsResponse(.success(items))):
+//                print(items)
+                state.cart?.item = items
+                return .none
+                
+            case .cart(.cartItemsResponse(.failure(_))):
+                print("NO items found")
+                return .none
+                
+            case .cart(.cartSessionResponse(.failure(_))):
+                print("NO Session found")
+                return .none
+                    
             case let .internal(.getAllProductsResponse(.success(products))):
                 state.products = IdentifiedArray(uniqueElements: products)
                 return .none
+                
             case .internal(.getAllProductsResponse(.failure(_))):
                 print("FAIL")
                 return .none
+                
             case let .internal(.createCartSession(.success(test))):
                 return .none
                 
@@ -163,10 +192,10 @@ public extension Home {
             case let .internal(.searchTextReceivingInput(text: text)):
                 state.searchText = text
                 
-                state.filteredProducts = state.productList.filter { $0.boardgame.title.contains(text) }
+                state.filteredProducts = state.products.filter { $0.boardgame.title.contains(text) }
                 
                 if state.filteredProducts == [] {
-                    state.filteredProducts = state.productList.filter { $0.boardgame.category.rawValue.contains(text) }
+                    state.filteredProducts = state.products.filter { $0.boardgame.category.rawValue.contains(text) }
                 }
                 return .none
                 
@@ -190,25 +219,21 @@ public extension Home {
                 state.quantity -= 1
                 return .none
                 
-                //MARK: Favourite interaction
-                
-                
-                
             case .delegate(_):
                 return .none
                 
             case let .internal(.categoryButtonTapped(category)):
                 switch category {
                 case .strategy:
-                    state.filteredProducts = state.productList.filter(
+                    state.filteredProducts = state.products.filter(
                         { $0.boardgame.category.rawValue == "Strategy"}
                     )
                 case .classics:
-                    state.filteredProducts = state.productList.filter({ $0.boardgame.category.rawValue == "Classics"})
+                    state.filteredProducts = state.products.filter({ $0.boardgame.category.rawValue == "Classics"})
                 case .children:
-                    state.filteredProducts = state.productList.filter({ $0.boardgame.category.rawValue == "Children"})
+                    state.filteredProducts = state.products.filter({ $0.boardgame.category.rawValue == "Children"})
                 case .scifi:
-                    state.filteredProducts = state.productList.filter({ $0.boardgame.category.rawValue == "Sci-fi"})
+                    state.filteredProducts = state.products.filter({ $0.boardgame.category.rawValue == "Sci-fi"})
                 }
                 return .none
                 

@@ -49,9 +49,6 @@ public extension Main {
                     }
                     .accentColor(Color("Primary"))
                 }
-                .onAppear {
-                    viewStore.send(.internal(.onAppear), animation: .default)
-                }
             }
         }
     }

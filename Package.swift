@@ -307,6 +307,7 @@ let package = Package(
                 "Boardgame",
                 "CartModel",
                 "FavoritesClient",
+                "NavigationBar",
                 "ProductViews",
                 "SiteRouter",
                 "StyleGuide",

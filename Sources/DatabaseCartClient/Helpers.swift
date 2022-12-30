@@ -14,11 +14,11 @@ public struct CreateCartSessionRequest: Sendable {
 
 public struct GetAllItemsInCartRequest: Sendable {
     public let db: PostgresConnection
-    public let session: Cart.Session
+    public let sessionID: Cart.Session.ID
     
-    public init(db: PostgresConnection, session: Cart.Session) {
+    public init(db: PostgresConnection, sessionID: Cart.Session.ID) {
         self.db = db
-        self.session = session
+        self.sessionID = sessionID
     }
 }
 

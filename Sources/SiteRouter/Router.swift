@@ -54,6 +54,9 @@ public let cartRouter = OneOf {
             Field("jwt")
         }
     }
+    Route(.case(CartRoute.fetchAllItems(session:))) {
+        Path { "cart" ; UUID.parser() }
+    }
     
     Route(.case(CartRoute.add(item:))) {
         Path { "cart"; "item" }

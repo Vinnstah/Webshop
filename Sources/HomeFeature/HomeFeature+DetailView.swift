@@ -31,95 +31,56 @@ public extension Home {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
-                    VStack {
-                        ScrollView(.vertical) {
-                            
-                            VStack {
-                                KFImage(URL(string: product.boardgame.imageURL))
-                                    .resizable()
-                                    .padding([.horizontal, .top])
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 350)
-                                    .clipShape(Rectangle())
-                                    .cornerRadius(40)
-                                    .ignoresSafeArea()
-                                    .matchedGeometryEffect(id: product.boardgame.imageURL, in: animation)
-                                HStack {
-                                    Text(product.boardgame.title)
-                                        .font(.largeTitle)
-                                        .scaledToFit()
-                                        .minimumScaleFactor(0.01)
-                                        .lineLimit(1)
-                                        .frame(width: 350)
-                                        .frame(alignment: .leading)
-                                }
-                                HStack {
-                                    VStack {
-                                        Text(product.boardgame.category.rawValue)
-                                            .font(.system(size: 10))
-                                            .foregroundColor(Color("Secondary"))
-                                            .frame(alignment:.leading)
-                                    }
-                                    .padding(.leading, 30)
-                                    
-                                    Spacer()
-                                    
-                                    Text("\(product.price.brutto) kr")
-                                        .font(.title)
-                                        .bold()
-                                        .foregroundColor(Color("Primary"))
-                                        .frame(alignment: .center)
-                                        .padding(.trailing, 50)
-                                }
-                                
-                                Divider()
-                                    .foregroundColor(.black)
-                                    .offset(y: -15)
-                                
-                                Text(product.boardgame.details.playInfo.descriptionText)
-                                    .font(.caption)
-                                    .multilineTextAlignment(.leading)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(Color("Secondary"))
-                                    .padding(.horizontal)
-                            }
-                        }
+                VStack {
+                    ScrollView(.vertical) {
                         
-                        HStack {
-                            HStack {
-                                Button(action: { viewStore.send(.detailView(.decreaseQuantityButtonTapped)) },
-                                       label: {
-                                    Image(systemName: "minus")
-                                        .foregroundColor(Color("Secondary"))
-                                })
-                                if viewStore.state.quantity < 10 {
-                                    Text(String("0" + "\(viewStore.state.quantity)"))
-                                        .font(.title3)
-                                        .bold()
-                                        .foregroundColor(Color("Secondary"))
-                                } else {
-                                    Text(String("\(viewStore.state.quantity)"))
-                                        .font(.title3)
-                                        .bold()
-                                        .foregroundColor(Color("Secondary"))
-                                }
-                                Button(action: { viewStore.send(.detailView(.increaseQuantityButtonTapped)) },
-                                       label: {
-                                    Image(systemName: "plus")
-                                        .foregroundColor(Color("Secondary"))
-                                })
-                            }
-                            .fixedSize()
-                            .padding(.horizontal)
+                        VStack {
                             
-                            Button("Add to cart") {
-                                viewStore.send(.delegate(.addProductToCart(quantity: viewStore.state.quantity, product: viewStore.state.product!)))
-                            }
-                            .buttonStyle(.primary)
-                            .padding(.horizontal)
+                            image(
+                                url: product.boardgame.imageURL,
+                                animationID: animation
+                            )
                             
+                            title(product.boardgame.title)
+                            
+                            priceAndCategory(
+                                category: product.boardgame.category.rawValue,
+                                price: product.price.brutto
+                            )
+                            
+                            Divider()
+                                .foregroundColor(.black)
+                                .offset(y: -15)
+                            
+                            Text(product.boardgame.details.playInfo.descriptionText)
+                                .font(.caption)
+                                .multilineTextAlignment(.leading)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .foregroundColor(Color("Secondary"))
+                                .padding(.horizontal)
                         }
                     }
+                    
+                    HStack {
+                        
+                        quantityModule(
+                            decreaseQuantity: { viewStore.send(.detailView(.decreaseQuantityButtonTapped), animation: .default) },
+                            increaseQuantity: { viewStore.send(.detailView(.increaseQuantityButtonTapped), animation: .default) },
+                            quantity: viewStore.state.quantity
+                        )
+                        
+                        
+                        Button("Add to cart") {
+                            viewStore.send(.delegate(.addProductToCart(
+                                quantity: viewStore.state.quantity,
+                                product: viewStore.state.product!))
+                            )
+                        }
+                        .buttonStyle(.primary)
+                        .padding(.horizontal)
+                        
+                    }
+                }
                 .background {
                     Color("BackgroundColor")
                 }
@@ -127,3 +88,4 @@ public extension Home {
         }
     }
 }
+

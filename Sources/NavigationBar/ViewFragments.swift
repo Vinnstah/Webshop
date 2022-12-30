@@ -27,7 +27,9 @@ public func cartButton(buttonAction: @escaping () -> Void, isCartEmpty: @escapin
     
     ZStack {
         Button(action: {
-            buttonAction()
+            withAnimation {
+                buttonAction()
+            }
         }, label: {
             Image(systemName: "cart")
                 .padding()

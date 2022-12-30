@@ -10,7 +10,6 @@ import NavigationBar
 
 public extension Home {
     struct View: SwiftUI.View {
-        
         @Namespace var animation
         public let store: StoreOf<Home>
         
@@ -20,112 +19,93 @@ public extension Home {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
-                NavigationBar.homeNavBar(viewStore: viewStore) {
-                ZStack {
-                    VStack {
+                NavigationBar.home(viewStore: viewStore) {
+                    ZStack {
                         VStack {
-                            
-                            HStack {
-                                Spacer()
+                            VStack {
                                 
-                                Text("Columns")
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                                    .frame(alignment: .trailing)
-                                
-                                Button(action: { viewStore.send(.view(.decreaseNumberOfColumnsTapped), animation: .default)  },
-                                       label: {
-                                    Image(systemName: "minus")
-                                        .font(.footnote)
-                                        .foregroundColor(Color("Secondary"))
-                                })
-                                Text(String("\(viewStore.state.columnsInGrid)"))
-                                    .font(.subheadline)
-                                    .foregroundColor(Color("Secondary"))
-                                
-                                Button(action: { viewStore.send(.view(.increaseNumberOfColumnsTapped), animation: .default) },
-                                       label: {
-                                    Image(systemName: "plus")
-                                        .font(.footnote)
-                                        .foregroundColor(Color("Secondary"))
-                                })
+                                gridColumnControl(
+                                    increaseColumns: { viewStore.send(.view(.increaseNumberOfColumnsTapped), animation: .default) },
+                                    decreaseColumns: { viewStore.send(.view(.decreaseNumberOfColumnsTapped), animation: .default) },
+                                    numberOfColumnsInGrid: viewStore.state.columnsInGrid
+                                )
+                                //TODO: Add category filtering
+                                //                                ScrollView(.horizontal) {
+                                //                                    HStack(spacing: 20) {
+                                //
+                                //                                        ForEach(viewStore.state.catergories.allCases, id: \.self) { category in
+                                //                                            Button(
+                                //                                                category.title
+                                //                                            ) {
+                                //                                                viewStore.send(.internal(.categoryButtonPressed(category)), animation: .default)
+                                //                                            }
+                                //                                            .frame(minWidth: 0, maxWidth: .infinity)
+                                //                                            .frame(height: 30)
+                                //                                            .buttonStyle(.primary(cornerRadius: 25))
+                                //                                        }
+                                //                                    }
+                                //                                }
                             }
-                            .padding(.horizontal
-                            )
-                            //TODO: Add category filtering
-                            //                                ScrollView(.horizontal) {
-                            //                                    HStack(spacing: 20) {
-                            //
-                            //                                        ForEach(viewStore.state.catergories.allCases, id: \.self) { category in
-                            //                                            Button(
-                            //                                                category.title
-                            //                                            ) {
-                            //                                                viewStore.send(.internal(.categoryButtonPressed(category)), animation: .default)
-                            //                                            }
-                            //                                            .frame(minWidth: 0, maxWidth: .infinity)
-                            //                                            .frame(height: 30)
-                            //                                            .buttonStyle(.primary(cornerRadius: 25))
-                            //                                        }
-                            //                                    }
-                            //                                }
-                        }
-                        StaggeredGrid(
-                            list: viewStore.state.products,
-                            columns: viewStore.state.columnsInGrid,
-                            content: { prod in
-                                Button(action: {
-                                    viewStore.send(.detailView(.toggleDetailView(prod)), animation: .easeIn)
-                                }, label: {
-                                    ProductCardView<Home>(
-                                        store: store,
-                                        product: prod,
-                                        action:{ viewStore.send(.favorite(.favoriteButtonClicked(prod))) },
-                                        isFavorite: { viewStore.state.favoriteProducts.sku.contains(prod.id) }
+                            StaggeredGrid(
+                                list: { viewStore.state.filteredProducts == [] ? viewStore.state.products : viewStore.state.filteredProducts },
+                                columns: viewStore.state.columnsInGrid,
+                                content: { product in
+                                    Button(action: {
+                                        viewStore.send(.detailView(.toggleDetailView(product)), animation: .easeIn)
+                                    }, label: {
+                                        
+                                            ProductCardView<Home>(
+                                                store: store,
+                                                product: product,
+                                                action:{ viewStore.send(.favorite(.favoriteButtonTapped(product))) },
+                                                isFavorite: { viewStore.state.favoriteProducts.sku.contains(product.id) }
+                                            )
+                                            .matchedGeometryEffect(id: product.boardgame.imageURL, in: animation)
+                                        }
                                     )
-                                    .matchedGeometryEffect(id: prod.boardgame.imageURL, in: animation)
-                                })
-                                
-                            })
+                                }
+                            )
+                        }
                         
+                        if viewStore.state.showDetailView && viewStore.state.product != nil {
+                            DetailView(
+                                store: store,
+                                product: viewStore.state.product!,
+                                isFavourite: { viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.id) },
+                                toggleFavourite: {viewStore.send(.favorite(.favoriteButtonTapped(viewStore.state.product!)))},
+                                animation: animation
+                            )
+                        }
                         
-                    }
-                    if viewStore.state.showDetailView && viewStore.state.product != nil {
-                        DetailView(
-                            store: store,
-                            product: viewStore.state.product!,
-                            isFavourite: { viewStore.state.favoriteProducts.sku.contains(viewStore.state.product!.id) },
-                            toggleFavourite: {viewStore.send(.favorite(.favoriteButtonClicked(viewStore.state.product!)))},
-                            animation: animation
-                        )
                     }
                     
-                }
-                
-                .onAppear {
-                    viewStore.send(.internal(.onAppear))
-                }
-                .refreshable {
-                    viewStore.send(.internal(.onAppear))
-                }
-                .navigationBarHidden(true)
-                .sheet(isPresented:
-                        viewStore.binding(
-                            get: \.isSettingsSheetPresented,
-                            send: .internal(.settingsButtonTapped))
-                ) {
-                    Settings() {
-                        viewStore.send(.internal(.signOutTapped))
+                    .onAppear {
+                        viewStore.send(.internal(.onAppear))
                     }
-                    .presentationDetents([.fraction(0.1)])
-                }
-                .sheet(isPresented: viewStore.binding(
-                    get: \.showCheckoutQuickView,
-                    send: .internal(.toggleCheckoutQuickViewTapped))) {
-                        EmptyView()
-                        //                            CheckoutQuickView(cart: viewStore.state.cart ?? .init(id: "TEST", userJWT: "TEST"))
-                                                }
+                    .refreshable {
+                        viewStore.send(.internal(.onAppear))
                     }
-                
+                    .sheet(isPresented:
+                            viewStore.binding(
+                                get: \.isSettingsSheetPresented,
+                                send: .internal(.settingsButtonTapped))
+                    ) {
+                        Settings() {
+                            viewStore.send(.internal(.signOutTapped))
+                        }
+                        .presentationDetents([.fraction(0.1)])
+                    }
+                }
+                .overlay(alignment: .top, content: { viewStore.state.showCheckoutQuickView ?
+//                ) {
+                         CheckoutQuickView(cart: (viewStore.state.cart) ?? .init(session: .init(id: .init(rawValue: .init()), jwt: .init(rawValue: "TEST")), item: [.init(product: .init(rawValue: .init()), quantity: 2)])) : nil
+//                        .animation(.default, value: viewStore.state.showCheckoutQuickView)
+//                        .opacity(viewStore.state.showCheckoutQuickView ? 1 : 0)
+                }
+//                    .onTapGesture {
+//                        viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .easeInOut(duration: 0.5))
+//                    }
+                )
             }
         }
     }
@@ -148,29 +128,33 @@ struct Settings: View {
 
 
 
-//public struct CheckoutQuickView: View {
+public struct CheckoutQuickView: View {
+
+    public var cart: Cart
+    public var products: [Product]
+//    public var products: [Cart.Item]
+
+    public init(cart: Cart, products: [Product] = []) {
+        self.cart = cart
+        self.products = products
+//        self.products = cart.item
+    }
+
+    public var body: some View {
+        ZStack {
+            RoundedRectangle(cornerSize: .zero)
+                .foregroundColor(.white)
+                .cornerRadius(25)
 //
-//    public let cart: Cart
-//    public var products: [Product]
-//
-//    public init(cart: Cart) {
-//        self.cart = cart
-//        self.products = cart.products.keys.sorted()
-//    }
-//
-//    public var body: some View {
-////        ZStack {
-////            RoundedRectangle(cornerSize: .zero)
-////                .foregroundColor(.white)
-////                .cornerRadius(25)
-////
-//            VStack {
-//                ForEach(products, id: \.self) { product in
-//                    Text("\(product.quantity!)")
-//                    Text(product.title)
-//                    Text("\(product.price)")
-//                }
-//            }
-////        }
-//    }
-//}
+            VStack {
+                ForEach(cart.item, id: \.product) { product in
+                    Text("\(product.product.rawValue)")
+                    Text(products.filter { $0.id == product.product}.description)
+                    Text("\(product.quantity.rawValue)")
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: 200, alignment: .top)
+        .transition(.move(edge: .top))
+    }
+}

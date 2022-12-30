@@ -3,6 +3,7 @@ import SiteRouter
 import Foundation
 import DatabaseCartClient
 import Dependencies
+import CartModel
 
 public struct CartService: Sendable {
     @Dependency(\.databaseCartClient) var databaseCartClient
@@ -25,9 +26,25 @@ public extension CartService {
             
         case let .fetch(jwt):
             let db = try await databaseCartClient.connect()
-            let cart = try await databaseCartClient.fetchCartSession(FetchCartSessionRequest(db: db, jwt: jwt))
+            guard let cart = try await databaseCartClient.fetchCartSession(FetchCartSessionRequest(db: db, jwt: jwt)) else {
+                try await db.close()
+                return ResultPayload(forAction: "fetch Cart Session", payload: "None")
+            }
+//            guard let item = try await databaseCartClient.getAllItemsInCart(GetAllItemsInCartRequest(db: db, sessionID: cart.session.id)) else {
+//                try await db.close()
+//                return ResultPayload(forAction: "fetch Cart Session", payload: "None")
+//            }
+//            cart.item = item.item
+//            print("CART: \(cart)")
             try await db.close()
             return ResultPayload(forAction: "fetch Cart Session", payload: cart)
+            
+        case let .fetchAllItems(session: id):
+            let db = try await databaseCartClient.connect()
+            let item = try await databaseCartClient.getAllItemsInCart(GetAllItemsInCartRequest(db: db, sessionID: Cart.Session.ID(rawValue: id)))
+            print(item)
+            try await db.close()
+            return ResultPayload(forAction: "fetch Cart Session", payload: item)
             
         case let .add(cart):
             let db = try await databaseCartClient.connect()

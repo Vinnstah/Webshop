@@ -132,4 +132,7 @@ Each box allows you to play from 1 to 6 players, and if you combine more boxes, 
             UPDATE SET quantity=2;
             
             INSERT INTO cart
-            VALUES('65F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, 'TEST1234');
+            VALUES('65F3787E-F457-4AA8-9E4B-E6131788AC88'::UUID, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0RDJCRjUwQS0yQ0FCLTRCMTYtOEM5Ny0zMDJBNzRDRTBEREEiLCJuYW1lIjoiVGVzdGVyMUB0ZXN0ZXIuc2UiLCJpYXQiOjE2Njk2NDU4OTguNzc5Mjk2OX0.Gq-iIQ3AoAIHo4-1fHlZ2PCvK0HM2lorWsEt2L-ymJw');
+
+INSERT INTO boardgames
+VALUES(gen_random_uuid (), 'Luxor', 'https://www.dragonslair.se/images/49651/original', 'Rudiger Dorn', '2013-01-01', 2, 'On the hunt for priceless treasures, groups of adventurers explore the legendary temple at Luxor. Their ultimate goal is the tomb of the pharaoh, but many treasures can be collected as they search. As they explore, the challenge unfolds: The player who manages to quickly get their team of adventurers to the tomb, while salvaging as many treasures as possible, will be the winner. Luxor offers variable game play, the path that leads to the tomb is different for every game, and will even change during play!', 8, 2, 4, 'Strategy');

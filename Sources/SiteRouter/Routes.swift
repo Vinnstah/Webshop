@@ -4,6 +4,7 @@ import UserModel
 import CartModel
 import Warehouse
 import Product
+import Foundation
 
 public enum SiteRoute: Equatable {
     case users(UserRoute)
@@ -21,6 +22,7 @@ public enum UserRoute: Equatable {
 public enum CartRoute: Equatable {
     case create(Cart)
     case fetch(jwt: String)
+    case fetchAllItems(session: UUID)
     case add(item: Cart)
 }
 

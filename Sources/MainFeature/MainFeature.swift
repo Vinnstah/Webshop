@@ -48,7 +48,6 @@ public extension Main {
         }
         
         public enum InternalAction: Equatable, Sendable {
-            case onAppear
             case tabSelected
         }
     }
@@ -96,17 +95,4 @@ public extension Main {
         
     }
     
-}
-
-public extension Main {
-    func `internal`(into state: inout State, action: Action) -> EffectTask<Action> {
-        switch action {
-            
-        case .internal(_):
-            return .none
-            
-        case .delegate, .home, .favorites, .checkout:
-            return .none
-        }
-    }
 }

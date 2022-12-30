@@ -32,13 +32,13 @@ public extension Database {
         var items: [Cart.Item] = []
         for try await row in rows {
             let randomRow = row.makeRandomAccess()
-            
+            print(randomRow)
             let item = try Cart.Item(
                 product: Product.ID(rawValue: randomRow["product_id"].decode(UUID.self, context: .default)),
                 quantity: Cart.Item.Quantity(rawValue: randomRow["quantity"].decode(Int.self, context: .default))
             )
-            
             items.append(item)
+//            items.append(item)
         }
         return items
     }

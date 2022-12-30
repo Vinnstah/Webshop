@@ -20,11 +20,15 @@ public struct SearchBar: SwiftUI.View {
         ZStack {
             TextField("", text: bindingText)
                 .labelsHidden()
+                .background(.white)
+                .cornerRadius(20)
                 .textFieldStyle(TappableTextFieldStyle())
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .padding(.horizontal)
-                .foregroundColor(Color("Secondary"))
+                .overlay(
+                               RoundedRectangle(cornerRadius: 20)
+                                   .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                           )
             
             HStack {
                 

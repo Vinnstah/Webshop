@@ -31,7 +31,6 @@ public extension Main {
         public enum Tab: Equatable, Sendable {
             case home
             case favorites
-            case settings
             case checkout
         }
     }
@@ -65,7 +64,6 @@ public extension Main {
                 switch state.selectedTab {
                 case .home: state.home = .init()
                 case .favorites: state.favorites = .init()
-                case .settings: return .none
                 case .checkout: return .none
                 }
                 return .none

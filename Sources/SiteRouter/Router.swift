@@ -45,7 +45,7 @@ public let cartRouter = OneOf {
     Route(.case(CartRoute.create)) {
         Path { "cart" }
         Method.post
-        Body(.json(Cart.self))
+        Body(.json(Cart.Session.JWT.RawValue.self))
     }
 
     Route(.case(CartRoute.fetch(jwt:))) {

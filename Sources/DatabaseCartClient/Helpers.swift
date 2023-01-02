@@ -4,11 +4,17 @@ import CartModel
 
 public struct CreateCartSessionRequest: Sendable {
     public let db: PostgresConnection
-    public let cart: Cart
+    public let jwt: Cart.Session.JWT
+    public let sessionID: Cart.Session.ID
     
-    public init(db: PostgresConnection, cart: Cart) {
+    public init(
+        db: PostgresConnection,
+        jwt: Cart.Session.JWT,
+        sessionID: Cart.Session.ID
+    ) {
         self.db = db
-        self.cart = cart
+        self.jwt = jwt
+        self.sessionID = sessionID
     }
 }
 

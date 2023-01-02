@@ -7,6 +7,7 @@ import CartModel
 
 public struct CartService: Sendable {
     @Dependency(\.databaseCartClient) var databaseCartClient
+    @Dependency(\.uuid) var uuid
     public init() {}
 }
 
@@ -18,39 +19,55 @@ public extension CartService {
         
         switch route {
             
-        case let .create(cart):
+        case let .create(jwt):
             let db = try await databaseCartClient.connect()
-            let jwt = try await databaseCartClient.createCartSession(CreateCartSessionRequest(db: db, cart: cart))
+            
+            let sessionID = Cart.Session.ID(rawValue: self.uuid.callAsFunction())
+            
+            let session = try await databaseCartClient.createCartSession(
+                CreateCartSessionRequest(
+                    db: db,
+                    jwt: Cart.Session.JWT(rawValue: jwt),
+                    sessionID: Cart.Session.ID(rawValue: sessionID.rawValue)
+                )
+            )
+            
             try await db.close()
-            return ResultPayload(forAction: "create Cart", payload: jwt.rawValue)
+            return ResultPayload(forAction: "create Cart", payload: session)
             
         case let .fetch(jwt):
             let db = try await databaseCartClient.connect()
+            
             guard let cart = try await databaseCartClient.fetchCartSession(FetchCartSessionRequest(db: db, jwt: jwt)) else {
                 try await db.close()
-                return ResultPayload(forAction: "fetch Cart Session", payload: "None")
+                return ResultPayload(forAction: "fetch Cart Session", payload: jwt)
             }
-//            guard let item = try await databaseCartClient.getAllItemsInCart(GetAllItemsInCartRequest(db: db, sessionID: cart.session.id)) else {
-//                try await db.close()
-//                return ResultPayload(forAction: "fetch Cart Session", payload: "None")
-//            }
-//            cart.item = item.item
-//            print("CART: \(cart)")
+            
             try await db.close()
             return ResultPayload(forAction: "fetch Cart Session", payload: cart)
             
         case let .fetchAllItems(session: id):
             let db = try await databaseCartClient.connect()
             let item = try await databaseCartClient.getAllItemsInCart(GetAllItemsInCartRequest(db: db, sessionID: Cart.Session.ID(rawValue: id)))
-            print(item)
             try await db.close()
-            return ResultPayload(forAction: "fetch Cart Session", payload: item)
+            return ResultPayload(forAction: "fetch all items", payload: item)
             
         case let .add(cart):
             let db = try await databaseCartClient.connect()
-            let id = try await databaseCartClient.insertItemsToCart(InsertItemsToCartRequest(db: db, cart: cart))
+            
+            guard let id = try await databaseCartClient.insertItemsToCart(InsertItemsToCartRequest(db: db, cart: cart)) else {
+                try await db.close()
+                return ResultPayload(forAction: "fetch Cart Session", payload: cart)
+            }
+            
+            let items = try await databaseCartClient.getAllItemsInCart(
+                GetAllItemsInCartRequest(
+                    db: db,
+                    sessionID: Cart.Session.ID(rawValue: id.rawValue)
+                )
+            )
             try await db.close()
-            return ResultPayload(forAction: "Add items to cart", payload: id)
+            return ResultPayload(forAction: "Add items to cart", payload: items)
         }
     }
 }

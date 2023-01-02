@@ -20,7 +20,7 @@ public enum UserRoute: Equatable {
 }
 
 public enum CartRoute: Equatable {
-    case create(Cart)
+    case create(jwt: Cart.Session.JWT.RawValue)
     case fetch(jwt: String)
     case fetchAllItems(session: UUID)
     case add(item: Cart)

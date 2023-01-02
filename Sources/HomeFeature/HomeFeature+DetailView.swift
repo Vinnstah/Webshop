@@ -71,9 +71,9 @@ public extension Home {
                         
                         
                         Button("Add to cart") {
-                            viewStore.send(.delegate(.addProductToCart(
+                            viewStore.send(.cart(.addProductToCartTapped(
                                 quantity: viewStore.state.quantity,
-                                product: viewStore.state.product!))
+                                product: product))
                             )
                         }
                         .buttonStyle(.primary)

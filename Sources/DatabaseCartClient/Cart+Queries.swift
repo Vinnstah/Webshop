@@ -7,14 +7,14 @@ import Database
 public extension Database {
     func createCartSession(
         request: CreateCartSessionRequest
-    ) async throws -> Cart.Session.ID {
+    ) async throws -> Cart.Session {
         try await request.db.query("""
             INSERT INTO cart
-            VALUES(\(request.cart.session.id.rawValue), \(request.cart.session.jwt.rawValue))
+            VALUES(\(request.sessionID.rawValue), \(request.jwt.rawValue))
             ON CONFLICT (jwt)
             DO NOTHING;
             """, logger: logger)
-        return request.cart.session.id
+        return Cart.Session(id: request.sessionID, jwt: request.jwt)
     }
     
     func fetchCartSession(
@@ -28,8 +28,7 @@ public extension Database {
         guard let session = try await decodeCartSession(from: rows) else {
             return nil
         }
-        var cart = Cart(session: session, item: [])
-//        let item = try await getAllItemsInCart(request: GetAllItemsInCartRequest(db: request.db, session: session))
+        let cart = Cart(session: session, item: [])
         print(cart)
         return cart
     }

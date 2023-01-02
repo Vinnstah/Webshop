@@ -9,7 +9,7 @@ extension NavigationBar {
         return Self.init(
             isRoot: !viewStore.state.showDetailView,
             
-            isCartPopulated: { viewStore.state.cart == nil },
+            isCartPopulated: { viewStore.state.cart?.item == [] },
             
             showCartQuickView: { viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .default)},
             

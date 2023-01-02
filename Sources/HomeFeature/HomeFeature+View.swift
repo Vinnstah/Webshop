@@ -54,14 +54,14 @@ public extension Home {
                                         viewStore.send(.detailView(.toggleDetailView(product)), animation: .easeIn)
                                     }, label: {
                                         
-                                            ProductCardView<Home>(
-                                                store: store,
-                                                product: product,
-                                                action:{ viewStore.send(.favorite(.favoriteButtonTapped(product))) },
-                                                isFavorite: { viewStore.state.favoriteProducts.sku.contains(product.id) }
-                                            )
-                                            .matchedGeometryEffect(id: product.boardgame.imageURL, in: animation)
-                                        }
+                                        ProductCardView<Home>(
+                                            store: store,
+                                            product: product,
+                                            action:{ viewStore.send(.favorite(.favoriteButtonTapped(product))) },
+                                            isFavorite: { viewStore.state.favoriteProducts.sku.contains(product.id) }
+                                        )
+                                        .matchedGeometryEffect(id: product.boardgame.imageURL, in: animation)
+                                    }
                                     )
                                 }
                             )
@@ -96,15 +96,18 @@ public extension Home {
                         .presentationDetents([.fraction(0.1)])
                     }
                 }
-                .overlay(alignment: .top, content: { viewStore.state.showCheckoutQuickView ?
-//                ) {
-                         CheckoutQuickView(cart: (viewStore.state.cart) ?? .init(session: .init(id: .init(rawValue: .init()), jwt: .init(rawValue: "TEST")), item: [.init(product: .init(rawValue: .init()), quantity: 2)])) : nil
-//                        .animation(.default, value: viewStore.state.showCheckoutQuickView)
-//                        .opacity(viewStore.state.showCheckoutQuickView ? 1 : 0)
+                .overlay(alignment: .top, content: {
+                    HStack {
+                        Spacer()
+                    viewStore.state.showCheckoutQuickView ?
+                    //                ) {
+                        CheckoutQuickView(
+                            cart: (viewStore.state.cart) ?? .init(session: .init(id: .init(rawValue: .init()),
+                                                                                 jwt: .init(rawValue: "TEST")),
+                                                                  item: [.init(product: .init(rawValue: .init()), quantity: 2)]), tapAction: { viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .default) }
+                        ) : nil
+                    }
                 }
-//                    .onTapGesture {
-//                        viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .easeInOut(duration: 0.5))
-//                    }
                 )
             }
         }
@@ -129,23 +132,27 @@ struct Settings: View {
 
 
 public struct CheckoutQuickView: View {
-
+    
     public var cart: Cart
     public var products: [Product]
-//    public var products: [Cart.Item]
-
-    public init(cart: Cart, products: [Product] = []) {
+    public var tapAction: () -> Void
+    
+    public init(
+        cart: Cart,
+        products: [Product] = [],
+        tapAction: @escaping () -> Void
+    ) {
         self.cart = cart
         self.products = products
-//        self.products = cart.item
+        self.tapAction = tapAction
     }
-
+    
     public var body: some View {
         ZStack {
             RoundedRectangle(cornerSize: .zero)
                 .foregroundColor(.white)
                 .cornerRadius(25)
-//
+            //
             VStack {
                 ForEach(cart.item, id: \.product) { product in
                     Text("\(product.product.rawValue)")
@@ -154,7 +161,11 @@ public struct CheckoutQuickView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: 200, alignment: .top)
-        .transition(.move(edge: .top))
+        .frame(maxWidth: 200, maxHeight: 500, alignment: .topTrailing )
+        .transition(.move(edge: .trailing))
+        .onTapGesture {
+            tapAction()
+        }
     }
+        
 }

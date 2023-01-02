@@ -78,6 +78,9 @@ public extension Home {
         public enum CartAction: Equatable, Sendable {
             case cartSessionResponse(TaskResult<Cart>)
             case cartItemsResponse(TaskResult<[Cart.Item]>)
+            case createCartSessionResponse(TaskResult<Cart.Session>)
+            case addProductToCartTapped(quantity: Int, product: Product)
+            case addProductToCartResponse(TaskResult<[Cart.Item]>)
         }
         
         public enum DelegateAction: Equatable, Sendable {
@@ -101,7 +104,6 @@ public extension Home {
             case cancelSearchTapped
             case categoryButtonTapped(Boardgame.Category)
             case toggleCheckoutQuickViewTapped
-            case createCartSession(TaskResult<String>)
         }
         
         public enum DetailViewAction: Equatable, Sendable {
@@ -119,6 +121,7 @@ public extension Home {
     var body: some ReducerProtocol<State, Action> {
         CombineReducers {
             Reduce(favorite.self)
+            Reduce(cart.self)
             
         Reduce { state, action in
             switch action {
@@ -151,31 +154,7 @@ public extension Home {
                                                          )))
                 }
                 
-            case let .cart(.cartSessionResponse(.success(cart))):
-                state.cart = cart
-                print("cart")
-                return .run { send in
-                    await send(.cart(.cartItemsResponse(
-                        TaskResult {
-                            try await self.apiClient.decodedResponse(
-                                for: .cart(.fetchAllItems(session: cart.session.id.rawValue)),
-                                           as: ResultPayload<[Cart.Item]>.self).value.status.get()
-                        }
-                    )))
-                }
-                
-            case let .cart(.cartItemsResponse(.success(items))):
-//                print(items)
-                state.cart?.item = items
-                return .none
-                
-            case .cart(.cartItemsResponse(.failure(_))):
-                print("NO items found")
-                return .none
-                
-            case .cart(.cartSessionResponse(.failure(_))):
-                print("NO Session found")
-                return .none
+           
                     
             case let .internal(.getAllProductsResponse(.success(products))):
                 state.products = IdentifiedArray(uniqueElements: products)
@@ -185,8 +164,6 @@ public extension Home {
                 print("FAIL")
                 return .none
                 
-            case let .internal(.createCartSession(.success(test))):
-                return .none
                 
                 //MARK: Search function
             case let .internal(.searchTextReceivingInput(text: text)):
@@ -262,11 +239,10 @@ public extension Home {
             case .internal(.toggleCheckoutQuickViewTapped):
                 state.showCheckoutQuickView.toggle()
                 return .none
-            case .internal(.createCartSession(.failure(_))):
-                print("ERROR")
-                return .none
                 
             case .favorite:
+                return .none
+            case .cart:
                 return .none
             }
             }

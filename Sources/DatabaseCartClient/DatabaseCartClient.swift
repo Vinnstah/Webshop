@@ -5,7 +5,7 @@ import Dependencies
 import Database
 
 public struct DatabaseCartClient: Sendable, DependencyKey {
-    public typealias CreateCartSession = @Sendable (CreateCartSessionRequest) async throws -> Cart.Session.ID
+    public typealias CreateCartSession = @Sendable (CreateCartSessionRequest) async throws -> Cart.Session
     public typealias GetAllItemsInCart = @Sendable (GetAllItemsInCartRequest) async throws -> [Cart.Item]
     public typealias FetchCartSession = @Sendable (FetchCartSessionRequest) async throws -> Cart?
     public typealias InsertItemsToCart = @Sendable (InsertItemsToCartRequest) async throws -> Cart.Session.ID?

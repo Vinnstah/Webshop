@@ -16,6 +16,7 @@ public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.favouritesClient) var favouritesClient
+    @Dependency(\.continuousClock) var clock
     public init() {}
 }
 
@@ -81,6 +82,8 @@ public extension Home {
             case createCartSessionResponse(TaskResult<Cart.Session>)
             case addProductToCartTapped(quantity: Int, product: Product)
             case addProductToCartResponse(TaskResult<[Cart.Item]>)
+            case removeItemFromCartTapped
+            case removeItemFromCartResponse(TaskResult<Cart.Session.ID.RawValue>)
         }
         
         public enum DelegateAction: Equatable, Sendable {

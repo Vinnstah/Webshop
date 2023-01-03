@@ -48,27 +48,29 @@ public extension Home {
             return .none
             
         case .cart(.createCartSessionResponse(.failure(_))):
-            print("FAILED Session found")
+            print("FAILED to create session")
             return .none
             
         case let .cart(.addProductToCartTapped(quantity: quantity, product: product)):
             
-            guard ((state.cart?.item.contains(where: {$0.product == product.id})) == nil) else {
-                state.cart!.item =  (state.cart?.item.map { $0.product == product.id ? Cart.Item(product: product.id, quantity: Cart.Item.Quantity(rawValue: quantity)) : $0 })!
-                return .run { [cart = state.cart] send in
-                    
-                    await send(.cart(.addProductToCartResponse(
-                        TaskResult {
-                            try await self.apiClient.decodedResponse(
-                                for: .cart(.add(item: cart!)),
-                                as: ResultPayload<[Cart.Item]>.self).value.status.get()
-                        }
-                    )))
-                }
+            guard quantity != 0 else {
+                return .none
             }
             
-            state.cart?.item.append(Cart.Item(product: product.id, quantity: Cart.Item.Quantity(rawValue: quantity)))
-            
+            if state.cart!.item.contains(
+                where: {$0.product == product.id}
+            ) {
+                state.cart!.item = state.cart!.item.map { $0.product == product.id ?
+                    Cart.Item(
+                        product: product.id,
+                        quantity: Cart.Item.Quantity(rawValue: quantity))
+                    : $0 }
+             } else {
+                 state.cart?.item.append(Cart.Item(
+                    product: product.id,
+                    quantity: Cart.Item.Quantity(rawValue: quantity))
+                 )
+             }
             return .run { [cart = state.cart] send in
                 
                 await send(.cart(.addProductToCartResponse(
@@ -82,13 +84,11 @@ public extension Home {
             
         case let .cart(.addProductToCartResponse(.success(items))):
             guard items == state.cart?.item else {
-                print("ERROR")
                 return .none
             }
             state.quantity = 0
-            print("SUCCESSFULLY ADDED ITEM")
             return .run { send in
-                
+                try await self.clock.sleep(for: .milliseconds(500))
                 await send(.detailView(.toggleDetailView(nil)), animation: .easeIn)
             }
             
@@ -96,6 +96,29 @@ public extension Home {
             print("FAIL")
             return .none
             
+        case .cart(.removeItemFromCartTapped):
+            return .run { [id = state.cart!.session.id.rawValue, product = state.product!.id] send in
+                await send(.cart(.removeItemFromCartResponse(
+                    TaskResult {
+                        try await self.apiClient.decodedResponse(
+                            for: .cart(.delete(id: id, product: product.rawValue)),
+                            as: ResultPayload<Cart.Session.ID.RawValue>.self).value.status.get()
+                    }
+                )))
+            }
+            
+        case .cart(.removeItemFromCartResponse(.success)):
+            state.cart?.item.removeAll(
+                where: { $0.product == state.product?.id}
+            )
+            return .none
+            
+        case .cart(.removeItemFromCartResponse(.failure(_))):
+            print("FAIL")
+            return .none
+            
+
+                        
         case .internal, .delegate, .view, .detailView, .favorite:
             return .none
         }

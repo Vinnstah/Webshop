@@ -4,6 +4,7 @@ import Foundation
 import DatabaseCartClient
 import Dependencies
 import CartModel
+import Product
 
 public struct CartService: Sendable {
     @Dependency(\.databaseCartClient) var databaseCartClient
@@ -53,21 +54,36 @@ public extension CartService {
             return ResultPayload(forAction: "fetch all items", payload: item)
             
         case let .add(cart):
+            print("cart \(cart)")
             let db = try await databaseCartClient.connect()
+            print("1")
+            let items = try await databaseCartClient.insertItemsToCart(InsertItemsToCartRequest(db: db, cart: cart))
+            print(items)
+//                try await db.close()
+//                print("FALFAFLA")
+//                return ResultPayload(forAction: "fetch Cart Session", payload: cart)
+//            }
             
-            guard let id = try await databaseCartClient.insertItemsToCart(InsertItemsToCartRequest(db: db, cart: cart)) else {
-                try await db.close()
-                return ResultPayload(forAction: "fetch Cart Session", payload: cart)
-            }
+//            let items = try await databaseCartClient.getAllItemsInCart(
+//                GetAllItemsInCartRequest(
+//                    db: db,
+//                    sessionID: Cart.Session.ID(rawValue: cart.session.id.rawValue)
+//                )
+//            )
+            try await db.close()
+            return ResultPayload(forAction: "Add items to cart", payload: items)
             
-            let items = try await databaseCartClient.getAllItemsInCart(
-                GetAllItemsInCartRequest(
+        case let .delete(id: id, product: product):
+            let db = try await databaseCartClient.connect()
+            let payload = try await databaseCartClient.removeItemFromCart(
+                RemoveItemFromCartRequest(
                     db: db,
-                    sessionID: Cart.Session.ID(rawValue: id.rawValue)
+                    id: Cart.Session.ID(rawValue: id),
+                    product: Product.ID(rawValue: product)
                 )
             )
             try await db.close()
-            return ResultPayload(forAction: "Add items to cart", payload: items)
+            return ResultPayload(forAction: "remove items to cart", payload: payload)
         }
     }
 }

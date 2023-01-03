@@ -63,6 +63,14 @@ public let cartRouter = OneOf {
         Method.post
         Body(.json(Cart.self))
     }
+    Route(.case(CartRoute.delete)) {
+        Path { "cart" ; "item" ; "delete" ; UUID.parser() ; UUID.parser() }
+        Method.delete
+//        Body(.json(Product.self))
+//        Query {
+//            Field("ID")
+//        }
+    }
 }
 
 

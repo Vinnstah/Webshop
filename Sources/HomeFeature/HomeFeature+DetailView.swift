@@ -1,4 +1,5 @@
 import Foundation
+import StyleGuide
 import SwiftUI
 import Product
 import ProductViews
@@ -69,7 +70,15 @@ public extension Home {
                             quantity: viewStore.state.quantity
                         )
                         
+                        viewStore.state.cart!.item.contains(where: {$0.product == product.id }) ?
                         
+                            
+                        Button("Remove from Cart") {
+                            viewStore.send(.cart(.removeItemFromCartTapped))
+                        }
+                        .buttonStyle(.primary(alternativeColor: Color("Secondary")))
+                        .padding(.horizontal)
+                        :
                         Button("Add to cart") {
                             viewStore.send(.cart(.addProductToCartTapped(
                                 quantity: viewStore.state.quantity,
@@ -78,7 +87,6 @@ public extension Home {
                         }
                         .buttonStyle(.primary)
                         .padding(.horizontal)
-                        
                     }
                 }
                 .background {

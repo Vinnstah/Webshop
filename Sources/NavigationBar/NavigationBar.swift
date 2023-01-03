@@ -14,7 +14,8 @@ import StyleGuide
 public struct NavigationBar<Content: View>: SwiftUI.View  {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     let isRoot: Bool
-    let isCartPopulated: () -> Bool
+//    let isCartPopulated: () -> Bool
+    let itemsInCart: Int
     let showCartQuickView: () -> Void
     let isFavourite: () -> Bool?
     let showFavouriteSymbol: () -> Void
@@ -26,7 +27,8 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
     
     public init(
         isRoot: Bool,
-        isCartPopulated: @escaping () -> Bool,
+//        isCartPopulated: @escaping () -> Bool,
+        itemsInCart: Int,
         showCartQuickView: @escaping () -> Void,
         isFavourite: @escaping () -> Bool? = { nil },
         showFavouriteSymbol: @escaping () -> Void = {},
@@ -37,7 +39,8 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         content: () -> Content
     ) {
         self.isRoot = isRoot
-        self.isCartPopulated = isCartPopulated
+        self.itemsInCart = itemsInCart
+//        self.isCartPopulated = isCartPopulated
         self.showCartQuickView = showCartQuickView
         self.isFavourite = isFavourite
         self.showFavouriteSymbol = showFavouriteSymbol
@@ -76,7 +79,8 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                                 bgColor: Color("Background")
                             )
                             
-                            cartButton(buttonAction: { showCartQuickView() }, isCartEmpty: { isCartPopulated() } )
+                            cartButton(buttonAction: { showCartQuickView() }, itemsInCart: itemsInCart )
+//                            cartButton(buttonAction: { showCartQuickView() }, isCartEmpty: { isCartPopulated() } )
                             
                             
                         }

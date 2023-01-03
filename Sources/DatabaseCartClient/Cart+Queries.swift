@@ -47,7 +47,7 @@ public extension Database {
     
     func insertItemsToCart(
         request: InsertItemsToCartRequest
-    ) async throws -> Cart.Session.ID? {
+    ) async throws -> [Cart.Item] {
         for item in request.cart.item {
             try await request.db.query("""
             INSERT INTO cart_items
@@ -57,7 +57,20 @@ public extension Database {
             UPDATE SET quantity=\(item.quantity.rawValue);
             """, logger: logger)
         }
-        return request.cart.session.id
+//        return try await getAllItemsInCart(request: GetAllItemsInCartRequest(db: request.db, sessionID: request.cart.session.id))
+        return request.cart.item
+    }
+    
+    func removeItemFromCart(
+        request: RemoveItemFromCartRequest
+    ) async throws -> Cart.Session.ID.RawValue {
+            try await request.db.query("""
+            DELETE FROM cart_items
+            WHERE cart_id=\(request.id.rawValue)
+            AND product_id=\(request.product.rawValue);
+            """, logger: logger)
+        
+        return request.id.rawValue
     }
 }
 

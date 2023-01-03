@@ -22,8 +22,8 @@ public func settingsButton(action: @escaping () -> Void) -> some View {
             .foregroundColor(Color("Secondary"))
     })
 }
-
-public func cartButton(buttonAction: @escaping () -> Void, isCartEmpty: @escaping () -> Bool) -> some View {
+//isCartEmpty: @escaping () -> Bool
+public func cartButton(buttonAction: @escaping () -> Void, itemsInCart: Int ) -> some View {
     
     ZStack {
         Button(action: {
@@ -38,12 +38,21 @@ public func cartButton(buttonAction: @escaping () -> Void, isCartEmpty: @escapin
         }
         )
         
-        if !isCartEmpty() {
-            Circle()
-                .foregroundColor(Color("Primary"))
-                .scaledToFill()
-                .frame(width: 10, height: 10, alignment: .topTrailing)
-                .offset(x: 8, y: -10)
+        if itemsInCart > 0 {
+            ZStack {
+                Circle()
+                    .foregroundColor(Color("Primary"))
+                    .scaledToFill()
+                    .frame(width: 10, height: 10, alignment: .topTrailing)
+                    .offset(x: 8, y: -10)
+                Text("\(itemsInCart)")
+                    .foregroundColor(Color("Secondary"))
+                    .scaledToFit()
+                    .minimumScaleFactor(0.01)
+                    .bold()
+                    .frame(width: 10, height: 10, alignment: .topTrailing)
+                    .offset(x: 5, y: -10)
+            }
         }
     }
 }

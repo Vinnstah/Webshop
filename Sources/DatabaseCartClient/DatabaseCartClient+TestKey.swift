@@ -11,6 +11,7 @@ extension DatabaseCartClient {
         getAllItemsInCart: unimplemented("\(Self.self).getAllItemsInCart"),
         fetchCartSession: unimplemented("\(Self.self).fetchCartSession"),
         insertItemsToCart: unimplemented("\(Self.self).insertItemsToCart"),
+        removeItemFromCart: unimplemented("\(Self.self).removeItemFromCart"),
         connect: unimplemented("\(Self.self).connect"),
         closeDatabaseEventLoop: unimplemented("\(Self.self).closeDatabaseEventLoop")
     )

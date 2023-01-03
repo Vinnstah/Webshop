@@ -1,6 +1,7 @@
 import PostgresNIO
 import Foundation
 import CartModel
+import Product
 
 public struct CreateCartSessionRequest: Sendable {
     public let db: PostgresConnection
@@ -46,4 +47,19 @@ public struct InsertItemsToCartRequest: Sendable {
         self.db = db
         self.cart = cart
     }
+    
 }
+
+public struct RemoveItemFromCartRequest: Sendable {
+    public let db: PostgresConnection
+    public let id: Cart.Session.ID
+    public let product: Product.ID
+    
+    public init(db: PostgresConnection, id: Cart.Session.ID, product: Product.ID) {
+        self.db = db
+        self.id = id
+        self.product = product
+    }
+    
+}
+

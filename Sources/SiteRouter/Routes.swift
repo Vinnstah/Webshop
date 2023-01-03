@@ -24,6 +24,7 @@ public enum CartRoute: Equatable {
     case fetch(jwt: String)
     case fetchAllItems(session: UUID)
     case add(item: Cart)
+    case delete(id: Cart.Session.ID.RawValue, product: Product.ID.RawValue)
 }
 
 public enum WarehouseRoute: Equatable {

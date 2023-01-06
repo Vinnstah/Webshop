@@ -53,12 +53,8 @@ public extension Home {
                                 .foregroundColor(.black)
                                 .offset(y: -15)
                             
-                            Text(product.boardgame.details.playInfo.descriptionText)
-                                .font(.caption)
-                                .multilineTextAlignment(.leading)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(Color("Secondary"))
-                                .padding(.horizontal)
+                            descriptionText(product.boardgame.details.playInfo.descriptionText)
+                            
                         }
                     }
                     
@@ -71,10 +67,9 @@ public extension Home {
                         )
                         
                         viewStore.state.cart!.item.contains(where: {$0.product == product.id }) ?
-                        
                             
                         Button("Remove from Cart") {
-                            viewStore.send(.cart(.removeItemFromCartTapped))
+                            viewStore.send(.cart(.removeItemFromCartTapped(viewStore.state.product!.id)))
                         }
                         .buttonStyle(.primary(alternativeColor: Color("Secondary")))
                         .padding(.horizontal)

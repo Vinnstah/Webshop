@@ -10,7 +10,6 @@ extension NavigationBar {
             isRoot: !viewStore.state.showDetailView,
             
             itemsInCart: viewStore.state.cart?.item.count ?? 0,
-//            isCartPopulated: { viewStore.state.cart?.item == [] },
             
             showCartQuickView: { viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .default)},
             
@@ -33,7 +32,7 @@ extension NavigationBar {
                 send: { .internal(.searchTextReceivingInput(text: $0)) }
             ),
             
-            cancelSearch: { viewStore.send(.internal(.cancelSearchTapped)) },
+            cancelSearch: { viewStore.send(.internal(.cancelSearchTapped),animation: .default) },
             
             previousScreenAction: { viewStore.send(.detailView(.toggleDetailView(nil)), animation: .easeOut) },
             

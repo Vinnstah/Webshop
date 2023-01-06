@@ -7,14 +7,17 @@ import ProductViews
 import CheckoutFeature
 import CartModel
 import NavigationBar
+import Boardgame
 
 public extension Home {
     struct View: SwiftUI.View {
         @Namespace var animation
         public let store: StoreOf<Home>
+        private let categories: IdentifiedArrayOf<Boardgame.Category>
         
-        public init(store: StoreOf<Home>) {
+        public init(store: StoreOf<Home>, categories: IdentifiedArrayOf<Boardgame.Category> = IdentifiedArray(uniqueElements: Boardgame.Category.allCases)) {
             self.store = store
+            self.categories = categories
         }
         
         public var body: some SwiftUI.View {
@@ -30,21 +33,22 @@ public extension Home {
                                     numberOfColumnsInGrid: viewStore.state.columnsInGrid
                                 )
                                 //TODO: Add category filtering
-                                //                                ScrollView(.horizontal) {
-                                //                                    HStack(spacing: 20) {
-                                //
-                                //                                        ForEach(viewStore.state.catergories.allCases, id: \.self) { category in
-                                //                                            Button(
-                                //                                                category.title
-                                //                                            ) {
-                                //                                                viewStore.send(.internal(.categoryButtonPressed(category)), animation: .default)
-                                //                                            }
-                                //                                            .frame(minWidth: 0, maxWidth: .infinity)
-                                //                                            .frame(height: 30)
-                                //                                            .buttonStyle(.primary(cornerRadius: 25))
-                                //                                        }
-                                //                                    }
-                                //                                }
+                                ScrollView(.horizontal) {
+                                    HStack(spacing: 20) {
+                                        
+                                        ForEach(categories
+                                        ) { category in
+                                            Button(
+                                                category.rawValue
+                                            ) {
+                                                viewStore.send(.internal(.categoryButtonTapped(category)), animation: .default)
+                                            }
+                                            .frame(minWidth: 0, maxWidth: .infinity)
+                                            .frame(height: 30)
+                                            .buttonStyle(.primary(cornerRadius: 25))
+                                        }
+                                    }
+                                }
                             }
                             StaggeredGrid(
                                 list: { viewStore.state.filteredProducts == [] ? viewStore.state.products : viewStore.state.filteredProducts },
@@ -99,12 +103,13 @@ public extension Home {
                 .overlay(alignment: .top, content: {
                     HStack {
                         Spacer()
-                    viewStore.state.showCheckoutQuickView ?
-                    //                ) {
+                        viewStore.state.showCheckoutQuickView ?
                         CheckoutQuickView(
-                            cart: (viewStore.state.cart) ?? .init(session: .init(id: .init(rawValue: .init()),
-                                                                                 jwt: .init(rawValue: "TEST")),
-                                                                  item: [.init(product: .init(rawValue: .init()), quantity: 2)]), tapAction: { viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .default) }
+                            store: self.store
+//                            cart: viewStore.state.cart!,
+//                            products: viewStore.state.products,
+//                            tapAction: { viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .default) },
+//                            deleteAction: { viewStore.send(.cart(.removeItemFromCartTapped(product)), animation: .default) }
                         ) : nil
                     }
                 }
@@ -114,58 +119,6 @@ public extension Home {
     }
 }
 
-//Temporary struct for logout button. Will create entire feature later on.
-struct Settings: View {
-    public let action: () -> Void
-    
-    public init(action: @escaping () -> Void) { self.action = action}
-    
-    public var body: some View {
-        Button("Log out user") {
-            action()
-        }
-        .buttonStyle(.primary)
-        .padding()
-    }
-}
-
-
-
-public struct CheckoutQuickView: View {
-    
-    public var cart: Cart
-    public var products: [Product]
-    public var tapAction: () -> Void
-    
-    public init(
-        cart: Cart,
-        products: [Product] = [],
-        tapAction: @escaping () -> Void
-    ) {
-        self.cart = cart
-        self.products = products
-        self.tapAction = tapAction
-    }
-    
-    public var body: some View {
-        ZStack {
-            RoundedRectangle(cornerSize: .zero)
-                .foregroundColor(.white)
-                .cornerRadius(25)
-            //
-            VStack {
-                ForEach(cart.item, id: \.product) { product in
-                    Text("\(product.product.rawValue)")
-                    Text(products.filter { $0.id == product.product}.description)
-                    Text("\(product.quantity.rawValue)")
-                }
-            }
-        }
-        .frame(maxWidth: 200, maxHeight: 500, alignment: .topTrailing )
-        .transition(.move(edge: .trailing))
-        .onTapGesture {
-            tapAction()
-        }
-    }
-        
-}
+//?? .init(session: .init(id: .init(rawValue: .init()),
+//                                                     jwt: .init(rawValue: "TEST")),
+//                                      item: [.init(product: .init(rawValue: .init()), quantity: 2)])

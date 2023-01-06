@@ -94,3 +94,14 @@ public extension Home.DetailView {
         .padding(.horizontal)
     }
 }
+
+public extension Home.DetailView {
+    func descriptionText(_ text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundColor(Color("Secondary"))
+            .padding(.horizontal)
+    }
+}

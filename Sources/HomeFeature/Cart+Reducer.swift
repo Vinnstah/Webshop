@@ -44,7 +44,7 @@ public extension Home {
                 )))
             }
         case let .cart(.createCartSessionResponse(.success(session))):
-            state.cart?.session = session
+            state.cart!.session = session
             return .none
             
         case .cart(.createCartSessionResponse(.failure(_))):
@@ -96,12 +96,13 @@ public extension Home {
             print("FAIL")
             return .none
             
-        case .cart(.removeItemFromCartTapped):
-            return .run { [id = state.cart!.session.id.rawValue, product = state.product!.id] send in
+        case let .cart(.removeItemFromCartTapped(id)):
+            state.cart?.item.removeAll(where: { $0.product == id })
+            return .run { [item = state.cart!.session.id.rawValue] send in
                 await send(.cart(.removeItemFromCartResponse(
                     TaskResult {
                         try await self.apiClient.decodedResponse(
-                            for: .cart(.delete(id: id, product: product.rawValue)),
+                            for: .cart(.delete(id: item, product: id.rawValue)),
                             as: ResultPayload<Cart.Session.ID.RawValue>.self).value.status.get()
                     }
                 )))

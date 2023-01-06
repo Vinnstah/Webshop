@@ -136,3 +136,21 @@ Each box allows you to play from 1 to 6 players, and if you combine more boxes, 
 
 INSERT INTO boardgames
 VALUES(gen_random_uuid (), 'Luxor', 'https://www.dragonslair.se/images/49651/original', 'Rudiger Dorn', '2013-01-01', 2, 'On the hunt for priceless treasures, groups of adventurers explore the legendary temple at Luxor. Their ultimate goal is the tomb of the pharaoh, but many treasures can be collected as they search. As they explore, the challenge unfolds: The player who manages to quickly get their team of adventurers to the tomb, while salvaging as many treasures as possible, will be the winner. Luxor offers variable game play, the path that leads to the tomb is different for every game, and will even change during play!', 8, 2, 4, 'Strategy');
+
+
+INSERT INTO boardgames
+VALUES(gen_random_uuid (), 'Ticket to Ride: Europe', 'https://www.dragonslair.se/images/5884/original', 'Days of Wonder', '2010-03-01', 3, 'Fristående startspel där Europas karta utgör spelplan. En aning mer avancerad än USA-kartan, det tillkommer nya regler för tunnlar, färjor och stationer. För att bygga tunnlar kan det krävas att man har fler tågkort än vad linjen normalt skulle kräva, för färjor krävs alltid minst ett lokomotiv/ jokerkort och stationer som byggs gör att du kan använda sträckor som motståndarna byggt till den staden. Kartan är mindre förlåtande än USA-kartan och det är svårare att klara sina biljetter, vilket gör Europakartan mer fokuserad på att snabbt bygga linjer som tros bli eftertraktade.', 8, 1, 6, 'Strategy');
+
+
+CREATE TABLE products (boardgame_id uuid, product_id uuid PRIMARY KEY, price integer, currency VARCHAR );
+
+INSERT INTO products
+VALUES
+('aab252aa-ece4-48b9-8344-807b54677b9a', gen_random_uuid (), 529, 'SEK'),
+('81c6391d-c891-411b-963c-9375e2201cc1', gen_random_uuid (), 299, 'SEK');
+
+
+ 
+ INSERT INTO boardgames
+VALUES(gen_random_uuid (), 'Star Wars Villainous: Power of the Dark Side', 'https://www.dragonslair.se/images/85957/product', 'LucasArt', '2020-03-01', 3, 'Become an iconic Star Wars Villain! Use your sinister Influence and unique abilities to manipulate the field in your favor. Are you powerful and clever enough to fulfill your dark destiny before your opponents? Explore a new universe of scum and villainy in Star Wars Villainous, the newest addition to the awardwinning Villainous game system. Choose your Villain and explore your Sector as you collect Credits, play ships and vehicles to gain new Abilities, and use Ambition to utilize your Villains unique skills. Play as Darth Vader, Moff Gideon, Kylo Ren, Asajj Ventress, or General Grievous.', 6, 1, 4, 'SciFi');
+

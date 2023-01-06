@@ -82,13 +82,12 @@ public extension Home {
             case createCartSessionResponse(TaskResult<Cart.Session>)
             case addProductToCartTapped(quantity: Int, product: Product)
             case addProductToCartResponse(TaskResult<[Cart.Item]>)
-            case removeItemFromCartTapped
+            case removeItemFromCartTapped(Product.ID)
             case removeItemFromCartResponse(TaskResult<Cart.Session.ID.RawValue>)
         }
         
         public enum DelegateAction: Equatable, Sendable {
             case userIsSignedOut
-            case addProductToCart(quantity: Int, product: Product)
         }
         
         public enum FavoriteAction: Equatable, Sendable {
@@ -151,7 +150,7 @@ public extension Home {
                     await send(.cart(.cartSessionResponse(
                         TaskResult {
                             try await self.apiClient.decodedResponse(
-                                for: .cart(.fetch(jwt: await self.userDefaultsClient.getLoggedInUserJWT() ?? "")),
+                                for: .cart(.fetch(jwt: await self.userDefaultsClient.getLoggedInUserJWT()!)),
                                 as: ResultPayload<Cart>.self).value.status.get()
                     }
                                                          )))

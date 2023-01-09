@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
-import ProductModel
+import Product
 import Kingfisher
 
 public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: Equatable {
@@ -30,12 +30,12 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                     .cornerRadius(25)
                 
                 VStack {
-                    KFImage(URL(string: product.imageURL))
+                    KFImage(URL(string: product.boardgame.imageURL))
                         .resizable()
                         .padding([.horizontal, .top])
                         .scaledToFill()
                     HStack {
-                        Text(product.title)
+                        Text(product.boardgame.title)
                             .foregroundColor(Color("Secondary"))
                             .font(.title)
                             .scaledToFit()
@@ -45,8 +45,8 @@ public struct ProductCardView<T: ReducerProtocol> : SwiftUI.View where T.State: 
                     .padding(.horizontal)
                     
                     HStack {
-                        Text("\(product.price)"+" kr")
-                            .foregroundColor(Color("ButtonColor"))
+                        Text("\(product.price.brutto)"+" kr")
+                            .foregroundColor(Color("Primary"))
                             .scaledToFit()
                             .minimumScaleFactor(0.01)
                             .bold()
@@ -70,7 +70,7 @@ public func favoriteButton(action: @escaping ()-> Void, isFavorite: Bool?, bgCol
             action()
         }, label: {
             Image(systemName: isFavorite! ? "heart.fill" : "heart")
-                .foregroundColor(Color("ButtonColor"))
+                .foregroundColor(Color("Primary"))
                 .background {
                     bgColor
                         .clipShape(Circle())

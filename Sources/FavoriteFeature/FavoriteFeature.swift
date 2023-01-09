@@ -1,9 +1,11 @@
 import Foundation
 import ComposableArchitecture
-import ProductModel
+import Product
 import ApiClient
 import SiteRouter
 import FavoritesClient
+
+extension IdentifiedArrayOf: @unchecked Sendable {}
 
 public struct Favorites: ReducerProtocol, Sendable {
     @Dependency(\.apiClient) var apiClient
@@ -13,7 +15,7 @@ public struct Favorites: ReducerProtocol, Sendable {
 
 public extension Favorites {
     struct State: Equatable, Sendable {
-        public var productList: [Product]
+        public var productList: IdentifiedArrayOf<Product>
         public var searchText: String
         public var searchResults: [Product]
         public var isProductDetailSheetPresented: Bool
@@ -22,7 +24,7 @@ public extension Favorites {
         public var favoriteProducts: FavoriteProducts
         
         public init(
-            productList: [Product] = [],
+            productList: IdentifiedArrayOf<Product> = [],
             searchText: String = "",
             searchResults: [Product] = [],
             isProductDetailSheetPresented: Bool = false,
@@ -54,9 +56,9 @@ public extension Favorites {
             case searchTextReceivesInput(String)
             case showProductDetailViewFor(Product)
             case toggleSheet
-            case loadFavoriteProducts([Product.SKU]?)
+            case loadFavoriteProducts([Product.ID]?)
             case favoriteButtonClicked(Product)
-            case removeFavouriteProduct(Product.SKU?)
+            case removeFavouriteProduct(Product.ID?)
         }
     }
     
@@ -65,18 +67,21 @@ public extension Favorites {
             switch action {
                 
             case .internal(.onAppear):
+//                return .run { send in
+//                    await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
+//                }
                 return .run { [apiClient] send in
                     return await send(.internal(.getProductResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(
-                                for: .getProducts,
+                                for: .products(.fetch),
                                 as: ResultPayload<[Product]>.self).value.status.get()
                         }
                     )))
                 }
                 
             case let .internal(.getProductResponse(.success(products))):
-                state.productList = products
+                state.productList = IdentifiedArray(uniqueElements: products)
                 return .run { send in
                     await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                 }
@@ -87,7 +92,7 @@ public extension Favorites {
                     }
                     
                 state.favoriteProducts.sku = products
-                state.productList = state.productList.filter { state.favoriteProducts.sku.contains($0.sku) }
+                state.productList = state.productList.filter { state.favoriteProducts.sku.contains($0.id) }
                 return .none
                 
             case let .internal(.getProductResponse(.failure(error))):
@@ -96,7 +101,7 @@ public extension Favorites {
                 
             case let .internal(.searchTextReceivesInput(text)):
                 state.searchText = text
-                state.searchResults = state.productList.filter { $0.title.contains(text)  }
+                state.searchResults = state.productList.filter { $0.boardgame.title.contains(text)  }
                 return .none
                 
             case let .internal(.showProductDetailViewFor(product)):
@@ -110,9 +115,9 @@ public extension Favorites {
                 
             case let .internal(.favoriteButtonClicked(product)):
                 
-                if state.favoriteProducts.sku.contains(product.sku) {
+                if state.favoriteProducts.sku.contains(product.id) {
                     return .run { send in
-                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.sku))))
+                        await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.id))))
                     }
                 }
                 return .none
@@ -121,7 +126,7 @@ public extension Favorites {
                 guard let sku else {
                     return .none
                 }
-                state.productList.removeAll(where: { $0.sku == sku })
+                state.productList.removeAll(where: { $0.id == sku })
                 return .none
                 
             case .delegate(_):

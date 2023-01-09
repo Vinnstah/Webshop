@@ -8,13 +8,13 @@ public struct Checkout: ReducerProtocol {
 
 public extension Checkout {
     struct State: Equatable, Sendable {
-        public var cart: Cart?
-        
-        public init(
-            cart: Cart? = nil
-        ) {
-            self.cart = cart
-        }
+//        public var cart: Cart?
+//        
+        public init() {}
+//            cart: Cart? = nil
+//        ) {
+//            self.cart = cart
+//        }
     }
     
     enum Action: Equatable, Sendable {

@@ -6,6 +6,7 @@ import UserModel
 import HomeFeature
 import FavoriteFeature
 import CheckoutFeature
+import NavigationBar
 
 public extension Main {
     struct View: SwiftUI.View {
@@ -37,6 +38,7 @@ public extension Main {
                         .tabItem {
                             Label("Favorites", systemImage: "heart")
                         }
+                        
                         Checkout.View(
                             store: self.store.scope(state: \.checkout!, action: Main.Action.checkout)
                         )
@@ -45,20 +47,10 @@ public extension Main {
                             Label("Checkout", systemImage: "cart")
                         }
                     }
-                    .accentColor(Color("ButtonColor"))
-                }
-                .onAppear {
-                    viewStore.send(.internal(.onAppear), animation: .default)
+                    .accentColor(Color("Primary"))
                 }
             }
         }
     }
 }
 
-//public extension Main {
-//    
-//    @ViewBuilder
-//    func topBar(numberOfProductsInCart: Int ) -> some View {
-//        Image(systemName: "cart")
-//    }
-//}

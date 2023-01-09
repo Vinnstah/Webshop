@@ -1,53 +1,53 @@
 import Foundation
-import ProductModel
+import Tagged
+import Product
 
-public struct Cart: Equatable, Identifiable, Sendable, Hashable, Codable {
+public struct Cart: Equatable, Codable, Sendable, Hashable {
+    public var session: Session
+    public var item: [Item]
     
-    public var id: String
-    public var products: [Product : Int]
-    public var userJWT: String
-    public var databaseID: String?
-    public var session: Cart.Session?
-    
-    public var numberOfItemsInCart: Int {
-        products.values.reduce(0, +)
-        }
-    
-    public var price: Int {
-        products.map({ $0.value * $0.key.price}).reduce(0, +)
+    public init(session: Session, item: [Item]) {
+        self.session = session
+        self.item = item
     }
-    
-    public init(
-        id: String,
-        products: [Product : Int] = [:],
-        userJWT: String,
-        databaseID: String? = nil,
-        session: Cart.Session? = nil
-    ) {
-        self.id = id
-        self.products = products
-        self.userJWT = userJWT
-        self.databaseID = databaseID
-        self.session = session  
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
-    public mutating func addItemToCart(product: Product, quantity: Int){
-        self.products[product] = quantity
-    }
-    
-    public struct Session: Equatable, Identifiable, Sendable, Hashable, Codable {
-        public var id: String
-        public var jwt: String
-        public var dbID: Int
+}
+
+public extension Cart {
+    struct Session: Identifiable, Equatable, Codable, Sendable, Hashable {
         
-        public init(id: String, jwt: String, dbID: Int) {
+        public var id: ID
+        public var jwt: JWT
+        
+        public init(id: ID, jwt: JWT) {
             self.id = id
             self.jwt = jwt
-            self.dbID = dbID
         }
     }
+}
+
+public extension Cart {
+    struct Item: Equatable, Codable, Sendable, Hashable  {
+        
+        public var product: Product.ID
+        public var quantity: Quantity
+        
+        public init(product: Product.ID, quantity: Quantity) {
+            self.product = product
+            self.quantity = quantity
+        }
+    }
+}
+
+public extension Cart.Session {
+    typealias ID = Tagged<Self, UUID>
+}
+
+public extension Cart.Session {
+    struct JWTTag: Sendable, Codable {}
+    typealias JWT = Tagged<JWTTag, String>
+}
+
+public extension Cart.Item {
+    struct QuantityTag: Sendable, Codable {}
+    typealias Quantity = Tagged<QuantityTag, Int>
 }

@@ -1,20 +1,19 @@
 import Foundation
-import ComposableArchitecture
+import Dependencies
 import URLRouting
 import SiteRouter
 
-private enum ApiClientKey: DependencyKey {
-    typealias Value = URLRoutingClient
-    static let liveValue = URLRoutingClient.live(router: SiteRouter.router
+extension URLRoutingClient<SiteRoute>: DependencyKey {
+    public static let liveValue = URLRoutingClient.live(router: SiteRouter.router
         .baseURL("http://127.0.0.1:8080"))
-    static let testValue = URLRoutingClient.live(router: SiteRouter.router
-        .baseURL("http://127.0.0.1:8080"))
-}
-public extension DependencyValues {
-    var apiClient: URLRoutingClient<SiteRoute> {
-        get { self[ApiClientKey.self] }
-        set { self[ApiClientKey.self] = newValue }
-    }
 }
 
+public extension DependencyValues {
+    var apiClient: URLRoutingClient<SiteRoute> {
+        get { self[URLRoutingClient.self] }
+        set { self[URLRoutingClient.self] = newValue }
+    }
+}
+// MARK: - URLRoutingClient + Sendable
 extension URLRoutingClient: @unchecked Sendable {}
+

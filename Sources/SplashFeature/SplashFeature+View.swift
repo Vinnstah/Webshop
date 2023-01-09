@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
+import StyleGuide
 
 public extension Splash {
     struct View: SwiftUI.View {
@@ -12,17 +13,18 @@ public extension Splash {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 }) { viewStore in
-                Text("SPLASH SCREEN")
-                    .onAppear {
-                        viewStore.send(.internal(.onAppear))
-                    }
-                    .background(Color(red: 52, green: 73, blue: 102))
-                    .frame(width: 600, height: 400)
-               
-                
+                ForceFullScreen {
+                    
+                    animatedTitle(animate: { viewStore.state.isAnimating } )
+                        .onAppear {
+                            viewStore.send(.internal(.onAppear))
+                        }
+                }
             }
-            .background(Color(red: 13, green: 24, blue: 33))
         }
     }
+    
+    
 }
+
 

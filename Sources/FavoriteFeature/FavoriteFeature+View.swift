@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 import ComposableArchitecture
-import ProductModel
+import Product
 import StyleGuide
 import ProductViews
 
@@ -13,7 +13,7 @@ public extension Favorites {
         @Namespace var animation
         
         struct ViewState: Equatable {
-            var productList: [Product]
+            var productList: IdentifiedArrayOf<Product>
             
             init(state: Favorites.State) {
                 self.productList = state.productList
@@ -32,20 +32,18 @@ public extension Favorites {
                 NavigationView {
                     ForceFullScreen {
                         VStack {
-                            
-                            StaggeredGrid(list: (viewStore.state.searchResults == []) ?
-                                          viewStore.state.productList :
-                                            viewStore.state.searchResults, columns: 2, content: { prod in
+                            Text("WIP")
+                            StaggeredGrid(list: { viewStore.state.productList }, columns: 2, content: { prod in
                                 ProductCardView<Favorites>(store: store, product: prod, action: {
                                     viewStore.send(.internal(.favoriteButtonClicked(prod)))
                                 }, isFavorite: {
-                                    viewStore.favoriteProducts.sku.contains(prod.sku)
+                                    viewStore.favoriteProducts.sku.contains(prod.id)
                                 })
                                 .padding(.horizontal)
                                 .onTapGesture {
                                     viewStore.send(.internal(.showProductDetailViewFor(prod)), animation: .default)
                                 }
-                                
+
                             })
                         }
                     }

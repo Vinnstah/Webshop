@@ -17,73 +17,61 @@ public extension SignUp {
                 ForceFullScreen {
                     VStack {
                         Spacer()
-                        HStack {
-                            Text("Email")
-                                .font(.subheadline)
-                            
-                            Spacer()
-                        }
-                        HStack {
-                            TextField("",
-                                      text: viewStore.binding(
-                                        get: { $0.email },
-                                        send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
-                                      )
-                            )
-                            .textFieldStyle(.roundedBorder)
-                            .autocorrectionDisabled()
-                            .foregroundColor(Color("Secondary"))
-                            .padding(.bottom)
-                            
-                            Image(systemName: viewStore.state.emailFulfillsRequirements ? "checkmark" : "xmark")
-                                .padding(.bottom)
-                                .foregroundColor(Color("Complementary"))
-                        }
+                        
+                        signUpImage()
+                        
+                        Spacer()
+                        
+                        Text(viewStore.state.emailFulfillsRequirements.rawValue)
+                            .font(.footnote)
+                            .foregroundColor(Color.gray.opacity(50))
                         
                         HStack {
-                            Text("Password")
-                                .font(.subheadline)
+                            emailTextField(
+                                text: viewStore.binding(
+                                    get: { $0.email },
+                                    send: { .internal(.emailAddressFieldReceivingInput(text: $0)) }
+                                )
+                            )
                             
-                            Spacer()
+                            credentialCheckerIndicator(action: { viewStore.state.emailFulfillsRequirements == .valid })
+                            
                         }
+                        .padding(.bottom)
+                        
+                        Text(viewStore.state.passwordFulfillsRequirements.rawValue)
+                            .font(.footnote)
+                            .foregroundColor(Color.gray.opacity(50))
                         
                         HStack {
-                            SecureField("",
-                                        text: viewStore.binding(
-                                            get: { $0.password },
-                                            send: { .internal(.passwordFieldReceivingInput(text: $0)) }
-                                        )
+                            passwordTextField(
+                                text: viewStore.binding(
+                                    get: { $0.password },
+                                    send: { .internal(.passwordFieldReceivingInput(text: $0)) }
+                                )
                             )
-                            .autocorrectionDisabled()
-                            .textFieldStyle(.roundedBorder)
-                            .foregroundColor(Color("Secondary"))
-                            .padding(.bottom)
                             
-                            Image(systemName: viewStore.state.passwordFulfillsRequirements ? "checkmark" : "xmark")
-                                .padding(.bottom)
-                                .foregroundColor(Color("Complementary"))
+                            credentialCheckerIndicator(action: { viewStore.state.passwordFulfillsRequirements == .valid })
                             
                         }
+                        .padding(.bottom)
                         
                         VStack {
-                            Button("Next step") {
-                                viewStore.send(.internal(.nextStep), animation: .default)
-                            }
-                            .buttonStyle(.primary(isDisabled: viewStore.disableButton, cornerRadius: 25))
-                            .disabled(viewStore.state.disableButton)
+                            actionButton(
+                                text: "Next Step",
+                                action: { viewStore.send(.delegate(
+                                    .goToNextStepTapped(
+                                        delegating: viewStore.state.user
+                                    )
+                                ), animation: .default) },
+                                isDisabled: { viewStore.state.disableButton })
                             
-                            Button("Go Back") { viewStore.send(.delegate(.goToThePreviousStep), animation: .default)}
-                                .foregroundColor(Color("Secondary"))
-                                .bold()
-                                .padding()
-                        }
-                    }
-                    
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                viewStore.send(.delegate(.goBackToLoginView), animation: .default)
+                            secondaryActionButton(
+                                text: "Go Back"
+                            ) {
+                                viewStore.send(.delegate(.goToThePreviousStepTapped), animation: .default)
                             }
+                            
                         }
                     }
                 }

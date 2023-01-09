@@ -14,27 +14,25 @@ public struct SignUp: ReducerProtocol {
 public extension SignUp {
     
     struct State: Equatable, Sendable {
-        public var user: User?
         public var alert: AlertState<Action>?
         public var email: String
         public var password: String
+        public var user: User
         
-        ///Rudimentary check to see if password exceeds 5 charachters. Will be replace by more sofisticated check later on.
-        public var passwordFulfillsRequirements: Bool {
-            password.count > 5
-        }
-        ///Check to see if email exceeds 5 charachters and if it contains `@`. Willl be replaced by RegEx.
-        public var emailFulfillsRequirements: Bool {
-            email.count > 5 && email.contains("@")
+        public var passwordFulfillsRequirements: PasswordChecker {
+            checkIfPasswordFulfillsRequirements(password)
         }
         
-        ///If either of the 3 conditions are `false` we return `true` and can disable specific buttons.
+        public var emailFulfillsRequirements: EmailCheckerResult {
+            checkIfEmailFullfillRequirements(email)
+        }
+        
         public var disableButton: Bool {
-             !passwordFulfillsRequirements || !emailFulfillsRequirements
+            passwordFulfillsRequirements != .valid || emailFulfillsRequirements != .valid
         }
         
         public init(
-            user: User? = nil,
+            user: User,
             alert: AlertState<Action>? = nil,
             email: String = "",
             password: String = ""
@@ -56,14 +54,13 @@ public extension SignUp {
         public enum InternalAction: Equatable, Sendable {
             case emailAddressFieldReceivingInput(text: String)
             case passwordFieldReceivingInput(text: String)
-            case nextStep
             case alertConfirmTapped
         }
         
         public enum DelegateAction: Equatable, Sendable {
-            case goToNextStep(User)
-            case goToThePreviousStep
-            case goBackToLoginView
+            case goToNextStepTapped(delegating: User)
+            case goToThePreviousStepTapped
+            case goBackToSignInViewTapped
         }
     }
     var body: some ReducerProtocol<State, Action> {
@@ -72,23 +69,16 @@ public extension SignUp {
                 ///Set `email` when emailField recceives input
             case let .internal(.emailAddressFieldReceivingInput(text: text)):
                 state.email = text
+                state.user.credentials.email = state.email
                 return .none
                 
                 ///Set  `password` when passwordField receives input.
             case let .internal(.passwordFieldReceivingInput(text: text)):
                 state.password = text
+                state.user.credentials.password = state.password
                 return .none
                 
-            case .internal(.nextStep):
-                state.user = User(email: state.email, password: state.password, jwt: "")
-//                
-                return .run { [user = state.user] send in
-                    await send(.delegate(.goToNextStep(user!)))
-                }
-                
-            case .delegate(_):
-                return .none
-            case .internal(_):
+            case .delegate, .internal:
                 return .none
             }
         }

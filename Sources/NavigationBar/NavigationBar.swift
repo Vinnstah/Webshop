@@ -1,3 +1,10 @@
+//import Foundation
+//import SwiftUI
+//import ProductViews
+//import StyleGuide
+//import ComposableArchitecture
+//import Product
+
 
 import Foundation
 import SwiftUI
@@ -7,7 +14,8 @@ import StyleGuide
 public struct NavigationBar<Content: View>: SwiftUI.View  {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     let isRoot: Bool
-    let isCartPopulated: () -> Bool
+//    let isCartPopulated: () -> Bool
+    let itemsInCart: Int
     let showCartQuickView: () -> Void
     let isFavourite: () -> Bool?
     let showFavouriteSymbol: () -> Void
@@ -19,9 +27,10 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
     
     public init(
         isRoot: Bool,
-        isCartPopulated: @escaping () -> Bool,
+//        isCartPopulated: @escaping () -> Bool,
+        itemsInCart: Int,
         showCartQuickView: @escaping () -> Void,
-        isFavourite: @escaping () -> Bool? = {nil},
+        isFavourite: @escaping () -> Bool? = { nil },
         showFavouriteSymbol: @escaping () -> Void = {},
         showSettingsSymbol: @escaping () -> Void = {},
         searchableBinding: Binding<String> = .constant(.init()),
@@ -30,7 +39,8 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         content: () -> Content
     ) {
         self.isRoot = isRoot
-        self.isCartPopulated = isCartPopulated
+        self.itemsInCart = itemsInCart
+//        self.isCartPopulated = isCartPopulated
         self.showCartQuickView = showCartQuickView
         self.isFavourite = isFavourite
         self.showFavouriteSymbol = showFavouriteSymbol
@@ -48,25 +58,15 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                     ZStack {
                         HStack {
                             if isRoot {
-                                Button(action: { showSettingsSymbol() }, label: {
-                                    Image(systemName: "gearshape")
-                                        .bold()
-                                        .padding()
-                                        .foregroundColor(Color("Secondary"))
-                                })
+                                settingsButton(action: { showSettingsSymbol() })
                             } else {
-                                Image(systemName: "chevron.left")
-                                    .bold()
-                                    .padding()
-                                    .foregroundColor(Color("Secondary"))
-                                    .onTapGesture(count: 1, perform: {
-                                        previousScreenAction()
-                                    })
-                                    .opacity(isRoot ? 0 : 1)
+                                backButton(action: { previousScreenAction() })
                             }
+                            
                             Spacer()
+                            
                             if isRoot {
-                                searchBar(
+                                SearchBar(
                                     bindingText: searchableBinding,
                                     showCancel: { searchableBinding.wrappedValue != "" },
                                     cancelSearch: { cancelSearch() }
@@ -79,24 +79,9 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
                                 bgColor: Color("Background")
                             )
                             
-                            ZStack {
-                                Button(action: {
-                                    showCartQuickView()
-                                }, label: {
-                                    Image(systemName: "cart")
-                                        .padding()
-                                        .bold()
-                                        .foregroundColor(Color("Secondary"))
-                                })
-                                
-                                if isCartPopulated() {
-                                    Circle()
-                                        .foregroundColor(Color("ButtonColor"))
-                                        .scaledToFill()
-                                        .frame(width: 10, height: 10, alignment: .topTrailing)
-                                        .offset(x: 8, y: -10)
-                                }
-                            }
+                            cartButton(buttonAction: { showCartQuickView() }, itemsInCart: itemsInCart )
+//                            cartButton(buttonAction: { showCartQuickView() }, isCartEmpty: { isCartPopulated() } )
+                            
                             
                         }
                         .frame(width: geometry.size.width)
@@ -116,53 +101,53 @@ public struct NavigationBar<Content: View>: SwiftUI.View  {
         }
     }
 }
-
-@ViewBuilder
-public func searchBar(bindingText: Binding<String>, showCancel: @escaping () -> Bool, cancelSearch: @escaping ()->Void) -> some View {
-    
-    ZStack {
-        TextField("", text: bindingText)
-            .labelsHidden()
-            .textFieldStyle(TappableTextFieldStyle())
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled()
-            .padding(.horizontal)
-            .foregroundColor(Color("Secondary"))
-        
-        HStack {
-            
-            Image(systemName: "magnifyingglass")
-                .bold()
-                .foregroundColor(.gray)
-                .padding(.horizontal)
-                .opacity(bindingText.wrappedValue == "" ? 1 : 0)
-            
-            Text("Search")
-                .font(.footnote)
-                .foregroundColor(.gray)
-                .opacity(bindingText.wrappedValue == "" ? 1 : 0)
-            
-            Spacer()
-            if showCancel() {
-                Button(action: {
-                    cancelSearch()
-                }, label: {
-                    Image(systemName: "x.circle")
-                        .bold()
-                        .foregroundColor(.gray)
-                })
-            }
-        }
-    }
-}
-
-public struct CustomTextFieldStyle : TextFieldStyle {
-    public func _body(configuration: TextField<Self._Label>) -> some View {
-        configuration
-            .font(.largeTitle)
-            .padding(10)
-            .background(
-                RoundedRectangle(cornerRadius: 5)
-                    .strokeBorder(Color.primary.opacity(0.5), lineWidth: 3))
-    }
-}
+////
+////@ViewBuilder
+////public func searchBar(bindingText: Binding<String>, showCancel: @escaping () -> Bool, cancelSearch: @escaping ()->Void) -> some View {
+////    
+////    ZStack {
+////        TextField("", text: bindingText)
+////            .labelsHidden()
+////            .textFieldStyle(TappableTextFieldStyle())
+////            .textInputAutocapitalization(.never)
+////            .autocorrectionDisabled()
+////            .padding(.horizontal)
+////            .foregroundColor(Color("Secondary"))
+////        
+////        HStack {
+////            
+////            Image(systemName: "magnifyingglass")
+////                .bold()
+////                .foregroundColor(.gray)
+////                .padding(.horizontal)
+////                .opacity(bindingText.wrappedValue == "" ? 1 : 0)
+////            
+////            Text("Search")
+////                .font(.footnote)
+////                .foregroundColor(.gray)
+////                .opacity(bindingText.wrappedValue == "" ? 1 : 0)
+////            
+////            Spacer()
+////            if showCancel() {
+////                Button(action: {
+////                    cancelSearch()
+////                }, label: {
+////                    Image(systemName: "x.circle")
+////                        .bold()
+////                        .foregroundColor(.gray)
+////                })
+////            }
+////        }
+////    }
+////}
+////
+////public struct CustomTextFieldStyle : TextFieldStyle {
+////    public func _body(configuration: TextField<Self._Label>) -> some View {
+////        configuration
+////            .font(.largeTitle)
+////            .padding(10)
+////            .background(
+////                RoundedRectangle(cornerRadius: 5)
+////                    .strokeBorder(Color.primary.opacity(0.5), lineWidth: 3))
+////    }
+////}

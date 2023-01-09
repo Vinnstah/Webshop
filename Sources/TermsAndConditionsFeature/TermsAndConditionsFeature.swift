@@ -1,18 +1,16 @@
 import Foundation
+import SwiftUI
 import ComposableArchitecture
 import UserModel
 import UserDefaultsClient
 import ApiClient
 import SiteRouter
 
-extension AlertState: @unchecked Sendable {}
-public struct TermsAndConditions: ReducerProtocol {
+public struct TermsAndConditions: ReducerProtocol, Sendable {
     @Dependency(\.userDefaultsClient) var userDefaultsClient
-    @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.apiClient) var apiClient
     public init() {}
 }
-
 
 public extension TermsAndConditions {
     typealias JWT = String
@@ -39,21 +37,16 @@ public extension TermsAndConditions {
         case `internal`(InternalAction)
         
         public enum InternalAction: Equatable, Sendable {
-            case nextStep
-            case previousStep
-            case cancelButtonPressed
             case alertConfirmTapped
-            case finishSignUpButtonPressed
-            case termsAndConditionsBoxPressed
-            case finishSignUp
-            case createUserRequest(User)
+            case finishSignUpButtonTapped
+            case termsAndConditionsBoxTapped
             case createUserResponse(TaskResult<JWT>)
         }
         
         public enum DelegateAction: Equatable, Sendable {
             case userFinishedOnboarding(JWT)
-            case previousStep(User)
-            case goBackToLoginView
+            case previousStepTapped(delegating: User)
+            case goBackToSignInViewTapped
         }
     }
     
@@ -62,22 +55,7 @@ public extension TermsAndConditions {
             
             switch action {
                 
-            case .internal(.finishSignUpButtonPressed):
-                return .run { send in
-                    await send(.internal(.finishSignUp))
-                }
-                
-            case .internal(.previousStep):
-                return .run { [user = state.user] send in
-                    await send(.delegate(.previousStep(user)))
-                }
-                
-            case .internal(.cancelButtonPressed):
-                return .run { send in
-                    await send(.delegate(.goBackToLoginView))
-                }
-                
-            case .internal(.termsAndConditionsBoxPressed):
+            case .internal(.termsAndConditionsBoxTapped):
                 state.areTermsAndConditionsAccepted.toggle()
                 return .none
                 
@@ -85,36 +63,25 @@ public extension TermsAndConditions {
                 state.alert = nil
                 return .none
                 
-            case .internal(.finishSignUp):
-                return .run { [
-                    user = state.user
-                ] send in
+            case .internal(.finishSignUpButtonTapped):
+                return .run { [user = state.user] send in
                     
-                    await send(.internal(.createUserRequest(user)))
-                }
-                
-            case let .internal(.createUserRequest(user)):
-                
-                return .run { [apiClient] send in
-                    return await send(.internal(
+                     await send(.internal(
                         .createUserResponse(
                             TaskResult {
-                                try await apiClient.decodedResponse(
-                                    for: .create(user),
+                                try await self.apiClient.decodedResponse(
+                                    for: .users(.create(user)),
                                     as: ResultPayload<JWT>.self
                                 ).value.status.get()
                             }
                         )
-                    )
-                    )
-                    
+                    ))
                 }
                 
             case let .internal(.createUserResponse(.success(jwt))):
-                return .run { [mainQueue, userDefaultsClient] send in
-                    try await mainQueue.sleep(for: .milliseconds(700))
-                    await userDefaultsClient.setLoggedInUserJWT(jwt)
-                    await send(.delegate(.userFinishedOnboarding(jwt)))
+                return .run {  send in
+                    await self.userDefaultsClient.setLoggedInUserJWT(jwt)
+                    await send(.delegate(.userFinishedOnboarding(jwt)), animation: .default)
                 }
                 
             case let .internal(.createUserResponse(.failure(error))):
@@ -125,14 +92,12 @@ public extension TermsAndConditions {
                 )
                 return .none
                 
-            case .internal(_):
+            case .internal, .delegate:
                 return .none
-                
-            case .delegate(_):
-                return .none
-                
-                
             }
         }
     }
 }
+
+extension Animation: @unchecked Sendable {}
+extension AlertState: @unchecked Sendable {}

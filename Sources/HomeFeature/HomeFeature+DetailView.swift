@@ -1,10 +1,10 @@
 import Foundation
+import StyleGuide
 import SwiftUI
-import ProductModel
+import Product
 import ProductViews
 import ComposableArchitecture
 import CartModel
-import NavigationBar
 import Kingfisher
 
 public extension Home {
@@ -32,100 +32,58 @@ public extension Home {
         
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
-                    VStack {
-                        ScrollView(.vertical) {
-                            
-                            VStack {
-                                KFImage(URL(string: product.imageURL))
-                                    .resizable()
-                                    .padding([.horizontal, .top])
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 350)
-                                    .clipShape(Rectangle())
-                                    .cornerRadius(40)
-                                    .ignoresSafeArea()
-                                    .matchedGeometryEffect(id: product.imageURL, in: animation)
-                                HStack {
-                                    Text(product.title)
-                                        .font(.largeTitle)
-                                        .scaledToFit()
-                                        .minimumScaleFactor(0.01)
-                                        .lineLimit(1)
-                                        .frame(width: 350)
-                                        .frame(alignment: .leading)
-                                }
-                                HStack {
-                                    VStack {
-                                        Text(product.category)
-                                            .font(.system(size: 10))
-                                            .foregroundColor(Color("Secondary"))
-                                            .frame(alignment:.leading)
-                                        
-                                        Text(product.subCategory)
-                                            .font(.system(size: 8))
-                                            .foregroundColor(Color("Secondary"))
-                                            .frame(alignment: .leading)
-                                    }
-                                    .padding(.leading, 30)
-                                    
-                                    Spacer()
-                                    
-                                    Text("\(product.price) kr")
-                                        .font(.title)
-                                        .bold()
-                                        .foregroundColor(Color("ButtonColor"))
-                                        .frame(alignment: .center)
-                                        .padding(.trailing, 50)
-                                }
-                                
-                                Divider()
-                                    .foregroundColor(.black)
-                                    .offset(y: -15)
-                                
-                                Text(product.description)
-                                    .font(.caption)
-                                    .multilineTextAlignment(.leading)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(Color("Secondary"))
-                                    .padding(.horizontal)
-                            }
-                        }
+                VStack {
+                    ScrollView(.vertical) {
                         
-                        HStack {
-                            HStack {
-                                Button(action: { viewStore.send(.internal(.decreaseQuantityButtonPressed)) },
-                                       label: {
-                                    Image(systemName: "minus")
-                                        .foregroundColor(Color("Secondary"))
-                                })
-                                if viewStore.state.quantity < 10 {
-                                    Text(String("0" + "\(viewStore.state.quantity)"))
-                                        .font(.title3)
-                                        .bold()
-                                        .foregroundColor(Color("Secondary"))
-                                } else {
-                                    Text(String("\(viewStore.state.quantity)"))
-                                        .font(.title3)
-                                        .bold()
-                                        .foregroundColor(Color("Secondary"))
-                                }
-                                Button(action: { viewStore.send(.internal(.increaseQuantityButtonPressed)) },
-                                       label: {
-                                    Image(systemName: "plus")
-                                        .foregroundColor(Color("Secondary"))
-                                })
-                            }
-                            .fixedSize()
-                            .padding(.horizontal)
+                        VStack {
                             
-                            Button("Add to cart") {
-                                viewStore.send(.delegate(.addProductToCart(quantity: viewStore.state.quantity, product: viewStore.state.product!)))
-                            }
-                            .buttonStyle(.primary)
-                            .padding(.horizontal)
+                            image(
+                                url: product.boardgame.imageURL,
+                                animationID: animation
+                            )
+                            
+                            title(product.boardgame.title)
+                            
+                            priceAndCategory(
+                                category: product.boardgame.category.rawValue,
+                                price: product.price.brutto
+                            )
+                            
+                            Divider()
+                                .foregroundColor(.black)
+                                .offset(y: -15)
+                            
+                            descriptionText(product.boardgame.details.playInfo.descriptionText)
                             
                         }
                     }
+                    
+                    HStack {
+                        
+                        quantityModule(
+                            decreaseQuantity: { viewStore.send(.detailView(.decreaseQuantityButtonTapped), animation: .default) },
+                            increaseQuantity: { viewStore.send(.detailView(.increaseQuantityButtonTapped), animation: .default) },
+                            quantity: viewStore.state.quantity
+                        )
+                        
+                        viewStore.state.cart!.item.contains(where: {$0.product == product.id }) ?
+                            
+                        Button("Remove from Cart") {
+                            viewStore.send(.cart(.removeItemFromCartTapped(viewStore.state.product!.id)))
+                        }
+                        .buttonStyle(.primary(alternativeColor: Color("Secondary")))
+                        .padding(.horizontal)
+                        :
+                        Button("Add to cart") {
+                            viewStore.send(.cart(.addProductToCartTapped(
+                                quantity: viewStore.state.quantity,
+                                product: product))
+                            )
+                        }
+                        .buttonStyle(.primary)
+                        .padding(.horizontal)
+                    }
+                }
                 .background {
                     Color("BackgroundColor")
                 }
@@ -133,3 +91,4 @@ public extension Home {
         }
     }
 }
+

@@ -24,7 +24,6 @@ public extension Home {
     struct State: Equatable, Sendable {
         public var products: IdentifiedArrayOf<Product>
         public var boardgames: IdentifiedArrayOf<Boardgame>
-        
         public var product: Product?
         public var catergories: Boardgame.Category?
         public var cart: Cart?

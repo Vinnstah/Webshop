@@ -97,7 +97,9 @@ public extension Home {
             return .none
             
         case let .cart(.removeItemFromCartTapped(id)):
+            
             state.cart?.item.removeAll(where: { $0.product == id })
+            
             return .run { [item = state.cart!.session.id.rawValue] send in
                 await send(.cart(.removeItemFromCartResponse(
                     TaskResult {

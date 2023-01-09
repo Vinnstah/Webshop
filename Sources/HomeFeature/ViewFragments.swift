@@ -1,5 +1,7 @@
 import SwiftUI
 import Foundation
+import ComposableArchitecture
+import Boardgame
 
 public extension Home.View {
     
@@ -51,6 +53,30 @@ public extension Home.View {
             }
             .buttonStyle(.primary)
             .padding()
+        }
+    }
+}
+
+public extension Home.View {
+    func categoryFiltering(
+    categories: IdentifiedArrayOf<Boardgame.Category>,
+        filterAction: @escaping () -> Void
+    ) -> some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 20) {
+                
+                ForEach(categories
+                ) { category in
+                    Button(
+                        category.rawValue
+                    ) {
+                        filterAction()
+                    }
+                    .frame(minWidth: 0, maxWidth: .infinity)
+                    .frame(height: 30)
+                    .buttonStyle(.primary(cornerRadius: 25))
+                }
+            }
         }
     }
 }

@@ -15,7 +15,10 @@ public extension Home {
         public let store: StoreOf<Home>
         private let categories: IdentifiedArrayOf<Boardgame.Category>
         
-        public init(store: StoreOf<Home>, categories: IdentifiedArrayOf<Boardgame.Category> = IdentifiedArray(uniqueElements: Boardgame.Category.allCases)) {
+        public init(
+            store: StoreOf<Home>,
+            categories: IdentifiedArrayOf<Boardgame.Category> = IdentifiedArray(uniqueElements: Boardgame.Category.allCases)
+        ) {
             self.store = store
             self.categories = categories
         }
@@ -32,7 +35,11 @@ public extension Home {
                                     decreaseColumns: { viewStore.send(.view(.decreaseNumberOfColumnsTapped), animation: .default) },
                                     numberOfColumnsInGrid: viewStore.state.columnsInGrid
                                 )
-                                //TODO: Add category filtering
+                                
+//                                categoryFiltering(
+//                                    categories: categories,
+//                                    filterAction: { viewStore.send(.internal(.categoryButtonTapped(category)), animation: .default)} )
+                                
                                 ScrollView(.horizontal) {
                                     HStack(spacing: 20) {
                                         
@@ -103,14 +110,11 @@ public extension Home {
                 .overlay(alignment: .top, content: {
                     HStack {
                         Spacer()
+                        
                         viewStore.state.showCheckoutQuickView ?
                         CheckoutQuickView(
-                            store: self.store
-//                            cart: viewStore.state.cart!,
-//                            products: viewStore.state.products,
-//                            tapAction: { viewStore.send(.internal(.toggleCheckoutQuickViewTapped), animation: .default) },
-//                            deleteAction: { viewStore.send(.cart(.removeItemFromCartTapped(product)), animation: .default) }
-                        ) : nil
+                            store: self.store)
+                        : nil
                     }
                 }
                 )
@@ -118,7 +122,3 @@ public extension Home {
         }
     }
 }
-
-//?? .init(session: .init(id: .init(rawValue: .init()),
-//                                                     jwt: .init(rawValue: "TEST")),
-//                                      item: [.init(product: .init(rawValue: .init()), quantity: 2)])

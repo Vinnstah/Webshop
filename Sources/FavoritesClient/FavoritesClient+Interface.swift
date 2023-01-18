@@ -14,7 +14,7 @@ public struct FavoritesClient: Sendable {
     
     public typealias AddFavorite = @Sendable (Product.ID) async throws -> Product.ID?
     public typealias RemoveFavorite = @Sendable (Product.ID) async throws -> Product.ID?
-    public typealias GetFavourites = @Sendable () async throws -> [Product.ID]?
+    public typealias GetFavourites = @Sendable () async throws -> [Product.ID]
     
     public var addFavorite: AddFavorite
     public var removeFavorite: RemoveFavorite

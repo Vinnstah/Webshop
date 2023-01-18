@@ -21,7 +21,7 @@ public struct CheckoutQuickView: View {
                     .cornerRadius(25)
                 List {
                     ForEach(viewStore.state.cart?.item ?? [], id: \.product) { item in
-                        CartProductView(item: item, products: viewStore.state.products)
+                        CartProductView(item: item, products: [])
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive, action: { viewStore.send(
                                     .cart(
@@ -72,5 +72,52 @@ public struct CartProductView : View {
             Text("\(item.quantity.rawValue * (products.first?.price.brutto ?? 1))")
         }
         .frame(height: 30)
+    }
+}
+
+public extension CheckoutQuickView {
+    struct ModifyQuantity: View {
+        
+        @State var quantity: Int = 0
+        let product: Product
+        let modifyQuantityAction: (Int, Product) -> Void
+        
+        public init(product: Product, modifyQuantityAction: @escaping (Int, Product) -> Void) {
+            self.product = product
+            self.modifyQuantityAction = modifyQuantityAction
+        }
+        
+        public var body: some View {
+            HStack {
+                Button(action:
+                        { quantity -= 1 },
+                       label: {
+                    Image(systemName: "minus")
+                        .foregroundColor(Color("Secondary"))
+                })
+                if quantity < 10 {
+                    Text(String("0" + "\(quantity)"))
+                        .font(.title3)
+                        .bold()
+                        .foregroundColor(Color("Secondary"))
+                        .animation(.default, value: quantity)
+                } else {
+                    Text(String("\(quantity)"))
+                        .font(.title3)
+                        .bold()
+                        .foregroundColor(Color("Secondary"))
+                }
+                Button(action: { quantity += 1 },
+                       label: {
+                    Image(systemName: "plus")
+                        .foregroundColor(Color("Secondary"))
+                })
+                Button(action: { modifyQuantityAction(quantity, product) },
+                       label: {
+                    Text("OK")
+                        .foregroundColor(Color("Secondary"))
+                })
+            }
+        }
     }
 }

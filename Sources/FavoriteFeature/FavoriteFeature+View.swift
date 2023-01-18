@@ -37,7 +37,7 @@ public extension Favorites {
                                 ProductCardView<Favorites>(store: store, product: prod, action: {
                                     viewStore.send(.internal(.favoriteButtonClicked(prod)))
                                 }, isFavorite: {
-                                    viewStore.favoriteProducts.sku.contains(prod.id)
+                                    viewStore.favoriteProducts.ids.contains(prod.id)
                                 })
                                 .padding(.horizontal)
                                 .onTapGesture {

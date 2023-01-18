@@ -37,6 +37,9 @@ let package = Package(
             name: "BoardgameService",
             targets: ["BoardgameService"]),
         .library(
+            name: "BrowseFeature",
+            targets: ["BrowseFeature"]),
+        .library(
             name: "CheckoutFeature",
             targets: ["CheckoutFeature"]),
         .library(
@@ -102,6 +105,9 @@ let package = Package(
         .library(
             name: "SignUpFeature",
             targets: ["SignUpFeature"]),
+        .library(
+            name: "SharedCartStateClient",
+            targets: ["SharedCartStateClient"]),
         .library(
             name: "Server",
             targets: ["Server"]),
@@ -187,6 +193,22 @@ let package = Package(
                 "SiteRouter",
                 dependencies,
                 vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "BrowseFeature",
+            dependencies: [
+                "ApiClient",
+                "Boardgame",
+                "CartModel",
+                "FavoritesClient",
+                "ProductViews",
+                "SharedCartStateClient",
+                "SiteRouter",
+                "StyleGuide",
+                kingfisher,
+                tca,
             ],
             swiftSettings: swiftSettings
         ),
@@ -304,14 +326,17 @@ let package = Package(
             name: "HomeFeature",
             dependencies: [
                 "ApiClient",
+                "BrowseFeature",
                 "Boardgame",
                 "CartModel",
                 "FavoritesClient",
                 "NavigationBar",
                 "ProductViews",
                 "SiteRouter",
+                "SharedCartStateClient",
                 "StyleGuide",
                 "UserDefaultsClient",
+                dependencies,
                 kingfisher,
                 tca,
             ],
@@ -470,7 +495,15 @@ let package = Package(
                 ],
                 swiftSettings: swiftSettings
             ),
-        
+        .target(
+            name: "SharedCartStateClient",
+            dependencies: [
+                tca,
+                "CartModel",
+                "Product",
+            ],
+            swiftSettings: swiftSettings
+        ),
         
             .target(
                 name: "SplashFeature",

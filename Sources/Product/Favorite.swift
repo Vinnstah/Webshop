@@ -2,9 +2,9 @@ import Foundation
 
 public struct FavoriteProducts: Equatable, Sendable, Codable {
     
-    public var sku: [Product.ID]
+    public var ids: [Product.ID]
     
-    public init(sku: [Product.ID] = []) {
-        self.sku = sku
+    public init(ids: [Product.ID] = []) {
+        self.ids = ids
     }
 }

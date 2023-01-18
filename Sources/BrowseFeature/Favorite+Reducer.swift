@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Foundation
 import FavoritesClient
 
-public extension Home {
+public extension Browse {
     
     func favorite(
         into state: inout State,
@@ -10,40 +10,34 @@ public extension Home {
     ) -> Effect<Action, Never> {
         switch action {
         case let .favorite(.loadFavoriteProducts(products)):
-            guard let products else {
+            guard !products.isEmpty else {
                 return .none
             }
             
-            state.favoriteProducts.sku = products
+            state.favoriteProducts.ids = products
             return .none
             
         case let .favorite(.favoriteButtonTapped(product)):
             
-            if state.favoriteProducts.sku.contains(product.id) {
+            guard !state.favoriteProducts.ids.contains(product.id) else {
                 return .run { send in
-                    await send(.favorite(.removeFavouriteProduct(try self.favouritesClient.removeFavorite(product.id))))
+                    await send(.favorite(.removeFavouriteProduct(try self.favouritesClient.removeFavorite(product.id)!)))
                 }
             }
             
             return .run { send in
-                await send(.favorite(.addFavouriteProduct(try self.favouritesClient.addFavorite(product.id))))
+                await send(.favorite(.addFavouriteProduct(try self.favouritesClient.addFavorite(product.id)!)))
             }
             
         case let .favorite(.removeFavouriteProduct(sku)):
-            guard let sku else {
-                return .none
-            }
-            state.favoriteProducts.sku.removeAll(where: { $0 == sku })
+            state.favoriteProducts.ids.removeAll(where: { $0 == sku })
             return .none
             
         case let .favorite(.addFavouriteProduct(sku)):
-            guard let sku else {
-                return .none
-            }
-            state.favoriteProducts.sku.append(sku)
+            state.favoriteProducts.ids.append(sku)
             return .none
             
-        case .internal, .delegate, .view, .detailView, .cart:
+        case .internal, .delegate, .view, .detailView, .task:
             return .none
         }
     }

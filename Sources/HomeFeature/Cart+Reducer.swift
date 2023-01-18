@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import CartModel
 import SiteRouter
+import Product
 
 public extension Home {
     
@@ -25,12 +26,14 @@ public extension Home {
             
         case let .cart(.cartItemsResponse(.success(items))):
             state.cart?.item = items
-            return .none
+            return .run { send in
+                await send(.task)
+            }
             
         case .cart(.cartItemsResponse(.failure(_))):
-            print("NO items found")
             return .none
             
+            //TODO: Change UUID creation to server-side and do it directly in DB
         case .cart(.cartSessionResponse(.failure)):
             state.cart?.session = .init(id: .init(rawValue: .init()), jwt: .init(rawValue: ""))
             return .run { send in
@@ -58,9 +61,10 @@ public extension Home {
             }
             
             if state.cart!.item.contains(
-                where: {$0.product == product.id}
+                where: { $0.product == product.id }
             ) {
-                state.cart!.item = state.cart!.item.map { $0.product == product.id ?
+                state.cart!.item = state.cart!.item.map {
+                    $0.product == product.id ?
                     Cart.Item(
                         product: product.id,
                         quantity: Cart.Item.Quantity(rawValue: quantity))
@@ -86,10 +90,10 @@ public extension Home {
             guard items == state.cart?.item else {
                 return .none
             }
-            state.quantity = 0
+//            state.quantity = 0
             return .run { send in
                 try await self.clock.sleep(for: .milliseconds(500))
-                await send(.detailView(.toggleDetailView(nil)), animation: .easeIn)
+                await send(.child(.browse(.delegate(.dismissedDetails))), animation: .easeIn)
             }
             
         case .cart(.addProductToCartResponse(.failure(_))):
@@ -105,14 +109,14 @@ public extension Home {
                     TaskResult {
                         try await self.apiClient.decodedResponse(
                             for: .cart(.delete(id: item, product: id.rawValue)),
-                            as: ResultPayload<Cart.Session.ID.RawValue>.self).value.status.get()
+                            as: ResultPayload<Product.ID.RawValue>.self).value.status.get()
                     }
                 )))
             }
             
-        case .cart(.removeItemFromCartResponse(.success)):
+        case let .cart(.removeItemFromCartResponse(.success(id))):
             state.cart?.item.removeAll(
-                where: { $0.product == state.product?.id}
+                where: { $0.product.rawValue == id}
             )
             return .none
             
@@ -120,10 +124,16 @@ public extension Home {
             print("FAIL")
             return .none
             
+        case .task:
+            return .run { [cart = state.cart!] _ in
+                await self.cartStateClient.sendAction(cart)
+            }
+            
 
-                        
-        case .internal, .delegate, .view, .detailView, .favorite:
+        case .internal, .delegate, .child, .browse:
             return .none
+            
         }
+            
     }
 }

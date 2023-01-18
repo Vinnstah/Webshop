@@ -54,28 +54,14 @@ public extension CartService {
             return ResultPayload(forAction: "fetch all items", payload: item)
             
         case let .add(cart):
-            print("cart \(cart)")
             let db = try await databaseCartClient.connect()
-            print("1")
             let items = try await databaseCartClient.insertItemsToCart(InsertItemsToCartRequest(db: db, cart: cart))
-            print(items)
-//                try await db.close()
-//                print("FALFAFLA")
-//                return ResultPayload(forAction: "fetch Cart Session", payload: cart)
-//            }
-            
-//            let items = try await databaseCartClient.getAllItemsInCart(
-//                GetAllItemsInCartRequest(
-//                    db: db,
-//                    sessionID: Cart.Session.ID(rawValue: cart.session.id.rawValue)
-//                )
-//            )
             try await db.close()
             return ResultPayload(forAction: "Add items to cart", payload: items)
             
         case let .delete(id: id, product: product):
             let db = try await databaseCartClient.connect()
-            let payload = try await databaseCartClient.removeItemFromCart(
+            try await databaseCartClient.removeItemFromCart(
                 RemoveItemFromCartRequest(
                     db: db,
                     id: Cart.Session.ID(rawValue: id),
@@ -83,7 +69,7 @@ public extension CartService {
                 )
             )
             try await db.close()
-            return ResultPayload(forAction: "remove items to cart", payload: payload)
+            return ResultPayload(forAction: "remove items to cart", payload: product)
         }
     }
 }

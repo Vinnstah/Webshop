@@ -91,8 +91,8 @@ public extension Favorites {
                         return .none
                     }
                     
-                state.favoriteProducts.sku = products
-                state.productList = state.productList.filter { state.favoriteProducts.sku.contains($0.id) }
+                state.favoriteProducts.ids = products
+                state.productList = state.productList.filter { state.favoriteProducts.ids.contains($0.id) }
                 return .none
                 
             case let .internal(.getProductResponse(.failure(error))):
@@ -115,7 +115,7 @@ public extension Favorites {
                 
             case let .internal(.favoriteButtonClicked(product)):
                 
-                if state.favoriteProducts.sku.contains(product.id) {
+                if state.favoriteProducts.ids.contains(product.id) {
                     return .run { send in
                         await send(.internal(.removeFavouriteProduct(try favouritesClient.removeFavorite(product.id))))
                     }

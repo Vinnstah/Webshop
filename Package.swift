@@ -104,6 +104,9 @@ let package = Package(
             name: "ProductService",
             targets: ["ProductService"]),
         .library(
+            name: "SearchClient",
+            targets: ["SearchClient"]),
+        .library(
             name: "SignUpFeature",
             targets: ["SignUpFeature"]),
         .library(
@@ -431,6 +434,15 @@ let package = Package(
                 "Product",
                 dependencies,
                 vapor,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "SearchClient",
+            dependencies: [
+                tca,
+                asyncExtension,
+                "Product",
             ],
             swiftSettings: swiftSettings
         ),

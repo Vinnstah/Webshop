@@ -14,18 +14,19 @@ public struct Main: ReducerProtocol, Sendable {
 public extension Main {
     struct State: Equatable, Sendable {
         
-        public var selectedTab: Tab
-        public var home: Home.State?
-        public var favorites: Favorites.State?
-        public var checkout: Checkout.State?
+        //        public var selectedTab: Tab
+        public var home: Identified<Tab, Home.State>
+        public var favorites: Identified<Tab, Favorites.State>
+        public var checkout: Identified<Tab, Checkout.State>
+        @BindableState var selectedTab: Tab
         
         public init(
             selectedTab: Tab = .home
         ) {
-            self.selectedTab = selectedTab
-            self.home = .init()
-            self.favorites = .init()
-            self.checkout = .init()
+            self.selectedTab = .home
+            self.home = .init(.init(), id: .home)
+            self.favorites = .init(.init(), id: .favorites)
+            self.checkout = .init(.init(), id: .checkout)
         }
         
         public enum Tab: Equatable, Sendable {
@@ -35,7 +36,8 @@ public extension Main {
         }
     }
     
-    enum Action: Equatable, Sendable {
+    enum Action: Equatable, Sendable, BindableAction {
+        case binding(BindingAction<State>)
         case `internal`(InternalAction)
         case delegate(DelegateAction)
         case home(Home.Action)
@@ -48,48 +50,69 @@ public extension Main {
         
         public enum InternalAction: Equatable, Sendable {
             case tabSelected
+            case selectTab(State.Tab)
         }
     }
-    
     var body: some ReducerProtocol<State, Action> {
-        Reduce { state, action in
-            switch action {
-                
-            case .home(.delegate(.userIsSignedOut)):
-                return .run { send in
-                    await send(.delegate(.userIsSignedOut))
-                }
-                
-            case .internal(.tabSelected):
-                switch state.selectedTab {
-                case .home: state.home = .init()
-                case .favorites: state.favorites = .init()
-                case .checkout: return .none
-                }
-                return .none
-                
-            case .delegate, .home, .internal, .favorites, .checkout:
-                return .none
+        CombineReducers {
+            BindingReducer<State, Action>()
+            Scope(state: \State.home.value, action: /Action.home) {
+                Home()
             }
+            Scope(state: \State.favorites.value, action: /Action.favorites) {
+                Favorites()
+            }
+            Scope(state: \State.checkout.value, action: /Action.checkout) {
+                Checkout()
+            }
+            Reduce { state, action in
+                switch action {
+                    
+                case .home(.delegate(.userIsSignedOut)):
+                    return .run { send in
+                        await send(.delegate(.userIsSignedOut))
+                    }
+                    
+                case let .internal(.selectTab(tab)):
+                    state.selectedTab = tab
+                    return .none
+                    
+                case .binding(\.$selectedTab):
+                    print(state.selectedTab)
+                    return .none
+                    //                case .internal(.tabSelected):
+                    //                    switch state.selectedTab {
+                    //                    case .home: state.home = .init()
+                    //                    case .favorites: state.favorites = .init()
+                    //                    case .checkout: return .none
+                    //                    }
+                    //                    return .none
+                default:
+                    return .none
+                    //            case .delegate, .home, .internal, .favorites, .checkout, .binding:
+                    //                return .none
+                }
+            }
+            
         }
-        .ifLet(
-            \State.home,
-             action: /Action.home
-        ) {
-            Home()
-        }
-        .ifLet(
-            \State.favorites,
-             action: /Action.favorites
-        ) {
-            Favorites()
-        }
-        .ifLet(
-            \State.checkout,
-             action: /Action.checkout
-        ) {
-            Checkout()
-        }
+        //        .ifLet(
+        //            \State.home,
+        //             action: /Action.home
+        //        ) {
+        //            Home()
+        //        }
+        //        .ifLet(
+        //            \State.favorites,
+        //             action: /Action.favorites
+        //        ) {
+        //            Favorites()
+        //        }
+        //        .ifLet(
+        //            \State.checkout,
+        //             action: /Action.checkout
+        //        ) {
+        //            Checkout()
+        //        }
         
     }
     

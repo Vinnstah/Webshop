@@ -1,10 +1,3 @@
-//
-//  WebshopApp.swift
-//  Webshop
-//
-//  Created by Viktor Jansson on 2022-09-22.
-//asf
-
 import SwiftUI
 import AppFeature
 import ComposableArchitecture

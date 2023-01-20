@@ -35,6 +35,8 @@ public extension Browse {
         public enum DetailViewAction: Equatable, Sendable {
             case increaseQuantityButtonTapped
             case decreaseQuantityButtonTapped
+            case addItemToCartTapped(quantity: Int, product: Product)
+            case removeItemFromCartTapped(Product.ID)
         }
         
         public enum ViewAction: Equatable, Sendable {

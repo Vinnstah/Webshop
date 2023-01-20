@@ -50,15 +50,15 @@ public extension Home {
     //Split into 3 cases, `child`, `internal` and `delegate`
     enum Action: Equatable, Sendable {
         case `internal`(InternalAction)
-        case child(ChildAction)
+//        case child(ChildAction)
         case delegate(DelegateAction)
         case browse(Browse.Action)
         case task
         case cart(CartAction)
         
-        public enum ChildAction: Equatable, Sendable {
-            case browse(Browse.Action)
-        }
+//        public enum ChildAction: Equatable, Sendable {
+//            case browse(Browse.Action)
+//        }
         public enum CartAction: Equatable, Sendable {
             case cartSessionResponse(TaskResult<Cart>)
             case cartItemsResponse(TaskResult<[Cart.Item]>)
@@ -88,12 +88,9 @@ public extension Home {
     var body: some ReducerProtocol<State, Action> {
         CombineReducers {
             
-            Reduce(cart.self)
-            
             Scope(state: \.browse, action: /Action.browse) {
                 Browse()
             }
-            
             Reduce { state, action in
                 switch action {
                     
@@ -113,6 +110,15 @@ public extension Home {
                                     as: ResultPayload<Cart>.self).value.status.get()
                             }
                         )))
+                    }
+                case let .browse(.delegate(.addedItemToCart(quantity: quantity, product: product))):
+                    return .run { send in
+                           await send(.cart(.addProductToCartTapped(quantity: quantity, product: product)))
+                    }
+                    
+                case let .browse(.delegate(.removedItemFromCart(id))):
+                    return .run { send in
+                        await send(.cart(.removeItemFromCartTapped(id)))
                     }
                     
                     //MARK: Search function
@@ -139,13 +145,12 @@ public extension Home {
                     state.showCheckoutQuickView.toggle()
                     return .none
                     
-                case .child:
-                    return .none
-                    
                 case .cart, .delegate, .browse, .task:
                     return .none
                 }
             }
+            
+            Reduce(cart.self)
         }
     }
 }

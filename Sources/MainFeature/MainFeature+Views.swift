@@ -10,29 +10,27 @@ import NavigationBar
 
 public extension Main {
     struct View: SwiftUI.View {
-        
-        public let store: StoreOf<Main>
-        
+        @ObservedObject var viewStore: ViewStoreOf<Main>
+        private let store: StoreOf<Main>
+
         public init(store: StoreOf<Main>) {
             self.store = store
+            viewStore = .init(store, observe: { $0 })
         }
         
         public var body: some SwiftUI.View {
-            WithViewStore(self.store, observe: \.selectedTab) { viewStore in
-                VStack {
-                    
-                    TabView(selection: viewStore.binding(send: Main.Action.internal(.tabSelected))
-                    ) {
+            ZStack {
+                TabView(selection: viewStore.binding(\.$selectedTab) ) {
                         Home.View(
-                            store: self.store.scope(state: \.home!, action: Main.Action.home)
-                        )
+                            store: self.store.scope(state: \.home.value , action: Main.Action.home)
+                            )
                         .tag(Main.State.Tab.home)
                         .tabItem {
                             Label("Home", systemImage: "house")
                         }
                         
                         Favorites.View(
-                            store: self.store.scope(state: \.favorites!, action: Main.Action.favorites)
+                            store: self.store.scope(state: \.favorites.value, action: Main.Action.favorites)
                         )
                         .tag(Main.State.Tab.favorites)
                         .tabItem {
@@ -40,7 +38,7 @@ public extension Main {
                         }
                         
                         Checkout.View(
-                            store: self.store.scope(state: \.checkout!, action: Main.Action.checkout)
+                            store: self.store.scope(state: \.checkout.value, action: Main.Action.checkout)
                         )
                         .tag(Main.State.Tab.checkout)
                         .tabItem {
@@ -48,9 +46,8 @@ public extension Main {
                         }
                     }
                     .accentColor(Color("Primary"))
-                }
+                
+            }
             }
         }
     }
-}
-

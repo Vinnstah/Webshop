@@ -53,6 +53,13 @@ public extension Home {
                     }
                 }
                 )
+                .onChange(of: viewStore.state.cart) { newValue in
+                    print(newValue)
+                    viewStore.send(.task)
+                }
+                .task {
+                    viewStore.send(.task)
+                }
             }
         }
     }

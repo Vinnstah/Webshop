@@ -81,6 +81,9 @@ public extension Browse {
                 .onAppear {
                     viewStore.send(.internal(.onAppear))
                 }
+                .task {
+                    viewStore.send(.task)
+                }
             }
         }
     }

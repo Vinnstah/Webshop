@@ -90,10 +90,10 @@ public extension Home {
             guard items == state.cart?.item else {
                 return .none
             }
-//            state.quantity = 0
             return .run { send in
                 try await self.clock.sleep(for: .milliseconds(500))
-                await send(.child(.browse(.delegate(.dismissedDetails))), animation: .easeIn)
+                await send(.browse(.delegate(.dismissedDetails)), animation: .easeIn)
+//                await send(.task)
             }
             
         case .cart(.addProductToCartResponse(.failure(_))):
@@ -118,19 +118,27 @@ public extension Home {
             state.cart?.item.removeAll(
                 where: { $0.product.rawValue == id}
             )
-            return .none
+            return .run { send in
+                await send(.task)
+            }
             
         case .cart(.removeItemFromCartResponse(.failure(_))):
             print("FAIL")
             return .none
             
-        case .task:
-            return .run { [cart = state.cart!] _ in
-                await self.cartStateClient.sendAction(cart)
-            }
-            
 
-        case .internal, .delegate, .child, .browse:
+        case .task:
+            return .run { [cart = state.cart] send in
+                guard let cart else {
+                    print("FAILLLL")
+                    return
+                }
+                print("OKAY")
+                await self.cartStateClient.sendAction(cart)
+//                await send(.browse(.task))
+            }
+
+        case .internal, .delegate, .browse:
             return .none
             
         }

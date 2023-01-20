@@ -69,22 +69,29 @@ public extension Browse {
                             quantity: quantity
                         )
                         
-//                        viewStore.state.cart!.item.contains(where: {$0.product == product.id }) ?
-//                            
-//                        Button("Remove from Cart") {
-//                            viewStore.send(.delegate(.removedItemFromCart(viewStore.state.selectedProduct!.id)))
-//                        }
-//                        .buttonStyle(.primary(alternativeColor: Color("Secondary")))
-//                        .padding(.horizontal)
-//                        :
-//                        Button("Add to cart") {
-//                            viewStore.send(.delegate(.addedItemToCart(
-//                                quantity: quantity,
-//                                product: product))
-//                            )
-//                        }
-//                        .buttonStyle(.primary)
-//                        .padding(.horizontal)
+                        viewStore.state.cart!.item.contains(where: {$0.product == product.id }) ?
+                            
+                        Button("Remove from Cart") {
+                            viewStore.send(.detailView(
+                                .removeItemFromCartTapped(
+                                    viewStore.state.selectedProduct!.id
+                                )
+                            )
+                            )
+                        }
+                        .buttonStyle(.primary(alternativeColor: Color("Secondary")))
+                        .padding(.horizontal)
+                        :
+                        Button("Add to cart") {
+                            viewStore.send(.detailView(
+                                .addItemToCartTapped(
+                                    quantity: quantity,
+                                    product: product)
+                            )
+                            )
+                        }
+                        .buttonStyle(.primary)
+                        .padding(.horizontal)
                     }
                 }
                 .background {

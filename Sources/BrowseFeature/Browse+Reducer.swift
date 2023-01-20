@@ -23,13 +23,16 @@ public extension Browse {
                         try self.favouritesClient.getFavourites()
                     )))
                     
-                    await send(.task)
                 }
                 
             case .task:
+                print("TASK?")
                 return .run { send in
-                    try await self.clock.sleep(for: .milliseconds(1000))
-                    for await value in try await self.cartStateClient.observeAction() {
+                    for try await value in try await self.cartStateClient.observeAction() {
+                        print("value \(value)")
+                        guard let value else {
+                            return
+                        }
                         await send(.internal(.cartValueResponse(value)))
                     }
                 }
@@ -57,6 +60,16 @@ public extension Browse {
 //                state.quantity -= 1
                 return .none
                 
+            case let .detailView(.addItemToCartTapped(quantity: quantity, product: product)):
+                state.selectedProduct = nil
+                return .run { send in
+                    await send(.delegate(.addedItemToCart(quantity: quantity, product: product)))
+                }
+                
+            case let .detailView(.removeItemFromCartTapped(id)):
+                return .run { send in
+                    await send(.delegate(.removedItemFromCart(id)))
+                }
                 
             case let .view(.categoryButtonTapped(category)):
                 switch category {
@@ -89,7 +102,7 @@ public extension Browse {
                 return .none
                 
             case let .view(.selectedProduct(prod)):
-                guard state.selectedProduct != nil else {
+                guard state.selectedProduct == nil else {
                     state.selectedProduct = nil
                     return .none
                 }

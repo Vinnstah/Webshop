@@ -11,6 +11,7 @@ let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift
 let tagged: Target.Dependency = .product(name: "Tagged", package: "swift-tagged")
 let kingfisher: Target.Dependency = .product(name: "Kingfisher", package: "Kingfisher")
 let dependencies: Target.Dependency = .product(name: "Dependencies", package: "swift-composable-architecture")
+let asyncExtension: Target.Dependency =  .product(name: "AsyncExtensions", package: "AsyncExtensions")
 
 var swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
@@ -150,6 +151,7 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.3.1"),
         .package(url: "https://github.com/onevcat/Kingfisher", from: "7.4.1"),
+        .package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.2"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -499,6 +501,7 @@ let package = Package(
             name: "SharedCartStateClient",
             dependencies: [
                 tca,
+                asyncExtension,
                 "CartModel",
                 "Product",
             ],

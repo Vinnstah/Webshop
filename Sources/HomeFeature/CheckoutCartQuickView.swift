@@ -20,12 +20,12 @@ public struct CheckoutQuickView: View {
                     .foregroundColor(.white)
                     .cornerRadius(25)
                 List {
-                    ForEach(viewStore.state.cart?.item ?? [], id: \.product) { item in
+                    ForEach(viewStore.state.cart?.item ?? [], id: \.id) { item in
                         CartProductView(item: item, products: [])
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive, action: { viewStore.send(
                                     .cart(
-                                        .removeItemFromCartTapped(item.product))) } ) {
+                                        .removeItemFromCartTapped(item.id))) } ) {
                                             Label("Delete", systemImage: "trash")
                                         }
                             }
@@ -62,12 +62,12 @@ public struct CartProductView : View {
     public var body: some View {
         HStack {
             Text("\(item.quantity.rawValue)")
-            KFImage(URL(string: products.first(where: { $0.id == item.product})?.boardgame.imageURL ?? ""))
+            KFImage(URL(string: products.first(where: { $0.id == item.id})?.boardgame.imageURL ?? ""))
                 .resizable()
                 .scaledToFit()
             VStack {
-                Text(products.first(where: { $0.id == item.product})?.boardgame.title ?? "")
-                Text(products.first(where: { $0.id == item.product})?.boardgame.category.rawValue ?? "")
+                Text(products.first(where: { $0.id == item.id})?.boardgame.title ?? "")
+                Text(products.first(where: { $0.id == item.id})?.boardgame.category.rawValue ?? "")
             }
             Text("\(item.quantity.rawValue * (products.first?.price.brutto ?? 1))")
         }

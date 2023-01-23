@@ -10,20 +10,20 @@ public struct Detail: Sendable, ReducerProtocol {
 }
 
 public extension Detail {
-    struct State: Equatable {
+    struct State: Equatable, Sendable {
         public var selectedProduct: Product
-        public var cart: Cart?
+        public var cartItems: IdentifiedArrayOf<Cart.Item>
         public var quantity: Int
         public var isFavourite: Bool
         
         public init(
             selectedProduct: Product,
-            cart: Cart? = nil,
-            quantity: Int,
-            isFavourite: Bool
+            cartItems: IdentifiedArrayOf<Cart.Item> = [],
+            quantity: Int = 0,
+            isFavourite: Bool = false
         ) {
             self.selectedProduct = selectedProduct
-            self.cart = cart
+            self.cartItems = cartItems
             self.quantity = quantity
             self.isFavourite = isFavourite
         }

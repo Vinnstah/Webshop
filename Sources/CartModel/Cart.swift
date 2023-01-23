@@ -26,15 +26,20 @@ public extension Cart {
 }
 
 public extension Cart {
-    struct Item: Equatable, Codable, Sendable, Hashable  {
+    struct Item: Equatable, Codable, Sendable, Hashable, Identifiable  {
         
-        public var product: Product.ID
+        public var id: Product.ID
         public var quantity: Quantity
+//        public var id:  {
+//            self.product
+//        }
         
-        public init(product: Product.ID, quantity: Quantity) {
-            self.product = product
+        public init(id: Product.ID, quantity: Quantity) {
+            self.id = id
             self.quantity = quantity
         }
+        
+        
     }
 }
 

@@ -6,17 +6,17 @@ public extension Detail {
         Reduce { state, action in
             switch action {
             case .detailView(.increaseQuantityButtonTapped):
+                state.quantity = state.quantity + 1
                 return .none
                 
             case .detailView(.decreaseQuantityButtonTapped):
-//                guard state.quantity != 0 else {
-//                    return .none
-//                }
-//                state.quantity -= 1
+                guard state.quantity != 0 else {
+                    return .none
+                }
+                state.quantity -= 1
                 return .none
                 
             case let .detailView(.addItemToCartTapped(quantity: quantity, product: product)):
-//                state.selectedProduct = nil
                 return .run { send in
                     await send(.delegate(.addedItemToCart(quantity: quantity, product: product)))
                 }
@@ -26,7 +26,26 @@ public extension Detail {
                     await send(.delegate(.removedItemFromCart(id)))
                 }
                 
-            default: return .none
+            case .task:
+                return .run { send in
+                    for try await value in try await self.cartStateClient.observeAction() {
+                        guard let value else {
+                            print("VLAUE \(value)")
+                            return
+                        }
+                        print("VAVAVA \(value)")
+                        await send(.detailView(.cartValueResponse(value)))
+                    }
+                }
+                
+            case let .detailView(.cartValueResponse(cart)):
+                print("CARVA:TA")
+                state.cartItems = IdentifiedArrayOf(uniqueElements: cart.item)
+                return .none
+                
+                
+            case .detailView, .delegate:
+                return .none
             }
         }
     }

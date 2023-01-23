@@ -51,7 +51,7 @@ public extension Database {
         for item in request.cart.item {
             try await request.db.query("""
             INSERT INTO cart_items
-            VALUES(\(request.cart.session.id.rawValue), \(item.product.rawValue), \(item.quantity.rawValue))
+            VALUES(\(request.cart.session.id.rawValue), \(item.id.rawValue), \(item.quantity.rawValue))
             ON CONFLICT (cart_id, product_id)
             DO
             UPDATE SET quantity=\(item.quantity.rawValue);

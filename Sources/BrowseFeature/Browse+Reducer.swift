@@ -26,10 +26,8 @@ public extension Browse {
                 }
                 
             case .task:
-                print("TASK?")
                 return .run { send in
                     for try await value in try await self.cartStateClient.observeAction() {
-                        print("value \(value)")
                         guard let value else {
                             return
                         }
@@ -81,13 +79,32 @@ public extension Browse {
 //                state.selectedProduct = nil
 //                return .none
                 
-//            case let .view(.selectedProduct(prod)):
-//                guard state.selectedProduct == nil else {
-//                    state.selectedProduct = nil
-//                    return .none
-//                }
-//                state.selectedProduct = prod
-//                return .none
+            case let .view(.selectedProduct(prod)):
+                guard (state.cart != nil) else {
+                    return .none
+                }
+                state.detail = .init(
+                    selectedProduct: prod,
+                    cartItems: IdentifiedArrayOf(uniqueElements: state.cart!.item) ,
+                    isFavourite: state.favoriteProducts.ids.contains { $0 == prod.id }
+                )
+                return .none
+                
+            case .detail(.delegate(.backToBrowse)):
+                state.detail = nil
+                return .none
+                
+            case let .detail(.delegate(.removedItemFromCart(id))):
+                print("123")
+                return .run { send in
+                    await send(.delegate(.removedItemFromCart(id)))
+                }
+                
+            case let .detail(.delegate(.addedItemToCart(quantity: quantity, product: product))):
+                return .run {
+                    send in
+                    await send(.delegate(.addedItemToCart(quantity: quantity, product: product)))
+                }
                 
             case .view, .delegate, .internal, .favorite, .detail:
                 return .none

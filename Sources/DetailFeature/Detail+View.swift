@@ -24,6 +24,9 @@ public extension Detail {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 VStack {
+                    backButton {
+                        viewStore.send(.delegate(.backToBrowse))
+                    }
                     ScrollView(.vertical) {
                         
                         VStack {
@@ -58,11 +61,11 @@ public extension Detail {
                             quantity: viewStore.state.quantity
                         )
                         
-                        viewStore.state.cart!.item.contains(where: {$0.product == viewStore.state.selectedProduct.id }) ?
+                        viewStore.state.cartItems.contains(where: {$0.id == viewStore.state.selectedProduct.id }) ?
                             
                         Button("Remove from Cart") {
-                            viewStore.send(.detailView(
-                                .removeItemFromCartTapped(
+                            viewStore.send(.delegate(
+                                .removedItemFromCart(
                                     viewStore.state.selectedProduct.id
                                 )
                             )
@@ -72,8 +75,8 @@ public extension Detail {
                         .padding(.horizontal)
                         :
                         Button("Add to cart") {
-                            viewStore.send(.detailView(
-                                .addItemToCartTapped(
+                            viewStore.send(.delegate(
+                                .addedItemToCart(
                                     quantity: viewStore.state.quantity,
                                     product: viewStore.state.selectedProduct)
                             )
@@ -196,5 +199,17 @@ public extension Detail.View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundColor(Color("Secondary"))
             .padding(.horizontal)
+    }
+}
+public extension Detail.View {
+    func backButton(action: @escaping () -> ()) -> some View {
+        Button(action: {
+            action()
+        }, label: {
+            Image(systemName: "chevron.left")
+                .bold()
+                .padding()
+                .foregroundColor(Color("Secondary"))
+        })
     }
 }

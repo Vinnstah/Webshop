@@ -61,17 +61,17 @@ public extension Home {
             }
             
             if state.cart!.item.contains(
-                where: { $0.product == product.id }
+                where: { $0.id == product.id }
             ) {
                 state.cart!.item = state.cart!.item.map {
-                    $0.product == product.id ?
+                    $0.id == product.id ?
                     Cart.Item(
-                        product: product.id,
+                        id: product.id,
                         quantity: Cart.Item.Quantity(rawValue: quantity))
                     : $0 }
              } else {
                  state.cart?.item.append(Cart.Item(
-                    product: product.id,
+                    id: product.id,
                     quantity: Cart.Item.Quantity(rawValue: quantity))
                  )
              }
@@ -102,7 +102,7 @@ public extension Home {
             
         case let .cart(.removeItemFromCartTapped(id)):
             
-            state.cart?.item.removeAll(where: { $0.product == id })
+            state.cart?.item.removeAll(where: { $0.id == id })
             
             return .run { [item = state.cart!.session.id.rawValue] send in
                 await send(.cart(.removeItemFromCartResponse(
@@ -116,7 +116,7 @@ public extension Home {
             
         case let .cart(.removeItemFromCartResponse(.success(id))):
             state.cart?.item.removeAll(
-                where: { $0.product.rawValue == id}
+                where: { $0.id.rawValue == id}
             )
             return .run { send in
                 await send(.task)

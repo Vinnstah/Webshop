@@ -1,4 +1,5 @@
 import Foundation
+import IdentifiedCollections
 
 public struct FavoriteProducts: Equatable, Sendable, Codable {
     

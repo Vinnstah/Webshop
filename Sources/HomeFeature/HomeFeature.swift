@@ -117,6 +117,7 @@ public extension Home {
                     }
                     
                 case let .browse(.delegate(.removedItemFromCart(id))):
+                    print("234")
                     return .run { send in
                         await send(.cart(.removeItemFromCartTapped(id)))
                     }

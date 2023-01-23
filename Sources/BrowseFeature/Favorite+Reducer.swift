@@ -37,7 +37,7 @@ public extension Browse {
             state.favoriteProducts.ids.append(sku)
             return .none
             
-        case .internal, .delegate, .view, .detailView, .task:
+        case .internal, .delegate, .view, .task, .detail:
             return .none
         }
     }

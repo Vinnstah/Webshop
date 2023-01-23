@@ -50,26 +50,6 @@ public extension Browse {
                 print(error.localizedDescription)
                 return .none
                 
-            case .detailView(.increaseQuantityButtonTapped):
-                return .none
-                
-            case .detailView(.decreaseQuantityButtonTapped):
-//                guard state.quantity != 0 else {
-//                    return .none
-//                }
-//                state.quantity -= 1
-                return .none
-                
-            case let .detailView(.addItemToCartTapped(quantity: quantity, product: product)):
-                state.selectedProduct = nil
-                return .run { send in
-                    await send(.delegate(.addedItemToCart(quantity: quantity, product: product)))
-                }
-                
-            case let .detailView(.removeItemFromCartTapped(id)):
-                return .run { send in
-                    await send(.delegate(.removedItemFromCart(id)))
-                }
                 
             case let .view(.categoryButtonTapped(category)):
                 switch category {
@@ -97,19 +77,19 @@ public extension Browse {
                 state.columnsInGrid -= 1
                 return .none
                 
-            case .delegate(.dismissedDetails):
-                state.selectedProduct = nil
-                return .none
+//            case .delegate(.dismissedDetails):
+//                state.selectedProduct = nil
+//                return .none
                 
-            case let .view(.selectedProduct(prod)):
-                guard state.selectedProduct == nil else {
-                    state.selectedProduct = nil
-                    return .none
-                }
-                state.selectedProduct = prod
-                return .none
+//            case let .view(.selectedProduct(prod)):
+//                guard state.selectedProduct == nil else {
+//                    state.selectedProduct = nil
+//                    return .none
+//                }
+//                state.selectedProduct = prod
+//                return .none
                 
-            case .view, .detailView, .delegate, .internal, .favorite:
+            case .view, .delegate, .internal, .favorite, .detail:
                 return .none
             }
         }

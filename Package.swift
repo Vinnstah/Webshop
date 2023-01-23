@@ -68,6 +68,9 @@ let package = Package(
             name: "DatabaseWarehouseClient",
             targets: ["DatabaseWarehouseClient"]),
         .library(
+            name: "DetailFeature",
+            targets: ["DetailFeature"]),
+        .library(
             name: "FavoritesClient",
             targets: ["FavoritesClient"]),
         .library(
@@ -207,6 +210,7 @@ let package = Package(
                 "ApiClient",
                 "Boardgame",
                 "CartModel",
+                "DetailFeature",
                 "FavoritesClient",
                 "ProductViews",
                 "SharedCartStateClient",
@@ -299,6 +303,21 @@ let package = Package(
                 "Warehouse",
                 dependencies,
                 postgres,
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .target(
+            name: "DetailFeature",
+            dependencies: [
+                "CartModel",
+                "FavoritesClient",
+                "Product",
+                "ProductViews",
+                "SharedCartStateClient",
+                "StyleGuide",
+                "SiteRouter",
+                "UserModel",
+                tca,
             ],
             swiftSettings: swiftSettings
         ),

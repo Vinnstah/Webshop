@@ -14,22 +14,23 @@ extension SharedCartStateClient: DependencyKey {
             // uses `AsyncBufferedChannel` from: https://github.com/sideeffect-io/AsyncExtensions
             // MUST have this if you PRODUCE values in one Task and CONSUME values in another,
             // which one very very often would like to do. AsyncStream DOES NOT support this.
-            private let cartChannel: AsyncBufferedChannel<Cart?> = .init()
-            private let replaySubject: AsyncReplaySubject<Cart?> = .init(bufferSize: 1)
+            private let cartChannel: AsyncThrowingBufferedChannel<Cart?, Swift.Error> = .init()
+            private let replaySubject: AsyncThrowingReplaySubject<Cart?, Swift.Error> = .init(bufferSize: 1)
             
             //              private let cartChannel: AsyncCurrentValueSubject<Cart?> = .init(nil)
             init() {}
             
             func emit(_ cart: Cart?) {
-                replaySubject.send(cart)
+                cartChannel.send(cart)
             }
             
             // uses `AnyAsyncSequence` from: https://github.com/sideeffect-io/AsyncExtensions
             func cartAsyncSequence() -> AnyAsyncSequence<Cart?> {
-                replaySubject
-                //                        .multicast(replaySubject)
+                cartChannel
+                    .multicast(replaySubject)
+                    .autoconnect()
                 
-                    .share() // <-- VERY VERY important if you are going to be consuming the values in MULTIPLE Tasks, nor AsyncStream of AsyncBufferedChannel supports this
+                //                    .share() // <-- VERY VERY important if you are going to be consuming the values in MULTIPLE Tasks, nor AsyncStream of AsyncBufferedChannel supports this
                     .eraseToAnyAsyncSequence()
                 //                    .eraseToAnyAsyncSequence() // hide the implementation details that this is a shared (multicasted) async sequence with an AsyncBufferedChannel as "Upstream"/"Base"
             }

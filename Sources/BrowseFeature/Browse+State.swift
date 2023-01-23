@@ -7,6 +7,7 @@ import ApiClient
 import Dependencies
 import SharedCartStateClient
 import CartModel
+import DetailFeature
 
 public struct Browse: ReducerProtocol, Sendable {
     public init() {}
@@ -23,7 +24,7 @@ public extension Browse {
         public var filteredProducts: Set<Product.ID>
         public var favoriteProducts: FavoriteProducts
         public var columnsInGrid: Int
-        public var selectedProduct: Product?
+        public var detail: Detail.State?
         public var cart: Cart?
         
         public init(
@@ -32,7 +33,7 @@ public extension Browse {
             filteredProducts: Set<Product.ID> = [],
             favoriteProducts: FavoriteProducts = .init(),
             columnsInGrid: Int = 2,
-            selectedProduct: Product? = nil,
+            detail: Detail.State? = nil,
             cart: Cart? = nil
         ) {
             self.categories = categories
@@ -40,7 +41,7 @@ public extension Browse {
             self.filteredProducts = filteredProducts
             self.favoriteProducts = favoriteProducts
             self.columnsInGrid = columnsInGrid
-            self.selectedProduct = selectedProduct
+            self.detail = detail
             self.cart = cart
         }
     }

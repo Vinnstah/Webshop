@@ -30,9 +30,6 @@ public extension Cart {
         
         public var id: Product.ID
         public var quantity: Quantity
-//        public var id:  {
-//            self.product
-//        }
         
         public init(id: Product.ID, quantity: Quantity) {
             self.id = id

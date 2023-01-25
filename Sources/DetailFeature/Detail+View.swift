@@ -11,14 +11,11 @@ public extension Detail {
     struct View: SwiftUI.View {
         
         public let store: StoreOf<Detail>
-//        public var animation: Namespace
         
         public init(
             store: StoreOf<Detail>
-//            animation: Namespace = .init()
         ) {
             self.store = store
-//            self.animation = animation
         }
         
         public var body: some SwiftUI.View {
@@ -32,9 +29,8 @@ public extension Detail {
                         VStack {
                             
                             image(
-                                url: viewStore.state.selectedProduct.boardgame.imageURL
-//                                ,
-//                                animationID: animation
+                                url: viewStore.state.selectedProduct.boardgame.imageURL,
+                                animationID: viewStore.state.animationID
                             )
                             
                             title(viewStore.state.selectedProduct.boardgame.title)
@@ -100,8 +96,8 @@ public extension Detail {
 public extension Detail.View {
     func image(
         url: String
-//        ,
-//        animationID: Namespace.ID
+        ,
+        animationID: Namespace.ID
     ) -> some View {
         KFImage(URL(string: url))
             .resizable()
@@ -111,7 +107,7 @@ public extension Detail.View {
             .clipShape(Rectangle())
             .cornerRadius(40)
             .ignoresSafeArea()
-//            .matchedGeometryEffect(id: url, in: animationID)
+            .matchedGeometryEffect(id: url, in: animationID)
     }
 }
 public extension Detail.View {

@@ -46,13 +46,12 @@ public extension Browse {
                         }
                         
                         StaggeredGrid(
-//                            list: { viewStore.state.filteredProducts == [] ? viewStore.state.products : viewStore.state.filteredProducts },
                             list: { viewStore.state.products },
                             columns: viewStore.state.columnsInGrid,
                             content: { product in
                                 Button(action: {
                                     
-                                    viewStore.send(.view(.selectedProduct(product)), animation: .easeIn)
+                                    viewStore.send(.view(.selectedProduct(product, animation)), animation: .easeIn)
                                 }, label: {
                                     
                                     ProductCardView<Browse>(
@@ -67,22 +66,11 @@ public extension Browse {
                             }
                         )
                     }
-//                    IfLetStore(self.store.scope(state: \.detail), then: Detail.View.init(store:, animation: animation))
                     IfLetStore(self.store.scope(
                         state: \.detail,
                         action: Browse.Action.detail),
                                then:Detail.View.init(store:)
                     )
-//                    if viewStore.state.selectedProduct != nil {
-//                        Detail.View(
-//                            store: store,
-//                            product: viewStore.state.selectedProduct!,
-//                            isFavourite: { viewStore.state.favoriteProducts.ids.contains(viewStore.state.selectedProduct!.id) },
-//                            toggleFavourite: {viewStore.send(.favorite(.favoriteButtonTapped(viewStore.state.selectedProduct!)))},
-//                            animation: animation,
-//                            quantity: 1
-//                        )
-//                    })
                 }
                 .onAppear {
                     viewStore.send(.internal(.onAppear))

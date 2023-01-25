@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import SwiftUI
 import Foundation
 import Product
 import CartModel
@@ -15,17 +16,20 @@ public extension Detail {
         public var cartItems: IdentifiedArrayOf<Cart.Item>
         public var quantity: Int
         public var isFavourite: Bool
+        public var animationID: Namespace.ID
         
         public init(
             selectedProduct: Product,
             cartItems: IdentifiedArrayOf<Cart.Item> = [],
             quantity: Int = 0,
-            isFavourite: Bool = false
+            isFavourite: Bool = false,
+            animationID: Namespace.ID
         ) {
             self.selectedProduct = selectedProduct
             self.cartItems = cartItems
             self.quantity = quantity
             self.isFavourite = isFavourite
+            self.animationID = animationID
         }
         
     }

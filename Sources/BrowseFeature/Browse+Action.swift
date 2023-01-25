@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import Product
 import ComposableArchitecture
 import Boardgame
@@ -37,7 +38,7 @@ public extension Browse {
         
         public enum ViewAction: Equatable, Sendable {
             case categoryButtonTapped(Boardgame.Category)
-            case selectedProduct(Product)
+            case selectedProduct(Product, Namespace.ID)
             case increaseNumberOfColumnsTapped
             case decreaseNumberOfColumnsTapped
         }

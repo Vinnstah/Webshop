@@ -26,6 +26,7 @@ public extension Browse {
             case onAppear
             case getAllProductsResponse(TaskResult<[Product]>)
             case cartValueResponse(Cart)
+            case searchValueResponse(String)
         }
         
         public enum DelegateAction: Equatable, Sendable {

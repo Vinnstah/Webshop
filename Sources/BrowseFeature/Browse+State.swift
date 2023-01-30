@@ -8,6 +8,7 @@ import Dependencies
 import SharedCartStateClient
 import CartModel
 import DetailFeature
+import SearchClient
 
 public struct Browse: ReducerProtocol, Sendable {
     public init() {}
@@ -15,6 +16,7 @@ public struct Browse: ReducerProtocol, Sendable {
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.cartStateClient) var cartStateClient
     @Dependency(\.continuousClock) var clock
+    @Dependency(\.searchClient) var searchClient
 }
 
 public extension Browse {
@@ -26,6 +28,7 @@ public extension Browse {
         public var columnsInGrid: Int
         public var detail: Detail.State?
         public var cart: Cart?
+        public var searchString: String
         
         public init(
             categories: IdentifiedArrayOf<Boardgame.Category> = IdentifiedArray(uniqueElements: Boardgame.Category.allCases),
@@ -34,7 +37,8 @@ public extension Browse {
             favoriteProducts: FavoriteProducts = .init(),
             columnsInGrid: Int = 2,
             detail: Detail.State? = nil,
-            cart: Cart? = nil
+            cart: Cart? = nil,
+            searchString: String = ""
         ) {
             self.categories = categories
             self.products = products
@@ -43,6 +47,7 @@ public extension Browse {
             self.columnsInGrid = columnsInGrid
             self.detail = detail
             self.cart = cart
+            self.searchString = searchString
         }
     }
 }

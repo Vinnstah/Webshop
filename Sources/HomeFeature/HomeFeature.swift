@@ -11,6 +11,7 @@ import Boardgame
 import Warehouse
 import BrowseFeature
 import SharedCartStateClient
+import SearchClient
 
 extension IdentifiedArrayOf: @unchecked Sendable {}
 
@@ -20,6 +21,7 @@ public struct Home: ReducerProtocol, Sendable {
     @Dependency(\.favouritesClient) var favouritesClient
     @Dependency(\.continuousClock) var clock
     @Dependency(\.cartStateClient) var cartStateClient
+    @Dependency(\.searchClient) var searchClient
     public init() {}
 }
 
@@ -50,15 +52,11 @@ public extension Home {
     //Split into 3 cases, `child`, `internal` and `delegate`
     enum Action: Equatable, Sendable {
         case `internal`(InternalAction)
-//        case child(ChildAction)
         case delegate(DelegateAction)
         case browse(Browse.Action)
         case task
         case cart(CartAction)
         
-//        public enum ChildAction: Equatable, Sendable {
-//            case browse(Browse.Action)
-//        }
         public enum CartAction: Equatable, Sendable {
             case cartSessionResponse(TaskResult<Cart>)
             case cartItemsResponse(TaskResult<[Cart.Item]>)
@@ -77,8 +75,8 @@ public extension Home {
             case signOutTapped
             case onAppear
             case settingsButtonTapped
-//            case searchTextReceivingInput(text: String)
-//            case cancelSearchTapped
+            case searchTextReceivingInput(text: String)
+            case cancelSearchTapped
             case toggleCheckoutQuickViewTapped
         }
         
@@ -123,20 +121,22 @@ public extension Home {
                     }
                     
                     //MARK: Search function
-//                case let .internal(.searchTextReceivingInput(text: text)):
-//                    state.searchText = text
-//
+                case let .internal(.searchTextReceivingInput(text: text)):
+                    state.searchText = text
+
 //                    state.child.browse.filteredProducts = state.products.filter { $0.boardgame.title.contains(text) }
 //
 //                    if state.filteredProducts == [] {
 //                        state.filteredProducts = state.products.filter { $0.boardgame.category.rawValue.contains(text) }
 //                    }
-//                    return .none
+                    return .run { _ in
+                        print("1234")
+                        try await self.searchClient.sendSearchInput(text)
+                    }
 //
-//                case .internal(.cancelSearchTapped):
-//                    state.searchText = ""
-//                    state.filteredProducts = []
-//                    return .none
+                case .internal(.cancelSearchTapped):
+                    state.searchText = ""
+                    return .none
                     
                 case .internal(.settingsButtonTapped):
                     state.isSettingsSheetPresented.toggle()

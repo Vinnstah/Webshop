@@ -28,16 +28,29 @@ public extension Browse {
                     
                 case .task:
                     return .run { send in
-                        for try await value in try await self.cartStateClient.observeAction() {
-                            guard let value else {
-                                return
+                        await withThrowingTaskGroup(of: Void.self) { group in
+                            group.addTask {
+                                for try await value in try await self.cartStateClient.observeAction() {
+                                    guard let value else {
+                                        return
+                                    }
+                                    await send(.internal(.cartValueResponse(value)))
+                                }
                             }
-                            await send(.internal(.cartValueResponse(value)))
+                            group.addTask {
+                                for try await searchValue in try await self.searchClient.observeSearchInput() {
+                                    await send(.internal(.searchValueResponse(searchValue)))
+                                }
+                            }
                         }
                     }
                     
                 case let .internal(.cartValueResponse(cart)):
                     state.cart = cart
+                    return .none
+                    
+                case let .internal(.searchValueResponse(text)):
+                    state.searchString = text
                     return .none
                     
                 case let .internal(.getAllProductsResponse(.success(products))):
@@ -116,3 +129,4 @@ public extension Browse {
 //        }
     }
 }
+

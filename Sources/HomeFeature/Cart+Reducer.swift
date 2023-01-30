@@ -128,14 +128,14 @@ public extension Home {
             
 
         case .task:
-            return .run { [cart = state.cart] send in
+            return .run { [cart = state.cart, text = state.searchText] send in
                 guard let cart else {
                     print("FAILLLL")
                     return
                 }
                 print("OKAY")
                 await self.cartStateClient.sendAction(cart)
-//                await send(.browse(.task))
+                try await self.searchClient.sendSearchInput(text)
             }
 
         case .internal, .delegate, .browse:

@@ -1,4 +1,4 @@
-import AsyncExtensions
+@preconcurrency import AsyncExtensions
 import Dependencies
 import Foundation
 import Product
@@ -8,7 +8,8 @@ extension SearchClient: DependencyKey {
     public static var liveValue: SearchClient {
         actor SearchHolder {
             
-            private let searchChannel: AsyncCurrentValueSubject<String> = .init("")
+            private let searchChannel: AsyncThrowingBufferedChannel<String, Swift.Error> = .init()
+            private let replaySubject: AsyncThrowingReplaySubject<String, Swift.Error> = .init(bufferSize: 1)
             
             public init() {}
             
@@ -18,7 +19,8 @@ extension SearchClient: DependencyKey {
             
             func observe() -> AnyAsyncSequence<String> {
                 searchChannel
-                    .share()
+                    .multicast(replaySubject)
+                    .autoconnect()
                     .eraseToAnyAsyncSequence()
             }
             
@@ -30,7 +32,8 @@ extension SearchClient: DependencyKey {
             await searchHolder.emit($0)
         },
             observeSearchInput: {
-            await searchHolder.observe()
+                print("OBserving search")
+            return await searchHolder.observe()
         })
     }
 }

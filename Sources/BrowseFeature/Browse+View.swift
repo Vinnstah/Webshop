@@ -46,7 +46,9 @@ public extension Browse {
                         }
                         
                         StaggeredGrid(
-                            list: { viewStore.state.products },
+                            list: { viewStore.state.searchString == "" ?
+                                viewStore.state.products :
+                                viewStore.state.products.filter { $0.boardgame.title.contains(where: { $0.description == viewStore.state.searchString})} },
                             columns: viewStore.state.columnsInGrid,
                             content: { product in
                                 Button(action: {
@@ -76,7 +78,7 @@ public extension Browse {
                     viewStore.send(.internal(.onAppear))
                 }
                 .task {
-                    viewStore.send(.task)
+                    await viewStore.send(.task).finish()
                 }
             }
         }

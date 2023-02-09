@@ -57,6 +57,10 @@ public extension Home {
                     }
                 }
             }
+            .background {
+                Color("Background")
+                    .ignoresSafeArea()
+            }
         }
     }
 }

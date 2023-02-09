@@ -65,18 +65,13 @@ public extension Home {
                 .onChange(of: viewStore.state.cart) { newValue in
                     viewStore.send(.task)
                 }
-//                .onChange(of: viewStore.state.searchText) { _ in
-//                    viewStore.send(.task)
-//                }
                 .task {
                     viewStore.send(.task)
                 }
-                .searchable(text:
-                                viewStore.binding(
-                                    get: \.searchText,
-                                    send: { .internal(.searchTextReceivingInput(text: $0)) }
-                                )
-                )
+                .background {
+                    Color("Background")
+                        .ignoresSafeArea()
+                }
             }
         }
     }

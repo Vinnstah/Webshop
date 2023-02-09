@@ -12,7 +12,7 @@ public extension Detail {
         public enum DelegateAction: Equatable, Sendable {
             case removedItemFromCart(Product.ID)
             case addedItemToCart(quantity: Int, product: Product)
-            case toggleFavourite
+            case toggleFavourite(Product.ID)
             case backToBrowse
         }
         

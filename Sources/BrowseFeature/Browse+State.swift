@@ -29,6 +29,7 @@ public extension Browse {
         public var detail: Detail.State?
         public var cart: Cart?
         public var searchString: String
+        public var searchResults: IdentifiedArrayOf<Product>
         
         public init(
             categories: IdentifiedArrayOf<Boardgame.Category> = IdentifiedArray(uniqueElements: Boardgame.Category.allCases),
@@ -38,7 +39,8 @@ public extension Browse {
             columnsInGrid: Int = 2,
             detail: Detail.State? = nil,
             cart: Cart? = nil,
-            searchString: String = ""
+            searchString: String = "",
+            searchResults: IdentifiedArrayOf<Product> = []
         ) {
             self.categories = categories
             self.products = products
@@ -48,6 +50,7 @@ public extension Browse {
             self.detail = detail
             self.cart = cart
             self.searchString = searchString
+            self.searchResults = searchResults
         }
     }
 }

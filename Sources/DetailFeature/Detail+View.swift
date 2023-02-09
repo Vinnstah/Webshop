@@ -21,8 +21,16 @@ public extension Detail {
         public var body: some SwiftUI.View {
             WithViewStore(self.store, observe: { $0 } ) { viewStore in
                 VStack {
-                    backButton {
-                        viewStore.send(.delegate(.backToBrowse))
+                    HStack {
+                        backButton {
+                            viewStore.send(.delegate(.backToBrowse), animation: .default)
+                        }
+                        Spacer()
+                        favoriteButton(action: {
+                            viewStore.send(.delegate(.toggleFavourite(viewStore.state.selectedProduct.id)), animation: .default)
+                        },
+                                       isFavorite: viewStore.state.isFavourite,
+                                       bgColor: Color("Background"))
                     }
                     ScrollView(.vertical) {
                         

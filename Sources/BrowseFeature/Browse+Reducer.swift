@@ -6,6 +6,7 @@ import DetailFeature
 
 public extension Browse {
     var body: some ReducerProtocol<State, Action> {
+    
             Reduce { state, action in
                 switch action {
                     
@@ -50,7 +51,16 @@ public extension Browse {
                     return .none
                     
                 case let .internal(.searchValueResponse(text)):
-                    state.searchString = text
+                    guard text != "" else {
+                        state.searchResults = []
+                        return .none
+                    }
+                    state.searchResults = state.products.filter { $0.boardgame.title.contains(text) }
+                    
+                    guard state.searchResults != [] else {
+                        state.searchResults = state.products.filter { $0.boardgame.category.rawValue.contains(text) }
+                        return .none
+                    }
                     return .none
                     
                 case let .internal(.getAllProductsResponse(.success(products))):
@@ -94,6 +104,7 @@ public extension Browse {
                     
                 case let .view(.selectedProduct(prod, id)):
                     guard (state.cart != nil) else {
+                        print("nil cart")
                         return .none
                     }
                     state.detail = .init(
@@ -119,14 +130,52 @@ public extension Browse {
                         await send(.delegate(.addedItemToCart(quantity: quantity, product: product)))
                     }
                     
+                case let .favorite(.loadFavoriteProducts(products)):
+                    guard !products.isEmpty else {
+                        return .none
+                    }
+                    
+                    state.favoriteProducts.ids = products
+                    return .none
+                    
+                case let .detail(.delegate(.toggleFavourite(id))):
+                    return .run { send in
+                        await send(.favorite(.favoriteButtonTapped(id)))
+                    }
+                    
+                case let .favorite(.favoriteButtonTapped(id)):
+                    print(state.favoriteProducts)
+                    guard !state.favoriteProducts.ids.contains(id) else {
+                        print("WRONG")
+                        return .run { send in
+                            await send(.favorite(.removeFavouriteProduct(try self.favouritesClient.removeFavorite(id)!)))
+                        }
+                    }
+                    
+                    return .run { send in
+                        print("RIGHT")
+                        await send(.favorite(.addFavouriteProduct(try self.favouritesClient.addFavorite(id)!)))
+                    }
+                    
+                case let .favorite(.removeFavouriteProduct(sku)):
+                    state.favoriteProducts.ids.removeAll(where: { $0 == sku })
+                    return .none
+                    
+                case let .favorite(.addFavouriteProduct(sku)):
+                    state.favoriteProducts.ids.append(sku)
+                    return .none
+                    
                 case .view, .delegate, .internal, .favorite, .detail:
                     return .none
+//                case .delegate(.removedItemFromCart(_)):
+//                    <#code#>
+//                case .delegate(.addedItemToCart(quantity: let quantity, product: let product)):
+//                    <#code#>
                 }
             }
             .ifLet(\.detail, action: /Action.detail) {
                 Detail()
             }
-//        }
     }
 }
 

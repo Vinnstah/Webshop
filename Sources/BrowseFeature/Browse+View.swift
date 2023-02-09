@@ -46,9 +46,9 @@ public extension Browse {
                         }
                         
                         StaggeredGrid(
-                            list: { viewStore.state.searchString == "" ?
+                            list: { viewStore.state.searchResults == [] ?
                                 viewStore.state.products :
-                                viewStore.state.products.filter { $0.boardgame.title.contains(where: { $0.description == viewStore.state.searchString})} },
+                                viewStore.state.searchResults },
                             columns: viewStore.state.columnsInGrid,
                             content: { product in
                                 Button(action: {
@@ -59,7 +59,7 @@ public extension Browse {
                                     ProductCardView<Browse>(
                                         store: store,
                                         product: product,
-                                        action:{ viewStore.send(.favorite(.favoriteButtonTapped(product))) },
+                                        action:{ viewStore.send(.favorite(.favoriteButtonTapped(product.id))) },
                                         isFavorite: { viewStore.state.favoriteProducts.ids.contains(product.id) }
                                     )
                                     .matchedGeometryEffect(id: product.boardgame.imageURL, in: animation)

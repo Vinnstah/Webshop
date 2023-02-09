@@ -16,7 +16,7 @@ public extension Browse {
         case task
         
         public enum FavoriteAction: Equatable, Sendable {
-            case favoriteButtonTapped(Product)
+            case favoriteButtonTapped(Product.ID)
             case loadFavoriteProducts([Product.ID])
             case removeFavouriteProduct(Product.ID)
             case addFavouriteProduct(Product.ID)

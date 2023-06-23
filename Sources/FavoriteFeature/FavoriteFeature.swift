@@ -67,10 +67,8 @@ public extension Favorites {
             switch action {
                 
             case .internal(.onAppear):
-//                return .run { send in
-//                    await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
-//                }
                 return .run { [apiClient] send in
+                    await send(.internal(.loadFavoriteProducts(try favouritesClient.getFavourites())))
                     return await send(.internal(.getProductResponse(
                         TaskResult {
                             try await apiClient.decodedResponse(

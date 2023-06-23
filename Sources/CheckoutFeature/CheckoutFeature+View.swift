@@ -25,7 +25,9 @@ public extension Checkout {
                                             Text("\(item.quantity.rawValue)")
                                     KFImage(URL(string: viewStore.state.products.first(where: { $0.id == item.id})?.boardgame.imageURL ?? ""))
                                                 .resizable()
+                                                .frame(width: 50, height: 50)
                                                 .scaledToFit()
+                                                
                                             VStack {
                                                 Text(viewStore.state.products.first(where: { $0.id == item.id})?.boardgame.title ?? "")
                                                 Text(viewStore.state.products.first(where: { $0.id == item.id})?.boardgame.category.rawValue ?? "")

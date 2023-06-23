@@ -10,7 +10,7 @@ let vaporRouting: Target.Dependency = .product(name: "VaporRouting", package: "v
 let urlRouting: Target.Dependency = .product(name: "URLRouting", package: "swift-url-routing")
 let tagged: Target.Dependency = .product(name: "Tagged", package: "swift-tagged")
 let kingfisher: Target.Dependency = .product(name: "Kingfisher", package: "Kingfisher")
-let dependencies: Target.Dependency = .product(name: "Dependencies", package: "swift-composable-architecture")
+let dependencies: Target.Dependency = .product(name: "Dependencies", package: "swift-dependencies")
 let asyncExtension: Target.Dependency =  .product(name: "AsyncExtensions", package: "AsyncExtensions")
 
 var swiftSettings: [SwiftSetting] = [
@@ -150,13 +150,15 @@ let package = Package(
             targets: ["WarehouseService"]),
     ],
     dependencies: [
+
         .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.11.1"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.47.1"),
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.66.1"),
-        .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.1"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.54.1"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.77.0"),
+        .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.3"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.5.1"),
         .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
-        .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.3.1"),
-        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.4.1"),
+        .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.5.0"),
+        .package(url: "https://github.com/onevcat/Kingfisher", from: "7.8.1"),
         .package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.2"),
     ],
     targets: [
@@ -243,9 +245,13 @@ let package = Package(
         .target(
             name: "CheckoutFeature",
             dependencies: [
+                kingfisher,
                 tca,
+                "ApiClient",
                 "CartModel",
                 "Product",
+                "SiteRouter",
+                "UserDefaultsClient",
             ],
             swiftSettings: swiftSettings
         ),

@@ -51,7 +51,8 @@ public extension Home {
                             .presentationDetents([.fraction(0.1)])
                         }
                 }
-                .overlay(alignment: .top, content: {
+                .overlay(alignment: .top) {
+                    
                     HStack {
                         Spacer()
                         
@@ -61,7 +62,6 @@ public extension Home {
                         : nil
                     }
                 }
-                )
                 .onChange(of: viewStore.state.cart) { newValue in
                     viewStore.send(.task)
                 }

@@ -61,18 +61,18 @@ public struct CartProductView : View {
     
     public var body: some View {
         HStack {
-            Text("\(item.quantity.rawValue)")
-            KFImage(URL(string: products.first(where: { $0.id == item.id})?.boardgame.imageURL ?? ""))
-                .resizable()
-                .scaledToFit()
-            VStack {
-                Text(products.first(where: { $0.id == item.id})?.boardgame.title ?? "")
-                Text(products.first(where: { $0.id == item.id})?.boardgame.category.rawValue ?? "")
+                    Text("\(item.quantity.rawValue)")
+                    KFImage(URL(string: products.first(where: { $0.id == item.id})?.boardgame.imageURL ?? ""))
+                        .resizable()
+                        .scaledToFit()
+                    VStack {
+                        Text(products.first(where: { $0.id == item.id})?.boardgame.title ?? "")
+                        Text(products.first(where: { $0.id == item.id})?.boardgame.category.rawValue ?? "")
+                    }
+                    Text("\(item.quantity.rawValue * (products.first?.price.brutto ?? 1))")
+                }
+                .frame(height: 30)
             }
-            Text("\(item.quantity.rawValue * (products.first?.price.brutto ?? 1))")
-        }
-        .frame(height: 30)
-    }
 }
 
 public extension CheckoutQuickView {

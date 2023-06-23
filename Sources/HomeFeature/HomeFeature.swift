@@ -9,7 +9,7 @@ import CartModel
 import FavoritesClient
 import Boardgame
 import Warehouse
-import BrowseFeature
+@preconcurrency import BrowseFeature
 import SharedCartStateClient
 import SearchClient
 

@@ -47,7 +47,7 @@ public extension Home {
                 )))
             }
         case let .cart(.createCartSessionResponse(.success(session))):
-            state.cart!.session = session
+            state.cart?.session = session
             return .none
             
         case .cart(.createCartSessionResponse(.failure(_))):
@@ -93,7 +93,6 @@ public extension Home {
             return .run { send in
                 try await self.clock.sleep(for: .milliseconds(500))
                 await send(.browse(.delegate(.dismissedDetails)), animation: .easeIn)
-//                await send(.task)
             }
             
         case .cart(.addProductToCartResponse(.failure(_))):
@@ -130,10 +129,8 @@ public extension Home {
         case .task:
             return .run { [cart = state.cart, text = state.searchText] send in
                 guard let cart else {
-                    print("FAILLLL")
                     return
                 }
-                print("OKAY")
                 await self.cartStateClient.sendAction(cart)
                 try await self.searchClient.sendSearchInput(text)
             }

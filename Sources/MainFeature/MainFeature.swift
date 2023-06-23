@@ -14,11 +14,10 @@ public struct Main: ReducerProtocol, Sendable {
 public extension Main {
     struct State: Equatable, Sendable {
         
-        //        public var selectedTab: Tab
         public var home: Identified<Tab, Home.State>
         public var favorites: Identified<Tab, Favorites.State>
         public var checkout: Identified<Tab, Checkout.State>
-        @BindableState var selectedTab: Tab
+        @BindingState var selectedTab: Tab
         
         public init(
             selectedTab: Tab = .home

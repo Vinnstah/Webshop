@@ -56,7 +56,7 @@ public extension Login {
             state.alert = AlertState(
                 title: TextState("Error"),
                 message: TextState(error.localizedDescription),
-                dismissButton: .cancel(TextState("Dismiss"), action: .none)
+                dismissButton: .cancel(TextState("Dismiss"))
             )
             return .none
             
